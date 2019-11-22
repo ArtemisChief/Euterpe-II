@@ -1,4 +1,4 @@
-package component;
+package component.interpreter;
 
 import entity.interpreter.Node;
 import entity.interpreter.Token;

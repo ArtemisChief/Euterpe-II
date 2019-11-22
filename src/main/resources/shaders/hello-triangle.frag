@@ -1,20 +1,11 @@
-
 #version 330
 
+in vec3 fragColor;
 
-#include semantic.glsl
+layout (location = 0) out vec4 outputColor;
 
+void main() {
 
-// Incoming interpolated (between vertices) color from the vertex shader.
-in vec3 interpolatedColor;
+    outputColor = vec4(fragColor, 1);
 
-
-// Outgoing final color.
-layout (location = FRAG_COLOR) out vec4 outputColor;
-
-
-void main()
-{
-    // We simply pad the interpolatedColor to vec4
-    outputColor = vec4(interpolatedColor, 1);
 }

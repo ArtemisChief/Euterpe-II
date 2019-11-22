@@ -1,4 +1,4 @@
-package component;
+package component.interpreter;
 
 import entity.interpreter.Token;
 import java.util.ArrayList;

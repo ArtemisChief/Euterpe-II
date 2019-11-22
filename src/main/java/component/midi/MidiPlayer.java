@@ -1,4 +1,4 @@
-package component;
+package component.midi;
 
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;

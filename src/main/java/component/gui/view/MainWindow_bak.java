@@ -2,12 +2,12 @@
  * Created by Chief on Thu Nov 15 10:05:17 CST 2018
  */
 
-package userInterface;
+package component.gui.view;
 
-import component.Lexical;
-import component.MidiPlayer;
-import component.Semantic;
-import component.Syntactic;
+import component.interpreter.Lexical;
+import component.interpreter.Semantic;
+import component.interpreter.Syntactic;
+import component.midi.MidiPlayer;
 import entity.interpreter.Node;
 import entity.interpreter.Token;
 import net.miginfocom.swing.MigLayout;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * @author Chief
  */
 
-public class GraphicalUserInterface extends JFrame {
+public class MainWindow_bak extends JFrame {
 
     private File midiFile;
     private File tempMidiFile;
@@ -160,8 +160,8 @@ public class GraphicalUserInterface extends JFrame {
     private String[] noteMapping;
     private boolean isNoteMappingPageOpen;
 
-    //初始化与案件绑定
-    public GraphicalUserInterface() {
+    //初始化与按键绑定
+    public MainWindow_bak() {
         initComponents();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
@@ -208,13 +208,13 @@ public class GraphicalUserInterface extends JFrame {
         });
 
         //按键映射保存按键的监听
-        outputTextPane.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (isNoteMappingPageOpen && e.getKeyCode() == KeyEvent.VK_S && e.isControlDown())
-                    saveNoteMapping();
-            }
-        });
+//        outputTextPane.addKeyListener(new KeyAdapter() {
+//            @Override
+//            public void keyPressed(KeyEvent e) {
+//                if (isNoteMappingPageOpen && e.getKeyCode() == KeyEvent.VK_S && e.isControlDown())
+//                    saveNoteMapping();
+//            }
+//        });
 
         //着色与补全、快捷键等的监听
         inputTextPane.addKeyListener(new KeyAdapter() {
@@ -283,7 +283,7 @@ public class GraphicalUserInterface extends JFrame {
         InputStatus inputStatus = new InputStatus();
         inputStatus.caretPos = inputTextPane.getCaretPosition();
         inputStatus.inputString = inputTextPane.getText();
-        inputStatusList.add(inputStatusListIndex, inputStatus);
+//        inputStatusList.add(inputStatusListIndex, inputStatus);
         inputStatusListMax = inputStatusListIndex;
         inputStatusListIndex++;
     }
@@ -433,7 +433,7 @@ public class GraphicalUserInterface extends JFrame {
             hasSaved = false;
 
             inputTextPane.setText("");
-            outputTextPane.setText("");
+//            outputTextPane.setText("");
             hasChanged = false;
             isLoadedMidiFile = false;
             this.setTitle("Euterpe - New Empty File");
@@ -490,7 +490,7 @@ public class GraphicalUserInterface extends JFrame {
             inputTextPane.setText(str);
             inputTextPane.setCaretPosition(0);
 
-            outputTextPane.setText("");
+//            outputTextPane.setText("");
             hasChanged = false;
             isLoadedMidiFile = false;
             this.setTitle("Euterpe - New Template File");
@@ -525,7 +525,7 @@ public class GraphicalUserInterface extends JFrame {
 
             inputTextPane.setText(stringBuilder.toString());
             inputTextPane.setCaretPosition(0);
-            outputTextPane.setText("");
+//            outputTextPane.setText("");
             hasSaved = true;
             hasChanged = false;
             stopDirectMenuItemActionPerformed(null);
@@ -609,7 +609,7 @@ public class GraphicalUserInterface extends JFrame {
         if (lexical.getError()) {
             output.append(lexical.getErrorInfo(tokens));
             output.append("\n检测到错误");
-            outputTextPane.setText(output.toString());
+//            outputTextPane.setText(output.toString());
             for (int line : lexical.getErrorLine()) {
                 inputStyledDocument.setCharacterAttributes(
                         getIndexByLine(line),
@@ -630,7 +630,7 @@ public class GraphicalUserInterface extends JFrame {
         if (syntactic.getIsError()) {
             output.append(syntactic.getErrors(AbstractSyntaxTree));
             output.append("\n检测到错误");
-            outputTextPane.setText(output.toString());
+//            outputTextPane.setText(output.toString());
             for (int line : syntactic.getErrorList()) {
                 inputStyledDocument.setCharacterAttributes(
                         getIndexByLine(line),
@@ -651,7 +651,7 @@ public class GraphicalUserInterface extends JFrame {
         if (semantic.getIsError()) {
             output.append(semantic.getErrors());
             output.append("\n检测到错误");
-            outputTextPane.setText(output.toString());
+//            outputTextPane.setText(output.toString());
             for (int line : semantic.getErrorLines()) {
                 inputStyledDocument.setCharacterAttributes(
                         getIndexByLine(line),
@@ -675,7 +675,7 @@ public class GraphicalUserInterface extends JFrame {
             return false;
 
         isNoteMappingPageOpen = false;
-        setOutputTextPaneEditable(false);
+//        setOutputTextPaneEditable(false);
 
         List<Token> tokens = runLex(inputTextPane.getText(), stringBuilder);
 
@@ -692,7 +692,7 @@ public class GraphicalUserInterface extends JFrame {
         if (code == null)
             return false;
 
-        outputTextPane.setText(code + "\n\n===========================================\nMidi Successfully Generated");
+//        outputTextPane.setText(code + "\n\n===========================================\nMidi Successfully Generated");
 
         return true;
     }
@@ -789,7 +789,7 @@ public class GraphicalUserInterface extends JFrame {
             playDirectMenuItem.setText("Pause");
             forbidOutputButton(true);
             isNoteMappingPageOpen = false;
-            setOutputTextPaneEditable(false);
+//            setOutputTextPaneEditable(false);
         }
 
         if (timer == null)
@@ -801,10 +801,10 @@ public class GraphicalUserInterface extends JFrame {
                 if (midiPlayer.getSequencer().isRunning()) {
                     if (hasSaved) {
                         midiPlayer.setTitle(file.getName().substring(0, file.getName().indexOf(".mui")));
-                        outputTextPane.setText(midiPlayer.getGraphicPlayer());
+//                        outputTextPane.setText(midiPlayer.getGraphicPlayer());
                     } else {
                         midiPlayer.setTitle("Untitled Song");
-                        outputTextPane.setText(midiPlayer.getGraphicPlayer());
+//                        outputTextPane.setText(midiPlayer.getGraphicPlayer());
                     }
                 }
             }
@@ -842,7 +842,6 @@ public class GraphicalUserInterface extends JFrame {
     //后退1秒
     private void backwardMenuItemActionPerformed(ActionEvent e) {
         fastMove(-1);
-
     }
 
     //前进五秒
@@ -856,159 +855,159 @@ public class GraphicalUserInterface extends JFrame {
     }
 
     //设置输出面板是否可编辑
-    private void setOutputTextPaneEditable(Boolean flag) {
-        outputTextPane.setEditable(flag);
-
-        if (flag) {
-            outputTextPane.setSelectedTextColor(Color.white);
-            outputTextPane.setSelectionColor(new Color(26, 125, 196));
-        } else {
-            outputTextPane.setSelectedTextColor(new Color(60, 60, 60));
-            outputTextPane.setSelectionColor(Color.white);
-        }
-    }
+//    private void setOutputTextPaneEditable(Boolean flag) {
+//        outputTextPane.setEditable(flag);
+//
+//        if (flag) {
+//            outputTextPane.setSelectedTextColor(Color.white);
+//            outputTextPane.setSelectionColor(new Color(26, 125, 196));
+//        } else {
+//            outputTextPane.setSelectedTextColor(new Color(60, 60, 60));
+//            outputTextPane.setSelectionColor(Color.white);
+//        }
+//    }
 
     //设置按键映射
-    private void setNoteMappingMenuItemActionPerformed(ActionEvent e) {
-        isNoteMappingPageOpen = true;
-        setOutputTextPaneEditable(true);
-
-        String str = "============================================\n" +
-                " \t\t  Set Note Mapping\n" +
-                "-------------------------------------------------------------------------\n" +
-                "* 此处用于设置数字键与音符的映射关系\n" +
-                "\n" +
-                "1.设置说明：\n" +
-                "\t1）需要修改的内容为“->”符号之后的内容\n" +
-                "\t2）理论上可以修改为任意值，长度不固定，数字字母皆可\n" +
-                "\t3）请保持此页面格式进行修改，不能删除空格，如1->#1，\n" +
-                "\t4）上一条示例意为按下数字键1输入#1，方便扒谱处理调性\n" +
-                "\t5）设置完成之后请在此文本框内使用Ctrl+S保存设置\n" +
-                "--------------------------------------------------------------------------\n" +
-                "\t0 -> " + noteMapping[0] + "\n" +
-                "\n" +
-                "\t1 -> " + noteMapping[1] + "\n" +
-                "\n" +
-                "\t2 -> " + noteMapping[2] + "\n" +
-                "\n" +
-                "\t3 -> " + noteMapping[3] + "\n" +
-                "\n" +
-                "\t4 -> " + noteMapping[4] + "\n" +
-                "\n" +
-                "\t5 -> " + noteMapping[5] + "\n" +
-                "\n" +
-                "\t6 -> " + noteMapping[6] + "\n" +
-                "\n" +
-                "\t7 -> " + noteMapping[7] + "\n" +
-                "\n" +
-                "\t8 -> " + noteMapping[8] + "\n" +
-                "\n" +
-                "\t9 -> " + noteMapping[9] + "\n" +
-                "============================================";
-
-        outputTextPane.setText(str);
-        outputTextPane.setCaretPosition(0);
-    }
+//    private void setNoteMappingMenuItemActionPerformed(ActionEvent e) {
+//        isNoteMappingPageOpen = true;
+//        setOutputTextPaneEditable(true);
+//
+//        String str = "============================================\n" +
+//                " \t\t  Set Note Mapping\n" +
+//                "-------------------------------------------------------------------------\n" +
+//                "* 此处用于设置数字键与音符的映射关系\n" +
+//                "\n" +
+//                "1.设置说明：\n" +
+//                "\t1）需要修改的内容为“->”符号之后的内容\n" +
+//                "\t2）理论上可以修改为任意值，长度不固定，数字字母皆可\n" +
+//                "\t3）请保持此页面格式进行修改，不能删除空格，如1->#1，\n" +
+//                "\t4）上一条示例意为按下数字键1输入#1，方便扒谱处理调性\n" +
+//                "\t5）设置完成之后请在此文本框内使用Ctrl+S保存设置\n" +
+//                "--------------------------------------------------------------------------\n" +
+//                "\t0 -> " + noteMapping[0] + "\n" +
+//                "\n" +
+//                "\t1 -> " + noteMapping[1] + "\n" +
+//                "\n" +
+//                "\t2 -> " + noteMapping[2] + "\n" +
+//                "\n" +
+//                "\t3 -> " + noteMapping[3] + "\n" +
+//                "\n" +
+//                "\t4 -> " + noteMapping[4] + "\n" +
+//                "\n" +
+//                "\t5 -> " + noteMapping[5] + "\n" +
+//                "\n" +
+//                "\t6 -> " + noteMapping[6] + "\n" +
+//                "\n" +
+//                "\t7 -> " + noteMapping[7] + "\n" +
+//                "\n" +
+//                "\t8 -> " + noteMapping[8] + "\n" +
+//                "\n" +
+//                "\t9 -> " + noteMapping[9] + "\n" +
+//                "============================================";
+//
+//        outputTextPane.setText(str);
+//        outputTextPane.setCaretPosition(0);
+//    }
 
     //保存按键映射
-    private void saveNoteMapping() {
-        String str = outputTextPane.getText();
-
-        Pattern pattern = Pattern.compile("\\d -> \\S+");
-
-        Matcher matcher = pattern.matcher(str);
-
-        int index = 0;
-        String[] tempNoteMapping = new String[10];
-
-        while (matcher.find()) {
-            String temp = matcher.group();
-            if (index < 10 && Integer.parseInt(temp.substring(0, 1)) == index) {
-                tempNoteMapping[index] = temp.replace(" ", "").substring(3);
-                index++;
-            } else
-                break;
-        }
-
-        String out;
-
-        if (index != 10) {
-            out = "============================================\n" +
-                    " \t\t  Set Note Mapping\n" +
-                    "-------------------------------------------------------------------------\n" +
-                    "* !!发现格式错误，请保持此页面格式进行修改!!\n" +
-                    "\n" +
-                    "1.设置说明：\n" +
-                    "\t1）需要修改的内容为“->”符号之后的内容\n" +
-                    "\t2）理论上可以修改为任意值，长度不固定，数字字母皆可\n" +
-                    "\t3）请保持此页面格式进行修改，不能删除空格，如1->#1，\n" +
-                    "\t4）上一条示例意为按下数字键1输入#1，方便扒谱处理调性\n" +
-                    "\t5）设置完成之后请在此文本框内使用Ctrl+S保存设置\n" +
-                    "--------------------------------------------------------------------------\n" +
-                    "\t0 -> " + noteMapping[0] + "\n" +
-                    "\n" +
-                    "\t1 -> " + noteMapping[1] + "\n" +
-                    "\n" +
-                    "\t2 -> " + noteMapping[2] + "\n" +
-                    "\n" +
-                    "\t3 -> " + noteMapping[3] + "\n" +
-                    "\n" +
-                    "\t4 -> " + noteMapping[4] + "\n" +
-                    "\n" +
-                    "\t5 -> " + noteMapping[5] + "\n" +
-                    "\n" +
-                    "\t6 -> " + noteMapping[6] + "\n" +
-                    "\n" +
-                    "\t7 -> " + noteMapping[7] + "\n" +
-                    "\n" +
-                    "\t8 -> " + noteMapping[8] + "\n" +
-                    "\n" +
-                    "\t9 -> " + noteMapping[9] + "\n" +
-                    "============================================";
-        } else {
-            noteMapping = tempNoteMapping;
-            out = "============================================\n" +
-                    " \t\t  Set Note Mapping\n" +
-                    "-------------------------------------------------------------------------\n" +
-                    "* 此处用于设置数字键与音符的映射关系（已保存）\n" +
-                    "\n" +
-                    "1.设置说明：\n" +
-                    "\t1）需要修改的内容为“->”符号之后的内容\n" +
-                    "\t2）理论上可以修改为任意值，长度不固定，数字字母皆可\n" +
-                    "\t3）请保持此页面格式进行修改，不能删除空格，如1->#1，\n" +
-                    "\t4）上一条示例意为按下数字键1输入#1，方便扒谱处理调性\n" +
-                    "\t5）设置完成之后请在此文本框内使用Ctrl+S保存设置\n" +
-                    "--------------------------------------------------------------------------\n" +
-                    "\t0 -> " + noteMapping[0] + "\n" +
-                    "\n" +
-                    "\t1 -> " + noteMapping[1] + "\n" +
-                    "\n" +
-                    "\t2 -> " + noteMapping[2] + "\n" +
-                    "\n" +
-                    "\t3 -> " + noteMapping[3] + "\n" +
-                    "\n" +
-                    "\t4 -> " + noteMapping[4] + "\n" +
-                    "\n" +
-                    "\t5 -> " + noteMapping[5] + "\n" +
-                    "\n" +
-                    "\t6 -> " + noteMapping[6] + "\n" +
-                    "\n" +
-                    "\t7 -> " + noteMapping[7] + "\n" +
-                    "\n" +
-                    "\t8 -> " + noteMapping[8] + "\n" +
-                    "\n" +
-                    "\t9 -> " + noteMapping[9] + "\n" +
-                    "============================================";
-        }
-
-        outputTextPane.setText(out);
-        outputTextPane.setCaretPosition(0);
-    }
+//    private void saveNoteMapping() {
+//        String str = outputTextPane.getText();
+//
+//        Pattern pattern = Pattern.compile("\\d -> \\S+");
+//
+//        Matcher matcher = pattern.matcher(str);
+//
+//        int index = 0;
+//        String[] tempNoteMapping = new String[10];
+//
+//        while (matcher.find()) {
+//            String temp = matcher.group();
+//            if (index < 10 && Integer.parseInt(temp.substring(0, 1)) == index) {
+//                tempNoteMapping[index] = temp.replace(" ", "").substring(3);
+//                index++;
+//            } else
+//                break;
+//        }
+//
+//        String out;
+//
+//        if (index != 10) {
+//            out = "============================================\n" +
+//                    " \t\t  Set Note Mapping\n" +
+//                    "-------------------------------------------------------------------------\n" +
+//                    "* !!发现格式错误，请保持此页面格式进行修改!!\n" +
+//                    "\n" +
+//                    "1.设置说明：\n" +
+//                    "\t1）需要修改的内容为“->”符号之后的内容\n" +
+//                    "\t2）理论上可以修改为任意值，长度不固定，数字字母皆可\n" +
+//                    "\t3）请保持此页面格式进行修改，不能删除空格，如1->#1，\n" +
+//                    "\t4）上一条示例意为按下数字键1输入#1，方便扒谱处理调性\n" +
+//                    "\t5）设置完成之后请在此文本框内使用Ctrl+S保存设置\n" +
+//                    "--------------------------------------------------------------------------\n" +
+//                    "\t0 -> " + noteMapping[0] + "\n" +
+//                    "\n" +
+//                    "\t1 -> " + noteMapping[1] + "\n" +
+//                    "\n" +
+//                    "\t2 -> " + noteMapping[2] + "\n" +
+//                    "\n" +
+//                    "\t3 -> " + noteMapping[3] + "\n" +
+//                    "\n" +
+//                    "\t4 -> " + noteMapping[4] + "\n" +
+//                    "\n" +
+//                    "\t5 -> " + noteMapping[5] + "\n" +
+//                    "\n" +
+//                    "\t6 -> " + noteMapping[6] + "\n" +
+//                    "\n" +
+//                    "\t7 -> " + noteMapping[7] + "\n" +
+//                    "\n" +
+//                    "\t8 -> " + noteMapping[8] + "\n" +
+//                    "\n" +
+//                    "\t9 -> " + noteMapping[9] + "\n" +
+//                    "============================================";
+//        } else {
+//            noteMapping = tempNoteMapping;
+//            out = "============================================\n" +
+//                    " \t\t  Set Note Mapping\n" +
+//                    "-------------------------------------------------------------------------\n" +
+//                    "* 此处用于设置数字键与音符的映射关系（已保存）\n" +
+//                    "\n" +
+//                    "1.设置说明：\n" +
+//                    "\t1）需要修改的内容为“->”符号之后的内容\n" +
+//                    "\t2）理论上可以修改为任意值，长度不固定，数字字母皆可\n" +
+//                    "\t3）请保持此页面格式进行修改，不能删除空格，如1->#1，\n" +
+//                    "\t4）上一条示例意为按下数字键1输入#1，方便扒谱处理调性\n" +
+//                    "\t5）设置完成之后请在此文本框内使用Ctrl+S保存设置\n" +
+//                    "--------------------------------------------------------------------------\n" +
+//                    "\t0 -> " + noteMapping[0] + "\n" +
+//                    "\n" +
+//                    "\t1 -> " + noteMapping[1] + "\n" +
+//                    "\n" +
+//                    "\t2 -> " + noteMapping[2] + "\n" +
+//                    "\n" +
+//                    "\t3 -> " + noteMapping[3] + "\n" +
+//                    "\n" +
+//                    "\t4 -> " + noteMapping[4] + "\n" +
+//                    "\n" +
+//                    "\t5 -> " + noteMapping[5] + "\n" +
+//                    "\n" +
+//                    "\t6 -> " + noteMapping[6] + "\n" +
+//                    "\n" +
+//                    "\t7 -> " + noteMapping[7] + "\n" +
+//                    "\n" +
+//                    "\t8 -> " + noteMapping[8] + "\n" +
+//                    "\n" +
+//                    "\t9 -> " + noteMapping[9] + "\n" +
+//                    "============================================";
+//        }
+//
+//        outputTextPane.setText(out);
+//        outputTextPane.setCaretPosition(0);
+//    }
 
     //关于
     private void aboutMenuItemActionPerformed(ActionEvent e) {
         isNoteMappingPageOpen = false;
-        setOutputTextPaneEditable(false);
+//        setOutputTextPaneEditable(false);
 
         String str = "============================================\n" +
                 "\t\t          Euterpe\n" +
@@ -1035,8 +1034,8 @@ public class GraphicalUserInterface extends JFrame {
                 "\t\t\t\t   All Rights Reserved. \n" +
                 "    \t    Copyright © 2018-2020 Chief, yyzih and AsrielMao.\n" +
                 "============================================";
-        outputTextPane.setText(str);
-        outputTextPane.setCaretPosition(0);
+//        outputTextPane.setText(str);
+//        outputTextPane.setCaretPosition(0);
     }
 
     //展示Demo
@@ -1097,7 +1096,7 @@ public class GraphicalUserInterface extends JFrame {
     //显示提示
     private void tipsMenuItemActionPerformed(ActionEvent e) {
         isNoteMappingPageOpen = false;
-        setOutputTextPaneEditable(false);
+//        setOutputTextPaneEditable(false);
 
         String str = "============================================\n" +
                 "                                                  Tips\n" +
@@ -1131,14 +1130,14 @@ public class GraphicalUserInterface extends JFrame {
                 "\t2）“&”左右的声部将同时播放，\n" +
                 "\t3）“ , ”左右的声部将先后播放\n" +
                 "===========================================";
-        outputTextPane.setText(str);
-        outputTextPane.setCaretPosition(0);
+//        outputTextPane.setText(str);
+//        outputTextPane.setCaretPosition(0);
     }
 
     //显示乐器列表
     private void instruMenuItemActionPerformed(ActionEvent e) {
         isNoteMappingPageOpen = false;
-        setOutputTextPaneEditable(false);
+//        setOutputTextPaneEditable(false);
 
         String str = "===========================================\n" +
                 "                                            Instrument\n" +
@@ -1225,8 +1224,8 @@ public class GraphicalUserInterface extends JFrame {
                 "62\t合成铜管1\t                |\t126\t鼓掌\n" +
                 "63\t合成铜管2\t                |\t127\t枪声\n" +
                 "===========================================";
-        outputTextPane.setText(str);
-        outputTextPane.setCaretPosition(0);
+//        outputTextPane.setText(str);
+//        outputTextPane.setCaretPosition(0);
     }
 
     //退出
@@ -1238,6 +1237,10 @@ public class GraphicalUserInterface extends JFrame {
 
             System.exit(0);
         }
+    }
+
+    private void setNoteMappingMenuItemActionPerformed(ActionEvent e) {
+        // TODO add your code here
     }
 
     private void initComponents() {
@@ -1276,8 +1279,7 @@ public class GraphicalUserInterface extends JFrame {
         lineTextArea = new JTextArea();
         scrollPane1 = new JScrollPane();
         inputTextPane = new JTextPane();
-        scrollPane2 = new JScrollPane();
-        outputTextPane = new JTextPane();
+        panel2 = new JPanel();
 
         //======== this ========
         setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
@@ -1432,7 +1434,7 @@ public class GraphicalUserInterface extends JFrame {
             panel1.setLayout(new MigLayout(
                 "insets 0,hidemode 3",
                 // columns
-                "[fill]0" +
+                "[40,fill]0" +
                 "[400:400:875,grow,fill]0" +
                 "[460:460:1005,grow,fill]",
                 // rows
@@ -1464,19 +1466,11 @@ public class GraphicalUserInterface extends JFrame {
             }
             panel1.add(scrollPane1, "cell 1 0,width 400:400:875,height 640:640:1080");
 
-            //======== scrollPane2 ========
+            //======== panel2 ========
             {
-
-                //---- outputTextPane ----
-                outputTextPane.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
-                outputTextPane.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-                outputTextPane.setBorder(null);
-                outputTextPane.setSelectionColor(Color.white);
-                outputTextPane.setSelectedTextColor(new Color(60, 60, 60));
-                outputTextPane.setEditable(false);
-                scrollPane2.setViewportView(outputTextPane);
+                panel2.setLayout(null);
             }
-            panel1.add(scrollPane2, "cell 2 0,width 460:460:1005,height 640:640:1080");
+            panel1.add(panel2, "cell 2 0");
         }
         contentPane.add(panel1);
         pack();
@@ -1519,8 +1513,7 @@ public class GraphicalUserInterface extends JFrame {
     private JTextArea lineTextArea;
     private JScrollPane scrollPane1;
     private JTextPane inputTextPane;
-    private JScrollPane scrollPane2;
-    private JTextPane outputTextPane;
+    private JPanel panel2;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 
 }
