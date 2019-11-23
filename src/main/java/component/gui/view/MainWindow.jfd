@@ -6,7 +6,7 @@ new FormModel {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
 			"$layoutConstraints": "insets 0,hidemode 3,gap 0 0"
 			"$columnConstraints": "[40,fill][430,fill][810,fill]"
-			"$rowConstraints": "[690,fill]"
+			"$rowConstraints": "0[690,fill]0[45,fill]0"
 		} ) {
 			name: "this"
 			"defaultCloseOperation": 3
@@ -51,6 +51,19 @@ new FormModel {
 				}
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 2 0"
+			} )
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "outputScrollPane"
+				add( new FormComponent( "javax.swing.JTextArea" ) {
+					name: "outputTextArea"
+					"font": new java.awt.Font( "Microsoft YaHei", 0, 12 )
+					"editable": false
+					auxiliary() {
+						"JavaCodeGenerator.variableModifiers": 1
+					}
+				} )
+			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
+				"value": "cell 0 1 2 1"
 			} )
 			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
 				name: "menuBar1"
@@ -154,16 +167,6 @@ new FormModel {
 					name: "toolMenu"
 					"text": "Tool"
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
-						name: "setNoteMappingMenuItem"
-						"text": "Set Note Mapping"
-						auxiliary() {
-							"JavaCodeGenerator.variableModifiers": 1
-						}
-					} )
-					add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
-						name: "separator7"
-					} )
-					add( new FormComponent( "javax.swing.JMenuItem" ) {
 						name: "transposerMenuItem"
 						"text": "Transposer"
 						auxiliary() {
@@ -197,34 +200,38 @@ new FormModel {
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-					name: "menu1"
-					"text": "                                                                                          Euterpe 2                                                                                                                                        "
+					name: "titleMenu"
+					"text": "                                                                                               Euterpe 2                                                                                                                                             "
 					"opaque": false
 					"borderPainted": false
 					"enabled": false
+					addEvent( new FormEvent( "java.awt.event.MouseListener", "mousePressed", "titleMenuMousePressed", true ) )
+					addEvent( new FormEvent( "java.awt.event.MouseMotionListener", "mouseDragged", "titleMenuMouseDragged", true ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "minimizeButton"
 					"borderPainted": false
 					"font": &Font0 new java.awt.Font( "Consolas", 0, 12 )
-					"icon": new com.jformdesigner.model.SwingIcon( 1, "F:\\Works\\μScore\\MusicScoreBook\\resources\\最小化1.png" )
-					"rolloverIcon": new com.jformdesigner.model.SwingIcon( 1, "F:\\Works\\μScore\\MusicScoreBook\\resources\\最小化3.png" )
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/minimize0.png" )
+					"rolloverIcon": new com.jformdesigner.model.SwingIcon( 0, "/icons/minimize1.png" )
 					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"rolloverSelectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/icons/minimize1.png" )
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "minimizeButtonActionPerformed", true ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "closeButton"
 					"borderPainted": false
 					"font": #Font0
-					"icon": new com.jformdesigner.model.SwingIcon( 1, "F:\\Works\\μScore\\MusicScoreBook\\resources\\关闭1.png" )
-					"rolloverIcon": new com.jformdesigner.model.SwingIcon( 1, "F:\\Works\\μScore\\MusicScoreBook\\resources\\关闭6.png" )
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/close0.png" )
+					"rolloverIcon": new com.jformdesigner.model.SwingIcon( 0, "/icons/close1.png" )
 					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"rolloverSelectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/icons/close1.png" )
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "closeButtonActionPerformed", true ) )
 				} )
 			}
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 1280, 750 )
+			"size": new java.awt.Dimension( 1280, 795 )
 		} )
 	}
 }

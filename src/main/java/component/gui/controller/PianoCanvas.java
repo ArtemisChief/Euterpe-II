@@ -71,6 +71,8 @@ public class PianoCanvas implements GLEventListener{
 
         gl.glEnable(GL_DEPTH_TEST);
 
+        gl.setSwapInterval(1);
+
         start = System.currentTimeMillis();
     }
 
@@ -130,7 +132,7 @@ public class PianoCanvas implements GLEventListener{
 
     private void initProgram(GL3 gl) {
 
-        program = new Program(gl, getClass(), "shaders", "hello-triangle.vert", "hello-triangle.frag", "model");
+        program = new Program(gl, getClass(), "shaders", "Euterpe.vert", "Euterpe.frag", "model");
 
         int globalMatricesBI = gl.glGetUniformBlockIndex(program.name, "GlobalMatrices");
 

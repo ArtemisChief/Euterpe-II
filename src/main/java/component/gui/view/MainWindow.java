@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
 
+import component.gui.controller.InputTexts;
 import component.gui.controller.Menus;
 import component.gui.controller.PianoCanvas;
 import net.miginfocom.swing.*;
@@ -31,9 +32,11 @@ public class MainWindow extends JFrame implements KeyListener {
     private static MainWindow instance = new MainWindow();
 
     // 获取单例
-    public static MainWindow getInstance() {
+    public static MainWindow GetInstance() {
         return instance;
     }
+
+    Point pressedPoint;
 
     private static Animator animator;
 
@@ -64,7 +67,7 @@ public class MainWindow extends JFrame implements KeyListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 animator.stop();
-                System.exit(1);
+                System.exit(0);
             }
         });
 
@@ -78,12 +81,15 @@ public class MainWindow extends JFrame implements KeyListener {
 
         lineScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         lineScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        lineScrollPane.getVerticalScrollBar().addAdjustmentListener(
+        inputScrollPane.getVerticalScrollBar().addAdjustmentListener(
                 e -> lineScrollPane.getVerticalScrollBar().setValue(inputScrollPane.getVerticalScrollBar().getValue()));
     }
 
     public MainWindow init() {
-        Menus.Init();
+        Menus.GetInstance().init();
+
+        InputTexts.GetInstance().init();
+
         return instance;
     }
 
@@ -108,6 +114,20 @@ public class MainWindow extends JFrame implements KeyListener {
         System.exit(0);
     }
 
+    // 拖动窗口-按下鼠标
+    private void titleMenuMousePressed(MouseEvent e) {
+        pressedPoint = e.getPoint();
+    }
+
+    // 拖动窗口-移动位置
+    private void titleMenuMouseDragged(MouseEvent e) {
+        Point point = e.getPoint();
+        Point locationPoint = getLocation();
+        int x = locationPoint.x + point.x - pressedPoint.x;
+        int y = locationPoint.y + point.y - pressedPoint.y;
+        setLocation(x, y);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         menuBar1 = new JMenuBar();
@@ -127,13 +147,12 @@ public class MainWindow extends JFrame implements KeyListener {
         playDirectMenuItem = new JMenuItem();
         stopDirectMenuItem = new JMenuItem();
         toolMenu = new JMenu();
-        setNoteMappingMenuItem = new JMenuItem();
         transposerMenuItem = new JMenuItem();
         helpMenu = new JMenu();
         instruMenuItem = new JMenuItem();
         tipsMenuItem = new JMenuItem();
         aboutMenuItem = new JMenuItem();
-        menu1 = new JMenu();
+        titleMenu = new JMenu();
         minimizeButton = new JButton();
         closeButton = new JButton();
         lineScrollPane = new JScrollPane();
@@ -141,6 +160,8 @@ public class MainWindow extends JFrame implements KeyListener {
         inputScrollPane = new JScrollPane();
         inputTextPane = new JTextPane();
         canvasPanel = new JPanel();
+        outputScrollPane = new JScrollPane();
+        outputTextArea = new JTextArea();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -155,7 +176,8 @@ public class MainWindow extends JFrame implements KeyListener {
             "[430,fill]" +
             "[810,fill]",
             // rows
-            "[690,fill]"));
+            "0[690,fill]0" +
+            "[45,fill]0"));
 
         //======== menuBar1 ========
         {
@@ -224,11 +246,6 @@ public class MainWindow extends JFrame implements KeyListener {
             {
                 toolMenu.setText("Tool");
 
-                //---- setNoteMappingMenuItem ----
-                setNoteMappingMenuItem.setText("Set Note Mapping");
-                toolMenu.add(setNoteMappingMenuItem);
-                toolMenu.addSeparator();
-
                 //---- transposerMenuItem ----
                 transposerMenuItem.setText("Transposer");
                 toolMenu.add(transposerMenuItem);
@@ -253,30 +270,44 @@ public class MainWindow extends JFrame implements KeyListener {
             }
             menuBar1.add(helpMenu);
 
-            //======== menu1 ========
+            //======== titleMenu ========
             {
-                menu1.setText("                                                                                          Euterpe 2                                                                                                                                        ");
-                menu1.setOpaque(false);
-                menu1.setBorderPainted(false);
-                menu1.setEnabled(false);
+                titleMenu.setText("                                                                                               Euterpe 2                                                                                                                                             ");
+                titleMenu.setOpaque(false);
+                titleMenu.setBorderPainted(false);
+                titleMenu.setEnabled(false);
+                titleMenu.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        titleMenuMousePressed(e);
+                    }
+                });
+                titleMenu.addMouseMotionListener(new MouseMotionAdapter() {
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        titleMenuMouseDragged(e);
+                    }
+                });
             }
-            menuBar1.add(menu1);
+            menuBar1.add(titleMenu);
 
             //---- minimizeButton ----
             minimizeButton.setBorderPainted(false);
             minimizeButton.setFont(new Font("Consolas", Font.PLAIN, 12));
-            minimizeButton.setIcon(new ImageIcon("F:\\Works\\\u03bcScore\\MusicScoreBook\\resources\\\u6700\u5c0f\u53161.png"));
-            minimizeButton.setRolloverIcon(new ImageIcon("F:\\Works\\\u03bcScore\\MusicScoreBook\\resources\\\u6700\u5c0f\u53163.png"));
+            minimizeButton.setIcon(new ImageIcon(getClass().getResource("/icons/minimize0.png")));
+            minimizeButton.setRolloverIcon(new ImageIcon(getClass().getResource("/icons/minimize1.png")));
             minimizeButton.setBorder(null);
+            minimizeButton.setRolloverSelectedIcon(new ImageIcon(getClass().getResource("/icons/minimize1.png")));
             minimizeButton.addActionListener(e -> minimizeButtonActionPerformed(e));
             menuBar1.add(minimizeButton);
 
             //---- closeButton ----
             closeButton.setBorderPainted(false);
             closeButton.setFont(new Font("Consolas", Font.PLAIN, 12));
-            closeButton.setIcon(new ImageIcon("F:\\Works\\\u03bcScore\\MusicScoreBook\\resources\\\u5173\u95ed1.png"));
-            closeButton.setRolloverIcon(new ImageIcon("F:\\Works\\\u03bcScore\\MusicScoreBook\\resources\\\u5173\u95ed6.png"));
+            closeButton.setIcon(new ImageIcon(getClass().getResource("/icons/close0.png")));
+            closeButton.setRolloverIcon(new ImageIcon(getClass().getResource("/icons/close1.png")));
             closeButton.setBorder(null);
+            closeButton.setRolloverSelectedIcon(new ImageIcon(getClass().getResource("/icons/close1.png")));
             closeButton.addActionListener(e -> closeButtonActionPerformed(e));
             menuBar1.add(closeButton);
         }
@@ -313,6 +344,16 @@ public class MainWindow extends JFrame implements KeyListener {
             canvasPanel.setLayout(null);
         }
         contentPane.add(canvasPanel, "cell 2 0");
+
+        //======== outputScrollPane ========
+        {
+
+            //---- outputTextArea ----
+            outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+            outputTextArea.setEditable(false);
+            outputScrollPane.setViewportView(outputTextArea);
+        }
+        contentPane.add(outputScrollPane, "cell 0 1 2 1");
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -336,13 +377,12 @@ public class MainWindow extends JFrame implements KeyListener {
     public JMenuItem playDirectMenuItem;
     public JMenuItem stopDirectMenuItem;
     private JMenu toolMenu;
-    public JMenuItem setNoteMappingMenuItem;
     public JMenuItem transposerMenuItem;
     private JMenu helpMenu;
     public JMenuItem instruMenuItem;
     public JMenuItem tipsMenuItem;
     public JMenuItem aboutMenuItem;
-    private JMenu menu1;
+    private JMenu titleMenu;
     private JButton minimizeButton;
     private JButton closeButton;
     private JScrollPane lineScrollPane;
@@ -350,5 +390,7 @@ public class MainWindow extends JFrame implements KeyListener {
     private JScrollPane inputScrollPane;
     public JTextPane inputTextPane;
     public JPanel canvasPanel;
+    private JScrollPane outputScrollPane;
+    public JTextArea outputTextArea;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
