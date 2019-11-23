@@ -1,11 +1,6 @@
 package component.gui.controller;
 
-
-import com.jogamp.newt.event.WindowAdapter;
-import com.jogamp.newt.event.WindowEvent;
-import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.mat.Mat4x4;
 import glm.vec._2.Vec2;
@@ -29,7 +24,7 @@ import static glm.GlmKt.glm;
 import static uno.buffer.UtilKt.destroyBuffers;
 import static uno.gl.GlErrorKt.checkError;
 
-public class PianoCanvas implements GLEventListener{
+public class PianoCanvas implements GLEventListener {
 
     private float[] vertexData = {
             -1, -1, 1, 0, 0,

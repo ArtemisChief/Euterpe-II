@@ -6,27 +6,31 @@ package component.gui.view;
 
 import java.awt.event.*;
 
-import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
-import com.jogamp.newt.event.KeyListener;
 
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 
 import component.gui.controller.InputTexts;
 import component.gui.controller.Menus;
 import component.gui.controller.PianoCanvas;
+import component.midi.MidiPiano;
+import component.midi.MidiPlayer;
 import net.miginfocom.swing.*;
 
 /**
  * @author Chief
  */
-public class MainWindow extends JFrame implements KeyListener {
+public class MainWindow extends JFrame {
 
     // 单例
     private static MainWindow instance = new MainWindow();
@@ -57,6 +61,29 @@ public class MainWindow extends JFrame implements KeyListener {
         final GLCanvas glcanvas = new GLCanvas(glCapabilities);
         glcanvas.setSize(canvasPanel.getSize());
         glcanvas.addGLEventListener(pianoCanvas);
+        glcanvas.addKeyListener(new KeyListener() {
+
+            List<Integer> keyDownList = new ArrayList<>();
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (!keyDownList.contains(e.getKeyCode())) {
+                    MidiPiano.GetInstance().pressKey(e);
+                    keyDownList.add(e.getKeyCode());
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                MidiPiano.GetInstance().releasedKey(e);
+                keyDownList.remove(keyDownList.indexOf(e.getKeyCode()));
+            }
+        });
 
         canvasPanel.add(glcanvas);
 
@@ -93,17 +120,6 @@ public class MainWindow extends JFrame implements KeyListener {
         return instance;
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
-
     // 最小化窗口
     private void minimizeButtonActionPerformed(ActionEvent e) {
         setExtendedState(JFrame.ICONIFIED);
@@ -111,6 +127,7 @@ public class MainWindow extends JFrame implements KeyListener {
 
     // 关闭窗口
     private void closeButtonActionPerformed(ActionEvent e) {
+        MidiPlayer.GetInstance().close();
         System.exit(0);
     }
 

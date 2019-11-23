@@ -122,6 +122,7 @@ public class Menus {
 
         // 退出
         MainWindow.GetInstance().exitMenuItem.addActionListener(e -> {
+            MidiPlayer.GetInstance().close();
             System.exit(0);
         });
 

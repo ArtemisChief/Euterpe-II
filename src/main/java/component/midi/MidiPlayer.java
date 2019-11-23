@@ -34,8 +34,6 @@ public class MidiPlayer {
 
             sequencer.getTransmitter().setReceiver(synthesizer.getReceiver());
 
-            synthesizer.unloadAllInstruments(synthesizer.getDefaultSoundbank());
-
             isLoadedMidiFile = false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,8 +82,17 @@ public class MidiPlayer {
         isLoadedMidiFile = false;
     }
 
+    public Synthesizer getSynthesizer() {
+        return synthesizer;
+    }
+
     public Sequencer getSequencer() {
         return sequencer;
+    }
+
+    public void close() {
+        sequencer.close();
+        synthesizer.close();
     }
 
 }
