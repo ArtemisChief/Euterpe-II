@@ -1,6 +1,6 @@
 import com.alee.laf.WebLookAndFeel;
 import com.alee.skin.dark.DarkSkin;
-import component.gui.view.MainWindow;
+import gui.view.MainWindow;
 
 /**
  * ░░░░░░░░░░░▄▀▄▀▀▀▀▄▀▄░░░░░░░░░░░░░░░░░░
