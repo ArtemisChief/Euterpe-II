@@ -7,22 +7,12 @@ package gui.view;
 import java.awt.event.*;
 import javax.swing.border.*;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
-import com.jogamp.opengl.util.Animator;
-
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
 
 import gui.controller.InputTexts;
 import gui.controller.Menus;
-import gui.controller.PianoCanvas;
-import midi.component.MidiPiano;
+import pianoroll.component.PianoCanvas;
 import midi.component.MidiPlayer;
 import net.miginfocom.swing.*;
 
@@ -169,7 +159,7 @@ public class MainWindow extends JFrame {
             // columns
             "[40,fill]" +
             "[430,fill]" +
-            "[810,fill]",
+            "[930,fill]",
             // rows
             "[690,fill]0" +
             "[45,fill]0"));
