@@ -18,7 +18,7 @@ public abstract class Key {
 
     public void press() {
         try {
-            ShortMessage shortMessage = new ShortMessage(144, 0, pitch, 127);
+            ShortMessage shortMessage = new ShortMessage(144, 0, pitch, 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -27,7 +27,7 @@ public abstract class Key {
 
     public void release() {
         try {
-            ShortMessage shortMessage = new ShortMessage(128, 0, pitch, 127);
+            ShortMessage shortMessage = new ShortMessage(128, 0, pitch, 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
         } catch (Exception e) {
             e.printStackTrace();
