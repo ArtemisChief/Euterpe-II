@@ -7,14 +7,17 @@ import com.jogamp.opengl.util.GLBuffers;
 import glm.mat.Mat4x4;
 import glm.vec._2.Vec2;
 import glm.vec._3.Vec3;
+import pianoroll.entity.Key;
 import pianoroll.entity.KeyBlack;
 import pianoroll.entity.KeyWhite;
 import uno.glsl.Program;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,26 +48,13 @@ public class PianoCanvas implements GLEventListener {
         int VERTEX_KEYWHITE = 0;
         int VERTEX_KEYBLACK = 1;
 //        int VERTEX_ROLLS = 2;
-        int COLOR_INSTANCE_KEYWHITE = 2;
-        int COLOR_INSTANCE_KEYBLACK = 3;
-//        int COLOR_INSTANCE_ROLLS =6;
-        int POSITION_INSTANCE_KEYWHITE = 4;
-        int POSITION_INSTANCE_KEYBLACK = 5;
-//        int POSITION_INSTANCE_ROLLS = 5;
-        int ELEMENT = 6;
-        int GLOBAL_MATRICES = 7;
-        int MAX = 8;
-    }
-
-    private interface VertexArray {
-        int KEYWHITE = 0;
-        int KEYBLACK = 1;
-//        int ROLLS = 2;
-        int MAX = 2;
+        int ELEMENT = 2;
+        int GLOBAL_MATRICES = 3;
+        int MAX = 4;
     }
 
     private IntBuffer bufferName = GLBuffers.newDirectIntBuffer(Buffer.MAX);
-    private IntBuffer vertexArrayName = GLBuffers.newDirectIntBuffer(VertexArray.MAX);
+    private IntBuffer vertexArrayName = GLBuffers.newDirectIntBuffer(88);
 
     private FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer(4);
     private FloatBuffer clearDepth = GLBuffers.newDirectFloatBuffer(1);
@@ -76,6 +66,7 @@ public class PianoCanvas implements GLEventListener {
     private PianoCanvas(){ }
 
     public static void Setup() {
+
         GLProfile glProfile = GLProfile.get(GLProfile.GL3);
         GLCapabilities glCapabilities = new GLCapabilities(glProfile);
 
@@ -128,24 +119,23 @@ public class PianoCanvas implements GLEventListener {
 
     private void initBuffers(GL3 gl) {
 
-        List<java.nio.Buffer> bufferList = new ArrayList<>();
-        bufferList.add(GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData()));
-        bufferList.add(GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData()));
-        bufferList.add(GLBuffers.newDirectFloatBuffer(PianoKeys.GetColorsWhite()));
-        bufferList.add(GLBuffers.newDirectFloatBuffer(PianoKeys.GetColorsBlack()));
-        bufferList.add(GLBuffers.newDirectFloatBuffer(PianoKeys.GetAnchorsWhite()));
-        bufferList.add(GLBuffers.newDirectFloatBuffer(PianoKeys.GetAnchorsBlack()));
-        bufferList.add(GLBuffers.newDirectShortBuffer(elementData));
+        FloatBuffer vertexBufferWhite = GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData());
+        FloatBuffer vertexBufferBlack = GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData());
+        ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
 
         gl.glGenBuffers(Buffer.MAX, bufferName);
 
-        for (int buffer = 0; buffer < Buffer.GLOBAL_MATRICES; buffer++) {
-            gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(buffer));
-            gl.glBufferData(GL_ARRAY_BUFFER, bufferList.get(buffer).capacity() * Float.BYTES, bufferList.get(buffer), GL_STATIC_DRAW);
-            gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Buffer.VERTEX_KEYWHITE));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferWhite.capacity() * Float.BYTES, vertexBufferWhite, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            destroyBuffers(bufferList.get(buffer));
-        }
+        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Buffer.VERTEX_KEYBLACK));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferBlack.capacity() * Float.BYTES, vertexBufferBlack, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferName.get(Buffer.ELEMENT));
+        gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer.capacity() * Short.BYTES, elementBuffer, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
         gl.glBufferData(GL_UNIFORM_BUFFER, Mat4x4.SIZE * 2, null, GL_STREAM_DRAW);
@@ -153,38 +143,34 @@ public class PianoCanvas implements GLEventListener {
 
         gl.glBindBufferBase(GL_UNIFORM_BUFFER, 4, bufferName.get(Buffer.GLOBAL_MATRICES));
 
+        destroyBuffers(vertexBufferWhite, vertexBufferBlack, elementBuffer);
+
         checkError(gl, "initBuffers");
     }
 
     private void initVertexArray(GL3 gl) {
 
-        gl.glGenVertexArrays(VertexArray.MAX, vertexArrayName);
+        gl.glGenVertexArrays(88, vertexArrayName);
 
-        for(int vertex=0;vertex<VertexArray.MAX;vertex++) {
-            gl.glBindVertexArray(vertexArrayName.get(vertex));
+        for (int trackID = 0; trackID < 88; trackID++) {
+            int buffer;
+            if (PianoKeys.isWhiteKey(trackID))
+                buffer = bufferName.get(Buffer.VERTEX_KEYWHITE);
+            else
+                buffer = bufferName.get(Buffer.VERTEX_KEYBLACK);
+
+            gl.glBindVertexArray(vertexArrayName.get(trackID));
             {
-                gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(vertex));
+                gl.glBindBuffer(GL_ARRAY_BUFFER, buffer);
                 {
                     gl.glEnableVertexAttribArray(0);
                     gl.glVertexAttribPointer(0, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
-
-                    gl.glEnableVertexAttribArray(1);
-                    gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(vertex + 2));
-                    gl.glVertexAttribPointer(1, Vec3.length, GL_FLOAT, false, Vec3.SIZE, 0);
-                    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-                    gl.glVertexAttribDivisor(1, 1);
-
-                    gl.glEnableVertexAttribArray(2);
-                    gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(vertex + 4));
-                    gl.glVertexAttribPointer(2, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
-                    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-                    gl.glVertexAttribDivisor(2, 1);
                 }
                 gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                 gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferName.get(Buffer.ELEMENT));
             }
-            gl.glBindVertexArray(vertex);
+            gl.glBindVertexArray(0);
         }
 
         checkError(gl, "initVao");
@@ -192,7 +178,7 @@ public class PianoCanvas implements GLEventListener {
 
     private void initProgram(GL3 gl) {
 
-        program = new Program(gl, getClass(), "shaders", "Euterpe.vert", "Euterpe.frag", "model");
+        program = new Program(gl, getClass(), "shaders", "Euterpe.vert", "Euterpe.frag", "trackID", "colorID", "model");
 
         int globalMatricesBI = gl.glGetUniformBlockIndex(program.name, "GlobalMatrices");
 
@@ -213,7 +199,7 @@ public class PianoCanvas implements GLEventListener {
         {
             Mat4x4 view = new Mat4x4();
             view
-                    .scale(15.3f)
+                    .scale(7.67f)
                     .to(matBuffer);
 
             gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
@@ -234,22 +220,12 @@ public class PianoCanvas implements GLEventListener {
             gl.glUniformMatrix4fv(program.get("model"), 1, false, matBuffer);
         }
 
-        gl.glBindVertexArray(vertexArrayName.get(VertexArray.KEYBLACK));
-        gl.glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0,36);
-
-        gl.glBindVertexArray(vertexArrayName.get(VertexArray.KEYWHITE));
-        gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.COLOR_INSTANCE_KEYWHITE));
-        for(int keyId:PianoKeys.GetPressingWhiteList())
-            gl.glBufferSubData(GL_UNIFORM_BUFFER, keyId*Vec3.SIZE, Vec3.SIZE, GLBuffers.newDirectFloatBuffer(KeyWhite.GetDownColorData()));
-        for(int keyId:PianoKeys.GetReleasingWhiteList()) {
-            gl.glBufferSubData(GL_UNIFORM_BUFFER, keyId * Vec3.SIZE, Vec3.SIZE, GLBuffers.newDirectFloatBuffer(KeyWhite.GetColorData()));
-            glcanvas.invoke(false, drawable1 -> {
-                PianoKeys.RemoveFromReleasingWhiteList(keyId);
-                return true;
-            });
+        for (Key key:PianoKeys.GetKeyList()) {
+            gl.glBindVertexArray(vertexArrayName.get(key.getTrackID()));
+            gl.glUniform1i(program.get("trackID"), key.getTrackID());
+            gl.glUniform1i(program.get("colorID"), key.getColorID());
+            gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         }
-        gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        gl.glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0,52);
 
         gl.glUseProgram(0);
         gl.glBindVertexArray(0);

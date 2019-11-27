@@ -22,15 +22,6 @@ public class PianoKeys {
 
     private static List<Key> keyList;
 
-    private static List<Key> keyWhiteList;
-    private static List<Key> keyBlackList;
-
-    private static float[] anchorsWhite;
-    private static float[] anchorsBlack;
-
-    private static float[] colorsWhite;
-    private static float[] colorsBlack;
-
     private static List<Integer> pressingWhiteList;
     private static List<Integer> releasingWhiteList;
 
@@ -43,70 +34,17 @@ public class PianoKeys {
 
         keyList = new ArrayList<>();
 
-        keyWhiteList = new ArrayList<>();
-        keyBlackList = new ArrayList<>();
+        pressingWhiteList = new ArrayList<>();
+        releasingWhiteList = new ArrayList<>();
 
-        anchorsWhite = new float[52 * 2];
-        anchorsBlack = new float[36 * 2];
+        pressingBlackList = new ArrayList<>();
+        releasingBlackList = new ArrayList<>();
 
-        colorsWhite = new float[52 * 3];
-        colorsBlack = new float[36 * 3];
-
-        pressingWhiteList=new ArrayList<>();
-        releasingWhiteList=new ArrayList<>();
-
-        pressingBlackList=new ArrayList<>();
-        releasingBlackList=new ArrayList<>();
-
-        Key key;
-
-        for (int i = 21; i < 109; i++) {
-            if (isWhiteKey(i)) {
-                key = new KeyWhite(i);
-                keyWhiteList.add(key);
-            } else {
-                key = new KeyBlack(i);
-                keyBlackList.add(key);
-            }
-            keyList.add(key);
-        }
-
-        float gap = 0.13f;
-        float width = 2.2f;
-        int count = 52;
-        float bottom = -31.3f;
-
-        for (int i = 0; i < count * 2; i++) {
-            anchorsWhite[i] = -(count - i) / 2 * (width + gap) - gap / 2;
-            anchorsWhite[++i] = bottom;
-        }
-
-        for (int i = 0; i < 35 * 2; i++) {
-            anchorsBlack[i] = (1 + i / 10 * 7 - count / 2) * (width + gap) - gap / 2;
-            anchorsBlack[++i] = bottom;
-            anchorsBlack[++i] = (3 + i / 10 * 7 - count / 2) * (width + gap) - gap / 2;
-            anchorsBlack[++i] = bottom;
-            anchorsBlack[++i] = (4 + i / 10 * 7 - count / 2) * (width + gap) - gap / 2;
-            anchorsBlack[++i] = bottom;
-            anchorsBlack[++i] = (6 + i / 10 * 7 - count / 2) * (width + gap) - gap / 2;
-            anchorsBlack[++i] = bottom;
-            anchorsBlack[++i] = (7 + i / 10 * 7 - count / 2) * (width + gap) - gap / 2;
-            anchorsBlack[++i] = bottom;
-        }
-        anchorsBlack[70] = (50 - count / 2) * (width + gap) - gap / 2;
-        anchorsBlack[71] = bottom;
-
-        for (int i = 0; i < 52; i++) {
-            for (int j = 0; j < 3; j++) {
-                colorsWhite[j + 3 * i] = KeyWhite.GetColorData()[j];
-            }
-        }
-
-        for (int i = 0; i < 36; i++) {
-            for (int j = 0; j < 3; j++) {
-                colorsBlack[j + 3 * i] = KeyBlack.GetColorData()[j];
-            }
-        }
+        for (int i = 0; i < 88; i++)
+            if (isWhiteKey(i))
+                keyList.add(new KeyWhite(i));
+            else
+                keyList.add(new KeyBlack(i));
 
         try {
             //todo sustain
@@ -117,19 +55,18 @@ public class PianoKeys {
         }
     }
 
-    private boolean isWhiteKey(int pitch) {
-        switch (pitch % 12) {
+    public static boolean isWhiteKey(int trackID) {
+        switch (trackID % 12) {
             case 1:
-            case 3:
+            case 4:
             case 6:
-            case 8:
-            case 10:
+            case 9:
+            case 11:
                 return false;
             default:
                 return true;
         }
     }
-
 
     private int parsePitch(KeyEvent keyEvent) {
         switch (keyEvent.getKeyCode()) {
@@ -185,14 +122,14 @@ public class PianoKeys {
         int pitch = parsePitch(keyEvent);
 
         if (pitch != -1) {
-            int keyId = pitch - 21;
-            Key key = keyList.get(keyId);
+            int trackID = pitch - 21;
+            Key key = keyList.get(trackID);
             key.press();
 
-            if (isWhiteKey(pitch))
-                pressingWhiteList.add(keyWhiteList.indexOf(key));
-            else
-                pressingBlackList.add(keyBlackList.indexOf(key));
+//            if (isWhiteKey(pitch))
+//                pressingWhiteList.add(keyWhiteList.indexOf(key));
+//            else
+//                pressingBlackList.add(keyBlackList.indexOf(key));
         }
     }
 
@@ -200,60 +137,14 @@ public class PianoKeys {
         int pitch = parsePitch(keyEvent);
 
         if (pitch != -1) {
-            int keyId = pitch - 21;
-            Key key = keyList.get(keyId);
+            int trackID = pitch - 21;
+            Key key = keyList.get(trackID);
             key.release();
-
-            if (isWhiteKey(pitch)) {
-                pressingWhiteList.remove(pressingWhiteList.indexOf(keyWhiteList.indexOf(key)));
-                releasingWhiteList.add(keyWhiteList.indexOf(key));
-            } else {
-                pressingBlackList.remove(pressingBlackList.indexOf(keyBlackList.indexOf(key)));
-                releasingBlackList.add(keyBlackList.indexOf(key));
-            }
         }
     }
 
-    public static void RemoveFromReleasingWhiteList(int keyId){
-        Key key = keyWhiteList.get(keyId);
-        releasingWhiteList.remove(releasingWhiteList.indexOf(keyWhiteList.indexOf(key)));
-    }
-
-    public static void RemoveFromReleasingBlackList(int keyId){
-        Key key = keyBlackList.get(keyId);
-        releasingBlackList.remove(releasingBlackList.indexOf(keyBlackList.indexOf(key)));
-    }
-
-    public static float[] GetAnchorsWhite() {
-        return anchorsWhite;
-    }
-
-    public static float[] GetAnchorsBlack() {
-        return anchorsBlack;
-    }
-
-    public static float[] GetColorsWhite() {
-        return colorsWhite;
-    }
-
-    public static float[] GetColorsBlack() {
-        return colorsBlack;
-    }
-
-    public static List<Integer> GetPressingWhiteList() {
-        return pressingWhiteList;
-    }
-
-    public static List<Integer> GetReleasingWhiteList() {
-        return releasingWhiteList;
-    }
-
-    public static List<Integer> GetPressingBlackList() {
-        return pressingBlackList;
-    }
-
-    public static List<Integer> GetReleasingBlackList() {
-        return releasingBlackList;
+    public static List<Key> GetKeyList() {
+        return keyList;
     }
 
 }
