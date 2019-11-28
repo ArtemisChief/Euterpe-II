@@ -7,16 +7,13 @@
 
 layout (location = 0) in vec2 position;
 
-uniform GlobalMatrices
-{
-    mat4 view;
-    mat4 proj;
-};
+
 
 uniform int trackID;
 uniform int colorID;
 
 uniform mat4 model;
+uniform mat4 proj;
 
 out vec3 fragColor;
 
@@ -98,7 +95,7 @@ void main() {
         break;
     }
 
-    gl_Position = proj * (view * (model * vec4(position, posZ, 1) + getOffset(trackID)));
+    gl_Position = proj * (model * vec4(position, posZ, 1) + getOffset(trackID));
 
 
 

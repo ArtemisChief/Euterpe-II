@@ -18,7 +18,7 @@ public class PianoKeys {
         return instance;
     }
 
-    private int pitchOffset;
+    private static int pitchOffset;
 
     private static List<Key> keyList;
 
@@ -125,11 +125,6 @@ public class PianoKeys {
             int trackID = pitch - 21;
             Key key = keyList.get(trackID);
             key.press();
-
-//            if (isWhiteKey(pitch))
-//                pressingWhiteList.add(keyWhiteList.indexOf(key));
-//            else
-//                pressingBlackList.add(keyBlackList.indexOf(key));
         }
     }
 
@@ -141,6 +136,14 @@ public class PianoKeys {
             Key key = keyList.get(trackID);
             key.release();
         }
+    }
+
+    public static void addHalfPitch(){
+        pitchOffset++;
+    }
+
+    public static void reduceHalfPitch(){
+        pitchOffset--;
     }
 
     public static List<Key> GetKeyList() {

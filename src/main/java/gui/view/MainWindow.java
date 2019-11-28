@@ -15,6 +15,7 @@ import gui.controller.Menus;
 import pianoroll.component.PianoCanvas;
 import midi.component.MidiPlayer;
 import net.miginfocom.swing.*;
+import pianoroll.component.PianoKeys;
 
 /**
  * @author Chief

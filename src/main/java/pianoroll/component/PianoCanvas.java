@@ -49,7 +49,6 @@ public class PianoCanvas implements GLEventListener {
         int VERTEX_KEYBLACK = 1;
 //        int VERTEX_ROLLS = 2;
         int ELEMENT = 2;
-        int GLOBAL_MATRICES = 3;
         int MAX = 4;
     }
 
@@ -137,12 +136,6 @@ public class PianoCanvas implements GLEventListener {
         gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer.capacity() * Short.BYTES, elementBuffer, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
-        gl.glBufferData(GL_UNIFORM_BUFFER, Mat4x4.SIZE * 2, null, GL_STREAM_DRAW);
-        gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        gl.glBindBufferBase(GL_UNIFORM_BUFFER, 4, bufferName.get(Buffer.GLOBAL_MATRICES));
-
         destroyBuffers(vertexBufferWhite, vertexBufferBlack, elementBuffer);
 
         checkError(gl, "initBuffers");
@@ -174,38 +167,21 @@ public class PianoCanvas implements GLEventListener {
         }
 
         checkError(gl, "initVao");
+
     }
 
     private void initProgram(GL3 gl) {
 
-        program = new Program(gl, getClass(), "shaders", "Euterpe.vert", "Euterpe.frag", "trackID", "colorID", "model");
-
-        int globalMatricesBI = gl.glGetUniformBlockIndex(program.name, "GlobalMatrices");
-
-        if (globalMatricesBI == -1) {
-            System.err.println("block index 'GlobalMatrices' not found!");
-        }
-        gl.glUniformBlockBinding(program.name, globalMatricesBI, 4);
+        program = new Program(gl, getClass(), "shaders", "Euterpe.vert", "Euterpe.frag", "trackID", "colorID", "model", "proj");
 
         checkError(gl, "initProgram");
+
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
 
         GL3 gl = drawable.getGL().getGL3();
-
-        // view matrix
-        {
-            Mat4x4 view = new Mat4x4();
-            view
-                    .scale(7.67f)
-                    .to(matBuffer);
-
-            gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
-            gl.glBufferSubData(GL_UNIFORM_BUFFER, Mat4x4.SIZE, Mat4x4.SIZE, matBuffer);
-            gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        }
 
         gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .266f).put(1, .266f).put(2, .266f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
@@ -238,15 +214,15 @@ public class PianoCanvas implements GLEventListener {
 
         GL3 gl = drawable.getGL().getGL3();
 
-        float halfWidth = glcanvas.getSize().width / 2.0f;
-        float halfHeight = glcanvas.getSize().height / 2.0f;
-        glm.ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -5.0f, 5.0f).to(matBuffer);
+        float ratio = (float)glcanvas.getSize().width / (float)glcanvas.getSize().height;
+        glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.0222f).to(matBuffer);
 
-        gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
-        gl.glBufferSubData(GL_UNIFORM_BUFFER, 0, Mat4x4.SIZE, matBuffer);
-        gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        gl.glUseProgram(program.name);
+        gl.glUniformMatrix4fv(program.get("proj"), 1, false, matBuffer);
+        gl.glUseProgram(0);
 
         gl.glViewport(x, y, width, height);
+
     }
 
     @Override
