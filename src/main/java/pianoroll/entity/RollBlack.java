@@ -1,6 +1,6 @@
 package pianoroll.entity;
 
-public class KeyBlack extends Key{
+public class RollBlack extends Roll{
 
     private static float[] vertexData = {
             -0.65f,  0.0f,          // Left-Top
@@ -9,20 +9,8 @@ public class KeyBlack extends Key{
             -0.65f, -8.0f           // Left-Bottom
     };
 
-    public KeyBlack(int keyID) {
-        super(keyID, 1);
-    }
-
-    @Override
-    public void press() {
-        super.press();
-        super.setColorID(3);
-    }
-
-    @Override
-    public void release() {
-        super.release();
-        super.setColorID(1);
+    public RollBlack(int keyID, int colorID) {
+        super(keyID, colorID);
     }
 
     public static float[] GetVertexData() {

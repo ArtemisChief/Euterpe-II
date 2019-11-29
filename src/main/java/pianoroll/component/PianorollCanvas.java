@@ -6,7 +6,6 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.mat.Mat4x4;
 import glm.vec._2.Vec2;
-import glm.vec._3.Vec3;
 import pianoroll.entity.Key;
 import pianoroll.entity.KeyBlack;
 import pianoroll.entity.KeyWhite;
@@ -14,7 +13,6 @@ import uno.glsl.Program;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -22,17 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
-import static com.jogamp.opengl.GL2ES2.GL_STREAM_DRAW;
 import static com.jogamp.opengl.GL2ES3.*;
 import static glm.GlmKt.glm;
 import static uno.buffer.UtilKt.destroyBuffers;
 import static uno.gl.GlErrorKt.checkError;
 
-public class PianoCanvas implements GLEventListener {
+public class PianorollCanvas implements GLEventListener {
 
-    public static PianoCanvas instance = new PianoCanvas();
+    public static PianorollCanvas instance = new PianorollCanvas();
 
-    public static PianoCanvas GetInstance() {
+    public static PianorollCanvas GetInstance() {
         return instance;
     }
 
@@ -62,7 +59,7 @@ public class PianoCanvas implements GLEventListener {
 
     private Program program;
 
-    private PianoCanvas(){ }
+    private PianorollCanvas(){ }
 
     public static void Setup() {
 
@@ -83,14 +80,14 @@ public class PianoCanvas implements GLEventListener {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!keyDownList.contains(e.getKeyCode())) {
-                    PianoKeys.GetInstance().pressKey(e);
+                    Piano.GetInstance().press(e);
                     keyDownList.add(e.getKeyCode());
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                PianoKeys.GetInstance().releasedKey(e);
+                Piano.GetInstance().release(e);
                 keyDownList.remove(keyDownList.indexOf(e.getKeyCode()));
             }
         });
@@ -147,7 +144,7 @@ public class PianoCanvas implements GLEventListener {
 
         for (int trackID = 0; trackID < 88; trackID++) {
             int buffer;
-            if (PianoKeys.isWhiteKey(trackID))
+            if (Piano.isWhiteKey(trackID))
                 buffer = bufferName.get(Buffer.VERTEX_KEYWHITE);
             else
                 buffer = bufferName.get(Buffer.VERTEX_KEYBLACK);
@@ -196,9 +193,9 @@ public class PianoCanvas implements GLEventListener {
             gl.glUniformMatrix4fv(program.get("model"), 1, false, matBuffer);
         }
 
-        for (Key key:PianoKeys.GetKeyList()) {
-            gl.glBindVertexArray(vertexArrayName.get(key.getTrackID()));
-            gl.glUniform1i(program.get("trackID"), key.getTrackID());
+        for (Key key: Piano.GetKeyList()) {
+            gl.glBindVertexArray(vertexArrayName.get(key.getKeyID()));
+            gl.glUniform1i(program.get("trackID"), key.getKeyID());
             gl.glUniform1i(program.get("colorID"), key.getColorID());
             gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         }

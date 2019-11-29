@@ -6,16 +6,16 @@ import javax.sound.midi.ShortMessage;
 
 public abstract class Key {
 
-    private int trackID;
+    private int keyID;
 
     private int colorID;
 
     private int pitch;
 
-    public Key(int trackID, int colorID) {
-        this.trackID = trackID;
+    public Key(int keyID, int colorID) {
+        this.keyID = keyID;
         this.colorID = colorID;
-        this.pitch = trackID + 21;
+        this.pitch = keyID + 21;
     }
 
     public void press() {
@@ -36,8 +36,8 @@ public abstract class Key {
         }
     }
 
-    public int getTrackID() {
-        return trackID;
+    public int getKeyID() {
+        return keyID;
     }
 
     public int getColorID() {
