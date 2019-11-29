@@ -9,8 +9,8 @@ public class KeyBlack extends Key{
             -0.65f, -8.0f           // Left-Bottom
     };
 
-    public KeyBlack(int keyID) {
-        super(keyID, 1);
+    public KeyBlack(int trackID) {
+        super(trackID, 1);
     }
 
     @Override

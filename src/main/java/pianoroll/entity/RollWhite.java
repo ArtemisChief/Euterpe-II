@@ -5,8 +5,8 @@ public class RollWhite extends Roll{
     private static float[] vertexData = {
             -1.1f,  0.0f,           // Left-Top
              1.1f,  0.0f,           // Right-Top
-             1.1f, -11.5f,          // Right-Bottom
-            -1.1f, -11.5f           // Left-Bottom
+             1.1f, -1.0f,           // Right-Bottom
+            -1.1f, -1.0f            // Left-Bottom
     };
 
     public RollWhite(int keyID, int colorID) {

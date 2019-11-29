@@ -1,26 +1,37 @@
 package pianoroll.entity;
 
-public abstract class Roll {
+public abstract class Roll extends GraphicElement{
 
-    private int keyID;
+    private float offsetY;
 
-    private int colorID;
+    private float scaleY;
 
-    public Roll(int keyID, int colorID) {
-        this.keyID = keyID;
-        this.colorID = colorID;
+    boolean isUpdatingScaleY;
+
+    public Roll(int trackID, int colorID) {
+        super(trackID, colorID);
+
+        offsetY = 0.0f;
+        scaleY = 1.0f;
     }
 
-    public int getKeyID() {
-        return keyID;
+    public void update(float deltaY) {
+        offsetY += deltaY;
+
+        if (isUpdatingScaleY)
+            scaleY += deltaY;
     }
 
-    public int getColorID() {
-        return colorID;
+    public float getScaleY() {
+        return scaleY;
     }
 
-    protected void setColorID(int colorID) {
-        this.colorID = colorID;
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public void setUpdatingScaleY(boolean updatingScaleY) {
+        isUpdatingScaleY = updatingScaleY;
     }
 
 }

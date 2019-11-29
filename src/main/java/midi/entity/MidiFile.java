@@ -1,6 +1,6 @@
 package midi.entity;
 
-import util.MidiUtil;
+import midi.util.MidiUtil;
 import java.io.*;
 import java.util.List;
 

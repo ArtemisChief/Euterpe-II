@@ -7,23 +7,21 @@
 
 layout (location = 0) in vec2 position;
 
-
-
 uniform int trackID;
 uniform int colorID;
+uniform float scaleY;
+uniform float offsetY;
 
-uniform mat4 model;
 uniform mat4 proj;
 
 out vec3 fragColor;
 
-vec4 getOffset(const int trackID) {
+float getOffsetX(const int trackID) {
 
     float width = 2.2f;
     float gap = 0.13f;
 
     float offsetX = (-52 / 2 + trackID / 12 * 7) * (width + gap) + (width - gap) / 2;
-    float offsetY = -33.0f;
 
     int tone = trackID % 12;
 
@@ -65,7 +63,7 @@ vec4 getOffset(const int trackID) {
         break;
     }
 
-    return vec4(offsetX, offsetY, 0.0f, 0.0f);
+    return offsetX;
 }
 
 void main() {
@@ -95,9 +93,7 @@ void main() {
         break;
     }
 
-    gl_Position = proj * (model * vec4(position, posZ, 1) + getOffset(trackID));
-
-
+    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 33.0f, posZ, 1);
 
 }
 

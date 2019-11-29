@@ -9,8 +9,8 @@ public class KeyWhite extends Key{
             -1.1f, -11.5f           // Left-Bottom
     };
 
-    public KeyWhite(int keyID) {
-        super(keyID, 0);
+    public KeyWhite(int trackID) {
+        super(trackID, 0);
     }
 
     @Override

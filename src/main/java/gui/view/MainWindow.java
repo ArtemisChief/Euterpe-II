@@ -39,8 +39,10 @@ public class MainWindow extends JFrame {
         // 初始化组件
         initComponents();
 
-        // 初始化钢琴卷帘组件并加入窗口
+        // 初始化钢琴卷帘组件
         PianorollCanvas.Setup();
+
+        // 钢琴卷帘组件加入到窗口
         getContentPane().add(PianorollCanvas.GetGlcanvas(), "cell 2 0");
 
         // 行号与滚动条

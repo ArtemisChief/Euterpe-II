@@ -4,18 +4,13 @@ import midi.component.MidiPlayer;
 
 import javax.sound.midi.ShortMessage;
 
-public abstract class Key {
-
-    private int keyID;
-
-    private int colorID;
+public abstract class Key extends GraphicElement{
 
     private int pitch;
 
-    public Key(int keyID, int colorID) {
-        this.keyID = keyID;
-        this.colorID = colorID;
-        this.pitch = keyID + 21;
+    public Key(int trackID, int colorID) {
+        super(trackID,colorID);
+        this.pitch = trackID + 21;
     }
 
     public void press() {
@@ -34,18 +29,6 @@ public abstract class Key {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public int getKeyID() {
-        return keyID;
-    }
-
-    public int getColorID() {
-        return colorID;
-    }
-
-    protected void setColorID(int colorID) {
-        this.colorID = colorID;
     }
 
 }
