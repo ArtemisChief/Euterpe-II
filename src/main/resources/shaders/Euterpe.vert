@@ -88,7 +88,7 @@ void main() {
         posZ = 0.0f;
         break;
         default :
-        fragColor = vec3(1.0f, 0.0f, 0.0f);
+        fragColor = vec3(0.0f, 0.66f, 0.76f);
         posZ = -0.4f;
         break;
     }

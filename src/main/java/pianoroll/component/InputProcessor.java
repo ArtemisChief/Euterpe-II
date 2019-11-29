@@ -1,5 +1,7 @@
 package pianoroll.component;
 
+import pianoroll.entity.Roll;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -25,11 +27,12 @@ public class InputProcessor implements KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int keyID = parseKey(e);
+        int trackID = parseKey(e);
 
-        if (keyID != -1) {
+        if (trackID != -1) {
             if (!keyDownList.contains(e.getKeyCode())) {
-                piano.getKeyList().get(keyID).press();
+                piano.getKeyList().get(trackID).press();
+                roller.newRoll(trackID);
 
                 keyDownList.add(e.getKeyCode());
             }
@@ -38,11 +41,15 @@ public class InputProcessor implements KeyListener{
 
     @Override
     public void keyReleased(KeyEvent e) {
-        int keyID = parseKey(e);
+        int trackID = parseKey(e);
 
-        if (keyID != -1) {
+        if (trackID != -1) {
             if (keyDownList.contains(e.getKeyCode())) {
-                piano.getKeyList().get(keyID).release();
+                piano.getKeyList().get(trackID).release();
+                for(Roll roll:roller.getRollList()){
+                    if(roll.getTrackID()==trackID && roll.isUpdatingScaleY())
+                        roll.setUpdatingScaleY(false);
+                }
 
                 keyDownList.remove(keyDownList.indexOf(e.getKeyCode()));
             }

@@ -5,10 +5,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
-import pianoroll.entity.GraphicElement;
-import pianoroll.entity.Key;
-import pianoroll.entity.KeyBlack;
-import pianoroll.entity.KeyWhite;
+import pianoroll.entity.*;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
@@ -80,7 +77,18 @@ public class PianorollCanvas implements GLEventListener {
     }
 
     private void drawRolls(GL3 gl, float deltaTime) {
+        roller.updateRolls(deltaTime);
 
+        for (Roll roll : roller.getRollList()) {
+            gl.glBindVertexArray(roll.getVao().get(0));
+            gl.glUniform1i(program.get("trackID"), roll.getTrackID());
+            gl.glUniform1i(program.get("colorID"), roll.getColorID());
+            gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
+            gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
+            gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+        }
+
+        gl.glBindVertexArray(0);
 
     }
 
@@ -101,25 +109,35 @@ public class PianorollCanvas implements GLEventListener {
     }
 
     private void initBuffers(GL3 gl) {
-        FloatBuffer vertexBufferWhite = GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData());
-        FloatBuffer vertexBufferBlack = GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData());
+        FloatBuffer vertexBufferKeyWhite = GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData());
+        FloatBuffer vertexBufferKeyBlack = GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData());
+        FloatBuffer vertexBufferRollWhite = GLBuffers.newDirectFloatBuffer(RollWhite.GetVertexData());
+        FloatBuffer vertexBufferRollBlack = GLBuffers.newDirectFloatBuffer(RollBlack.GetVertexData());
         ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
 
         gl.glGenBuffers(Semantic.Buffer.MAX, bufferName);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_KEYWHITE));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferWhite.capacity() * Float.BYTES, vertexBufferWhite, GL_STATIC_DRAW);
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferKeyWhite.capacity() * Float.BYTES, vertexBufferKeyWhite, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_KEYBLACK));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferBlack.capacity() * Float.BYTES, vertexBufferBlack, GL_STATIC_DRAW);
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferKeyBlack.capacity() * Float.BYTES, vertexBufferKeyBlack, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_ROLLWHITE));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollWhite.capacity() * Float.BYTES, vertexBufferRollWhite, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_ROLLBLACK));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollBlack.capacity() * Float.BYTES, vertexBufferRollBlack, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.ELEMENT));
         gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer.capacity() * Short.BYTES, elementBuffer, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        destroyBuffers(vertexBufferWhite, vertexBufferBlack, elementBuffer);
+        destroyBuffers(vertexBufferKeyWhite, vertexBufferKeyBlack, vertexBufferRollWhite, vertexBufferRollBlack, elementBuffer);
 
         checkError(gl, "initBuffers");
     }

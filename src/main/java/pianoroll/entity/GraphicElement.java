@@ -44,4 +44,17 @@ public abstract class GraphicElement {
         this.colorID = colorID;
     }
 
+    public static boolean IsWhite(int trackID) {
+        switch (trackID % 12) {
+            case 1:
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                return false;
+            default:
+                return true;
+        }
+    }
+
 }

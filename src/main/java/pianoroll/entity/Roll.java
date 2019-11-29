@@ -30,6 +30,10 @@ public abstract class Roll extends GraphicElement{
         return offsetY;
     }
 
+    public boolean isUpdatingScaleY() {
+        return isUpdatingScaleY;
+    }
+
     public void setUpdatingScaleY(boolean updatingScaleY) {
         isUpdatingScaleY = updatingScaleY;
     }

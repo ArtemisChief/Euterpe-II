@@ -51,7 +51,7 @@ public class Piano {
         Key key;
         int vbo;
 
-        if (isWhiteKey(trackID)) {
+        if (Key.IsWhite(trackID)) {
             key = new KeyWhite(trackID);
             vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.VERTEX_KEYWHITE);
         } else {

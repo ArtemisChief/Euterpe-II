@@ -1,33 +1,46 @@
 package pianoroll.component;
 
-import pianoroll.entity.Roll;
+import pianoroll.entity.*;
+import pianoroll.util.Semantic;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Roller {
 
-    private float speed = 1.0f;
+    private float speed = 40.0f;
 
     private List<Roll> rollList;
 
     public Roller() {
-
         rollList = new ArrayList<>();
-
     }
 
     public void newRoll(int trackID) {
+        Roll roll;
+        int vbo;
 
+        if (Key.IsWhite(trackID)) {
+            roll = new RollWhite(trackID,5);
+            vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLWHITE);
+        } else {
+            roll = new RollBlack(trackID,5);
+            vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLBLACK);
+        }
+
+        roll.setVbo(vbo);
+        roll.setUpdatingScaleY(true);
+        PianorollCanvas.OfferGraphicElementQueue(roll);
+        rollList.add(roll);
     }
 
-    public void UpdateRolls(float deltaTime) {
+    public void updateRolls(float deltaTime) {
         for (Roll roll : rollList) {
             roll.update(deltaTime * speed);
         }
     }
 
-    public List<Roll> GetRollList() {
+    public List<Roll> getRollList() {
         return rollList;
     }
 
