@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Roller {
 
-    private float speed = 40.0f;
+    private float speed = 33.0f;
 
     private List<Roll> rollList;
 
@@ -32,6 +32,13 @@ public class Roller {
         roll.setUpdatingScaleY(true);
         PianorollCanvas.OfferGraphicElementQueue(roll);
         rollList.add(roll);
+    }
+
+    public void stopUpdatingScaleY(int trackID) {
+        for (Roll roll : rollList) {
+            if (roll.getTrackID() == trackID && roll.isUpdatingScaleY())
+                roll.setUpdatingScaleY(false);
+        }
     }
 
     public void updateRolls(float deltaTime) {

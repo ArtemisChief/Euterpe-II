@@ -46,10 +46,7 @@ public class InputProcessor implements KeyListener{
         if (trackID != -1) {
             if (keyDownList.contains(e.getKeyCode())) {
                 piano.getKeyList().get(trackID).release();
-                for(Roll roll:roller.getRollList()){
-                    if(roll.getTrackID()==trackID && roll.isUpdatingScaleY())
-                        roll.setUpdatingScaleY(false);
-                }
+                roller.stopUpdatingScaleY(trackID);
 
                 keyDownList.remove(keyDownList.indexOf(e.getKeyCode()));
             }

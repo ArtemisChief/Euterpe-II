@@ -61,7 +61,6 @@ public class PianorollCanvas implements GLEventListener {
     }
 
     private void drawKeys(GL3 gl) {
-
         gl.glUniform1f(program.get("scaleY"), 1f);
         gl.glUniform1f(program.get("offsetY"), 0);
 
@@ -73,7 +72,6 @@ public class PianorollCanvas implements GLEventListener {
         }
 
         gl.glBindVertexArray(0);
-
     }
 
     private void drawRolls(GL3 gl, float deltaTime) {
@@ -89,7 +87,6 @@ public class PianorollCanvas implements GLEventListener {
         }
 
         gl.glBindVertexArray(0);
-
     }
 
     public static void Setup() {

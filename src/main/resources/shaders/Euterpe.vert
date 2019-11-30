@@ -72,11 +72,11 @@ void main() {
 
     switch (colorID){
         case WHITE:
-        fragColor = vec3(0.94f, 0.94f, 0.94f);
+        fragColor = vec3(0.98f, 0.98f, 0.98f);
         posZ = -0.2f;
         break;
         case BLACK:
-        fragColor = vec3(0.22f, 0.22f, 0.22f);
+        fragColor = vec3(0.07f, 0.07f, 0.07f);
         posZ = 0.0f;
         break;
         case WHITE_PRESS:
@@ -88,7 +88,7 @@ void main() {
         posZ = 0.0f;
         break;
         default :
-        fragColor = vec3(0.0f, 0.66f, 0.76f);
+        fragColor = vec3(0.38f, 0.68f, 0.80f);
         posZ = -0.4f;
         break;
     }
