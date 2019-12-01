@@ -74,16 +74,27 @@ public class PianorollCanvas implements GLEventListener {
         gl.glBindVertexArray(0);
     }
 
-    private void drawRolls(GL3 gl, float deltaTime) {
-        roller.updateRolls(deltaTime);
+    private void drawRolls(GL3 gl) {
+        long timeCurrentFrame = System.currentTimeMillis();
+        float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
+        timeLastFrame = timeCurrentFrame;
 
         for (Roll roll : roller.getRollList()) {
-            gl.glBindVertexArray(roll.getVao().get(0));
-            gl.glUniform1i(program.get("trackID"), roll.getTrackID());
-            gl.glUniform1i(program.get("colorID"), roll.getColorID());
-            gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
-            gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
-            gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+            if (roll.getOffsetY() - roll.getScaleY() > 80.0f) {
+                glcanvas.invoke(false, drawable -> {
+                    roller.getRollList().remove(roll);
+                    return true;
+                });
+                gl.glDeleteVertexArrays(1,roll.getVao());
+            } else {
+                gl.glBindVertexArray(roll.getVao().get(0));
+                gl.glUniform1i(program.get("trackID"), roll.getTrackID());
+                gl.glUniform1i(program.get("colorID"), roll.getColorID());
+                gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
+                gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
+                roll.update(deltaTime * roller.getSpeed());
+                gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+            }
         }
 
         gl.glBindVertexArray(0);
@@ -207,11 +218,7 @@ public class PianorollCanvas implements GLEventListener {
 
         drawKeys(gl);
 
-        long timeCurrentFrame = System.currentTimeMillis();
-        float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
-        timeLastFrame = timeCurrentFrame;
-
-        drawRolls(gl, deltaTime);
+        drawRolls(gl);
 
         gl.glUseProgram(0);
 

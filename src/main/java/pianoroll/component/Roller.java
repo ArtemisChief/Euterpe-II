@@ -21,10 +21,10 @@ public class Roller {
         int vbo;
 
         if (Key.IsWhite(trackID)) {
-            roll = new RollWhite(trackID,5);
+            roll = new RollWhite(trackID);
             vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLWHITE);
         } else {
-            roll = new RollBlack(trackID,5);
+            roll = new RollBlack(trackID);
             vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLBLACK);
         }
 
@@ -36,15 +36,15 @@ public class Roller {
 
     public void stopUpdatingScaleY(int trackID) {
         for (Roll roll : rollList) {
-            if (roll.getTrackID() == trackID && roll.isUpdatingScaleY())
+            if (roll.getTrackID() == trackID && roll.isUpdatingScaleY()) {
                 roll.setUpdatingScaleY(false);
+                roll.setColorID(trackID);
+            }
         }
     }
 
-    public void updateRolls(float deltaTime) {
-        for (Roll roll : rollList) {
-            roll.update(deltaTime * speed);
-        }
+    public float getSpeed() {
+        return speed;
     }
 
     public List<Roll> getRollList() {

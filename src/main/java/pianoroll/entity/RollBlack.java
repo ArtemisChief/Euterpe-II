@@ -9,8 +9,8 @@ public class RollBlack extends Roll{
             -0.5f, -1.0f             // Left-Bottom
     };
 
-    public RollBlack(int keyID, int colorID) {
-        super(keyID, colorID);
+    public RollBlack(int keyID) {
+        super(keyID);
     }
 
     public static float[] GetVertexData() {

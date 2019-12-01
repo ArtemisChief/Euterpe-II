@@ -10,19 +10,19 @@ public class KeyBlack extends Key{
     };
 
     public KeyBlack(int trackID) {
-        super(trackID, 1);
+        super(trackID, 201);
     }
 
     @Override
     public void press() {
         super.press();
-        super.setColorID(3);
+        super.setColorID(getTrackID());
     }
 
     @Override
     public void release() {
         super.release();
-        super.setColorID(1);
+        super.setColorID(201);
     }
 
     public static float[] GetVertexData() {

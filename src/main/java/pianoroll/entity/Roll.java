@@ -8,8 +8,8 @@ public abstract class Roll extends GraphicElement{
 
     boolean isUpdatingScaleY;
 
-    public Roll(int trackID, int colorID) {
-        super(trackID, colorID);
+    public Roll(int trackID) {
+        super(trackID, trackID+100);
 
         offsetY = 0.0f;
         scaleY = 1.0f;

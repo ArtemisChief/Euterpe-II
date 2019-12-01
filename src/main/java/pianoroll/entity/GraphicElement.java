@@ -40,21 +40,27 @@ public abstract class GraphicElement {
         return colorID;
     }
 
-    protected void setColorID(int colorID) {
+    public void setColorID(int colorID) {
         this.colorID = colorID;
     }
 
     public static boolean IsWhite(int trackID) {
+        boolean bool;
+
         switch (trackID % 12) {
             case 1:
             case 4:
             case 6:
             case 9:
             case 11:
-                return false;
+                bool=false;
+                break;
             default:
-                return true;
+                bool=true;
+                break;
         }
+
+        return bool;
     }
 
 }

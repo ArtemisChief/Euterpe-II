@@ -1,9 +1,7 @@
 #version 330
 
-#define WHITE       0
-#define BLACK       1
-#define WHITE_PRESS 2
-#define BLACK_PRESS 3
+#define WHITE   200
+#define BLACK   201
 
 layout (location = 0) in vec2 position;
 
@@ -16,8 +14,54 @@ uniform mat4 proj;
 
 out vec3 fragColor;
 
-float getOffsetX(const int trackID) {
+vec3 hsvToRgb(vec3 hsv){
+    float h = hsv.x, s = hsv.y, v = hsv.z;
+    float r = 0, g = 0, b = 0;
+    int i = int(h) / 60 % 6;
+    float f = (h / 60) - i;
+    float p = v * (1 - s);
+    float q = v * (1 - f * s);
+    float t = v * (1 - (1 - f) * s);
 
+    switch (i) {
+        case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+        case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+        case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+        case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+        case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+        case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
+        default :
+        break;
+    }
+
+    return vec3(r, g, b);
+}
+
+float getOffsetX(const int trackID) {
     float width = 2.2f;
     float gap = 0.13f;
 
@@ -66,34 +110,63 @@ float getOffsetX(const int trackID) {
     return offsetX;
 }
 
-void main() {
-
+float getPosZ(int trackID){
     float posZ;
 
-    switch (colorID){
-        case WHITE:
-        fragColor = vec3(0.98f, 0.98f, 0.98f);
-        posZ = -0.2f;
+    switch (trackID % 12) {
+        case 1:
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+        posZ = 1.0f;
         break;
-        case BLACK:
-        fragColor = vec3(0.07f, 0.07f, 0.07f);
-        posZ = 0.0f;
-        break;
-        case WHITE_PRESS:
-        fragColor = vec3(0.90f, 0.47f, 0.04f);
-        posZ = -0.2f;
-        break;
-        case BLACK_PRESS:
-        fragColor = vec3(0.52f, 0.29f, 0.06f);
-        posZ = 0.0f;
-        break;
-        default :
-        fragColor = vec3(0.38f, 0.68f, 0.80f);
-        posZ = -0.4f;
+        default:
+        posZ = 0.5f;
         break;
     }
 
-    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 33.0f, posZ, 1);
+    return posZ;
+}
+
+vec3 getColor(int colorID){
+    vec3 color;
+
+    switch (colorID){
+        case WHITE:
+        color = vec3(0.98f, 0.98f, 0.98f);
+        break;
+
+        case BLACK:
+        color = vec3(0.07f, 0.07f, 0.07f);
+        break;
+
+        default :
+        float s = 0.5f;
+        float v = 1.0f;
+
+        if(colorID > 100){
+            colorID -= 100;
+            s = 0.1f;
+        }
+
+        int h = colorID * 4 - 60;
+
+        if (h < 0)
+        h=-h;
+
+        color =  hsvToRgb(vec3(h, s, v));
+        break;
+    }
+
+    return color;
+}
+
+void main() {
+
+    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 33.0f, getPosZ(trackID), 1);
+
+    fragColor = getColor(colorID);
 
 }
 

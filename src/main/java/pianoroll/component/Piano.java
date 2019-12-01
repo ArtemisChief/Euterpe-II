@@ -34,19 +34,6 @@ public class Piano {
         }
     }
 
-    private boolean isWhiteKey(int keyID) {
-        switch (keyID % 12) {
-            case 1:
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                return false;
-            default:
-                return true;
-        }
-    }
-
     private void newKey(int trackID) {
         Key key;
         int vbo;
