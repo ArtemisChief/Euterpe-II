@@ -150,10 +150,7 @@ vec3 getColor(int colorID){
             s = 0.1f;
         }
 
-        int h = colorID * 4 - 60;
-
-        if (h < 0)
-        h=-h;
+        int h = (colorID * 5 + 330) % 360;
 
         color =  hsvToRgb(vec3(h, s, v));
         break;

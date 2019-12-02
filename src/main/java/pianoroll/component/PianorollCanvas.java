@@ -38,11 +38,6 @@ public class PianorollCanvas implements GLEventListener {
 
     private static Queue<GraphicElement> graphicElementQueue = new LinkedList<>();
 
-    private static short[] elementData = new short[]{
-            0, 1, 2,
-            0, 2, 3
-    };
-
     private Piano piano;
     private Roller roller;
 
@@ -68,7 +63,7 @@ public class PianorollCanvas implements GLEventListener {
             gl.glBindVertexArray(key.getVao().get(0));
             gl.glUniform1i(program.get("trackID"), key.getTrackID());
             gl.glUniform1i(program.get("colorID"), key.getColorID());
-            gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+            gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 
         gl.glBindVertexArray(0);
@@ -93,7 +88,7 @@ public class PianorollCanvas implements GLEventListener {
                 gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
                 gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
                 roll.update(deltaTime * roller.getSpeed());
-                gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             }
         }
 
@@ -121,7 +116,6 @@ public class PianorollCanvas implements GLEventListener {
         FloatBuffer vertexBufferKeyBlack = GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData());
         FloatBuffer vertexBufferRollWhite = GLBuffers.newDirectFloatBuffer(RollWhite.GetVertexData());
         FloatBuffer vertexBufferRollBlack = GLBuffers.newDirectFloatBuffer(RollBlack.GetVertexData());
-        ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
 
         gl.glGenBuffers(Semantic.Buffer.MAX, bufferName);
 
@@ -141,11 +135,7 @@ public class PianorollCanvas implements GLEventListener {
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollBlack.capacity() * Float.BYTES, vertexBufferRollBlack, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.ELEMENT));
-        gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer.capacity() * Short.BYTES, elementBuffer, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        destroyBuffers(vertexBufferKeyWhite, vertexBufferKeyBlack, vertexBufferRollWhite, vertexBufferRollBlack, elementBuffer);
+        destroyBuffers(vertexBufferKeyWhite, vertexBufferKeyBlack, vertexBufferRollWhite, vertexBufferRollBlack);
 
         checkError(gl, "initBuffers");
     }
