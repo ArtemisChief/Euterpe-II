@@ -48,7 +48,7 @@ public class MainWindow extends JFrame {
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
 
-        for (int i = 1; i < 1000; i++)
+        for (int i = 1; i < 1000; ++i)
             lineStr.append(i).append("\n");
 
         lineTextArea.setText(lineStr.toString());

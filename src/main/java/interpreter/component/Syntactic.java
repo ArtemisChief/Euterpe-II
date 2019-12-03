@@ -25,7 +25,7 @@ public class Syntactic {
         AbstractSyntaxTree = new Node("root");
 
         boolean hadPlay = false;
-        for (index = 0; index < tokens.size(); index++) {
+        for (index = 0; index < tokens.size(); ++index) {
             if (tokens.get(index).getType() == 6) {
                 hadPlay = true;
                 //break;

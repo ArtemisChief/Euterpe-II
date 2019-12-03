@@ -182,14 +182,13 @@ public class InputTexts {
         }
 
         //注释着色
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = 0; i < input.length(); ++i) {
             //单行注释
             if (i + 1 < input.length())
                 if (input.charAt(i) == '/' && input.charAt(i + 1) == '/')
                     while (i + 1 < input.length() && input.charAt(i) != '\n') {
-                        i++;
                         inputStyledDocument.setCharacterAttributes(
-                                i - 1,
+                                ++i - 1,
                                 2,
                                 commentAttributeSet, true
                         );
@@ -198,9 +197,8 @@ public class InputTexts {
             //多行注释
             if (i + 1 < input.length() && input.charAt(i) == '/' && input.charAt(i + 1) == '*')
                 while (i + 1 < input.length() && (input.charAt(i) != '*' || input.charAt(i + 1) != '/')) {
-                    i++;
                     inputStyledDocument.setCharacterAttributes(
-                            i - 1,
+                            ++i - 1,
                             3,
                             commentAttributeSet, true
                     );
@@ -230,7 +228,7 @@ public class InputTexts {
         int index = 0;
         String input = inputTextPane.getText().replace("\r", "") + "\n";
 
-        for (int i = 0; i < line - 1; i++) {
+        for (int i = 0; i < line - 1; ++i) {
             index = input.indexOf("\n", index + 1);
         }
         return index;

@@ -368,7 +368,7 @@ public class Semantic {
         Note tempNote;
 
         int count = noteList.size();
-        for (int index = 0; index < count; index++) {
+        for (int index = 0; index < count; ++index) {
             while (!symbolQueue.isEmpty() && symbolQueue.peek().getPosition() == index) {
                 //处理特殊符号，i为符号后一个音符
                 switch (symbolQueue.poll().getSymbol()) {

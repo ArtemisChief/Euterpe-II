@@ -40,6 +40,10 @@ public abstract class GraphicElement {
         return colorID;
     }
 
+    public void setTrackID(int trackID) {
+        this.trackID = trackID;
+    }
+
     public void setColorID(int colorID) {
         this.colorID = colorID;
     }

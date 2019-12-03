@@ -22,7 +22,7 @@ public class Piano {
 
         keyList = new ArrayList<>();
 
-        for (int trackID = 0; trackID < Semantic.Piano.KEY_MAX; trackID++)
+        for (int trackID = 0; trackID < Semantic.Piano.KEY_MAX; ++trackID)
             newKey(trackID);
 
         try {

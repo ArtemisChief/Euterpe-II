@@ -18,7 +18,7 @@ public class MidiUtil {
 
         int[] ints = new int[byteCount];
 
-        for (int i = 0; i < byteCount; i++) {
+        for (int i = 0; i < byteCount; ++i) {
             ints[i] = val & 0xFF;
             buffer[byteCount - i - 1] = (byte) ints[i];
 
@@ -67,12 +67,12 @@ public class MidiUtil {
             tmpVal = tmpVal >> 7;
         }
 
-        for (int i = 1; i < mSizeInBytes; i++) {
+        for (int i = 1; i < mSizeInBytes; ++i) {
             vals[i] |= 0x80;
         }
 
         mBytes = new byte[mSizeInBytes];
-        for (int i = 0; i < mSizeInBytes; i++) {
+        for (int i = 0; i < mSizeInBytes; ++i) {
             mBytes[i] = (byte) vals[mSizeInBytes - i - 1];
         }
         return mBytes;

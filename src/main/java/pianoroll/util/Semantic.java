@@ -11,7 +11,7 @@ public abstract class Semantic {
         int VERTEX_KEYBLACK = 1;
         int VERTEX_ROLLWHITE = 2;
         int VERTEX_ROLLBLACK = 3;
-        int ELEMENT = 4;
+        int PARTICLE = 4;
         int MAX = 5;
     }
 
