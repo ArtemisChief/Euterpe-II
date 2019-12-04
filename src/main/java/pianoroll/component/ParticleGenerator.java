@@ -18,14 +18,18 @@ public class ParticleGenerator {
 
     private Random random;
 
-    public ParticleGenerator(int amount) {
-        this.amount = amount;
+    private List<Integer> generateParticleTrackList;
+
+    public ParticleGenerator() {
+        this.amount = 500;
 
         lastUsedParticle = 0;
 
         particleList = new ArrayList<>();
 
         random = new Random(System.currentTimeMillis());
+
+        generateParticleTrackList = new ArrayList<>();
 
         int vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.PARTICLE);
 
@@ -38,11 +42,9 @@ public class ParticleGenerator {
         }
     }
 
-    public void newParticle(int trackID,int amount) {
-        for (int i = 0; i < amount; ++i) {
-            int unusedParticle = firstUnusedParticle();
-            respawnParticle(particleList.get(unusedParticle), trackID);
-        }
+    public void newParticle(int trackID) {
+        int unusedParticle = firstUnusedParticle();
+        respawnParticle(particleList.get(unusedParticle), trackID);
     }
 
     private int firstUnusedParticle() {
@@ -67,9 +69,26 @@ public class ParticleGenerator {
     private void respawnParticle(Particle particle, int trackID) {
         particle.setTrackID(trackID);
         particle.setColorID(trackID);
+        particle.setLife(0.7f);
         particle.setDegrees(random.nextFloat() * 90);
-        particle.setOffset(random.nextFloat(), random.nextFloat());
-        particle.setVelocity(random.nextFloat(), random.nextFloat() * 15.0f);
+        particle.setOffset((random.nextFloat() - 0.5f) * 1.8f, random.nextFloat());
+        particle.setVelocity((random.nextFloat() - 0.5f) * 1.1f, random.nextFloat() * 20.0f);
+    }
+
+    public void addParticlesToTrack(int trackID){
+        generateParticleTrackList.add(trackID);
+    }
+
+    public void stopAddingParticlesToTrack(int trackID) {
+        generateParticleTrackList.remove(generateParticleTrackList.indexOf(trackID));
+    }
+
+    public List<Particle> getParticleList() {
+        return particleList;
+    }
+
+    public List<Integer> getGenerateParticleTrackList(){
+        return generateParticleTrackList;
     }
 
 }

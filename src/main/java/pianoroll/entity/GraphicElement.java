@@ -49,22 +49,16 @@ public abstract class GraphicElement {
     }
 
     public static boolean IsWhite(int trackID) {
-        boolean bool;
-
         switch (trackID % 12) {
             case 1:
             case 4:
             case 6:
             case 9:
             case 11:
-                bool=false;
-                break;
+                return false;
             default:
-                bool=true;
-                break;
+                return true;
         }
-
-        return bool;
     }
 
 }

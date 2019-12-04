@@ -39,6 +39,7 @@ public class PianorollCanvas implements GLEventListener {
 
     private Piano piano;
     private Roller roller;
+    private ParticleGenerator particleGenerator;
 
     private FloatBuffer clearColor;
     private FloatBuffer clearDepth;
@@ -48,6 +49,7 @@ public class PianorollCanvas implements GLEventListener {
     private Program particleProgram;
 
     private long timeLastFrame;
+    private float deltaTime;
 
     private PianorollCanvas() {
         clearColor = GLBuffers.newDirectFloatBuffer(4);
@@ -70,9 +72,6 @@ public class PianorollCanvas implements GLEventListener {
     }
 
     private void drawRolls(GL3 gl) {
-        long timeCurrentFrame = System.currentTimeMillis();
-        float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
-        timeLastFrame = timeCurrentFrame;
 
         for (Roll roll : roller.getRollList()) {
             if (roll.getOffsetY() - roll.getScaleY() > 80.0f) {
@@ -96,8 +95,27 @@ public class PianorollCanvas implements GLEventListener {
         gl.glBindVertexArray(0);
     }
 
-    private void drawParticles(GL3 gl){
+    private void drawParticles(GL3 gl) {
+        if (!particleGenerator.getGenerateParticleTrackList().isEmpty()) {
+            for (int trackID : particleGenerator.getGenerateParticleTrackList()) {
+                particleGenerator.newParticle(trackID);
+            }
+        }
 
+        for (Particle particle : particleGenerator.getParticleList()) {
+            particle.update(deltaTime);
+
+            if(particle.getLife()>0.0f) {
+                gl.glBindVertexArray(particle.getVao().get(0));
+                gl.glUniform1i(particleProgram.get("trackID"), particle.getTrackID());
+                gl.glUniform2f(particleProgram.get("offset"), particle.getOffsetX(), particle.getOffsetY());
+                gl.glUniform1f(particleProgram.get("degrees"), particle.getDegrees());
+                gl.glUniform1f(particleProgram.get("life"), particle.getLife());
+                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            }
+        }
+
+        gl.glBindVertexArray(0);
     }
 
     public static void Setup() {
@@ -113,7 +131,7 @@ public class PianorollCanvas implements GLEventListener {
 
     private void initProgram(GL3 gl) {
         pianorollProgram = new Program(gl, getClass(), "shaders", "Pianoroll.vert", "Pianoroll.frag", "trackID", "scaleY", "offsetY", "proj", "colorID");
-        particleProgram = new Program(gl, getClass(), "shaders", "Particle.vert", "Particle.frag", "trackID", "offset", "degrees", "proj", "colorID", "life");
+        particleProgram = new Program(gl, getClass(), "shaders", "Particle.vert", "Particle.frag", "trackID", "offset", "degrees", "proj", "life");
         checkError(gl, "initProgram");
     }
 
@@ -194,18 +212,25 @@ public class PianorollCanvas implements GLEventListener {
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);
+        gl.glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
         gl.setSwapInterval(1);
 
         timeLastFrame = System.currentTimeMillis();
 
-        piano=new Piano();
-        roller=new Roller();
-        glcanvas.addKeyListener(new InputProcessor(piano, roller));
+        piano = new Piano();
+        roller = new Roller();
+        particleGenerator = new ParticleGenerator();
+        glcanvas.addKeyListener(new InputProcessor(piano, roller, particleGenerator));
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
+
+        long timeCurrentFrame = System.currentTimeMillis();
+        deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
+        timeLastFrame = timeCurrentFrame;
+
         GL3 gl = drawable.getGL().getGL3();
 
         while (!graphicElementQueue.isEmpty())
@@ -215,14 +240,12 @@ public class PianorollCanvas implements GLEventListener {
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
         gl.glUseProgram(pianorollProgram.name);
-        gl.glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
         drawKeys(gl);
 
         drawRolls(gl);
 
         gl.glUseProgram(particleProgram.name);
-        gl.glBlendFunc(GL_SRC_ALPHA,GL_ONE);
 
         drawParticles(gl);
 
@@ -241,7 +264,7 @@ public class PianorollCanvas implements GLEventListener {
         gl.glUseProgram(pianorollProgram.name);
         gl.glUniformMatrix4fv(pianorollProgram.get("proj"), 1, false, matBuffer);
         gl.glUseProgram(particleProgram.name);
-        gl.glUniformMatrix4fv(pianorollProgram.get("proj"), 1, false, matBuffer);
+        gl.glUniformMatrix4fv(particleProgram.get("proj"), 1, false, matBuffer);
         gl.glUseProgram(0);
 
         gl.glViewport(x, y, width, height);

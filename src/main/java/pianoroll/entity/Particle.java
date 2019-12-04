@@ -1,29 +1,30 @@
 package pianoroll.entity;
 
-import glm.vec._2.Vec2;
-
 public class Particle extends GraphicElement{
 
     private static float[] vertexData = {
-            -0.2f,   0.2f,          // Left-Top
-            -0.2f,  -0.2f,          // Left-Bottom
-             0.2f,   0.2f,          // Right-Top
-             0.2f,  -0.2f           // Right-Bottom
-
+            -0.3f,   0.3f,          // Left-Top
+            -0.3f,  -0.3f,          // Left-Bottom
+             0.3f,   0.3f,          // Right-Top
+             0.3f,  -0.3f           // Right-Bottom
     };
 
-    private Vec2 offset;
+    private float offsetX;
+    private float offsetY;
 
-    private Vec2 velocity;
+    private float velocityX;
+    private float velocityY;
 
     private float degrees;
 
     private float life;
 
     public Particle() {
-        super(0, 0);
-        offset = new Vec2(0.0f, 0.0f);
-        velocity = new Vec2(0.0f, 0.0f);
+        super(-1, -1);
+        offsetX = 0.0f;
+        offsetY = 0.0f;
+        velocityX = 0.0f;
+        velocityY = 0.0f;
         degrees = 0.0f;
         life = 0.0f;
     }
@@ -32,8 +33,8 @@ public class Particle extends GraphicElement{
         life -= deltaTime;
         if (life > 0.0f) {
             degrees += deltaTime;
-            velocity.minus(deltaTime);
-            offset.plus(velocity.times(deltaTime));
+            offsetX += velocityX * deltaTime;
+            offsetY += velocityY * deltaTime;
         }
     }
 
@@ -41,22 +42,22 @@ public class Particle extends GraphicElement{
         return vertexData;
     }
 
-    public Vec2 getOffset() {
-        return offset;
+    public float getOffsetX() {
+        return offsetX;
     }
 
-    public void setOffset(float x,float y) {
-        offset.x = x;
-        offset.y = y;
+    public float getOffsetY() {
+        return offsetY;
     }
 
-    public Vec2 getVelocity() {
-        return velocity;
+    public void setOffset(float offsetX, float offsetY) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
     }
 
-    public void setVelocity(float x,float y) {
-        velocity.x = x;
-        velocity.y = y;
+    public void setVelocity(float velocityX, float velocityY) {
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
     }
 
     public float getDegrees() {

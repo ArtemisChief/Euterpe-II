@@ -66,10 +66,10 @@ float getPosZ(int trackID){
         case 6:
         case 9:
         case 11:
-        posZ = 0.8f;
+        posZ = 1.0f;
         break;
         default:
-        posZ = 0.5f;
+        posZ = 0.0f;
         break;
     }
 
