@@ -1,6 +1,6 @@
 #version 330 core
 
-uniform int trackID;
+uniform int colorID;
 uniform float life;
 
 vec3 hsvToRgb(vec3 hsv){
@@ -50,21 +50,21 @@ vec3 hsvToRgb(vec3 hsv){
     return vec3(r, g, b);
 }
 
-vec4 getColor(int trackID, float life){
+vec4 getColor(int colorID, float life){
     vec4 color;
 
     float s = 0.7f;
     float v = 1.0f;
 
-    int h = (trackID * 5 + 330) % 360;
+    int h = (colorID * 5 + 330) % 360;
 
-    color =  vec4(hsvToRgb(vec3(h, s, v)), life * 2.0f);
+    color =  vec4(hsvToRgb(vec3(h, s, v)), life);
 
     return color;
 }
 
 void main() {
 
-    gl_FragColor = getColor(trackID, life);
+    gl_FragColor = getColor(colorID, life);
 
 }

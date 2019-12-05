@@ -15,9 +15,14 @@ public class Particle extends GraphicElement{
     private float velocityX;
     private float velocityY;
 
+    private float scale;
+
     private float degrees;
 
     private float life;
+
+    private float lifeConst;
+    private float scaleConst;
 
     public Particle() {
         super(-1, -1);
@@ -25,16 +30,20 @@ public class Particle extends GraphicElement{
         offsetY = 0.0f;
         velocityX = 0.0f;
         velocityY = 0.0f;
+        scale = 0.0f;
         degrees = 0.0f;
         life = 0.0f;
+        lifeConst = 0.0f;
+        scaleConst = 0.0f;
     }
 
     public void update(float deltaTime) {
         life -= deltaTime;
         if (life > 0.0f) {
-            degrees += deltaTime * 500.0f;
+            degrees += deltaTime * 300.0f;
             offsetX += velocityX * deltaTime;
             offsetY += velocityY * deltaTime;
+            scale -= deltaTime / lifeConst * scaleConst;
         }
     }
 
@@ -60,6 +69,15 @@ public class Particle extends GraphicElement{
         this.velocityY = velocityY;
     }
 
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+        this.scaleConst = scale;
+    }
+
     public float getDegrees() {
         return degrees;
     }
@@ -74,6 +92,7 @@ public class Particle extends GraphicElement{
 
     public void setLife(float life) {
         this.life = life;
+        this.lifeConst = life;
     }
 
 }

@@ -4,6 +4,7 @@ layout (location = 0) in vec2 position;
 
 uniform int trackID;
 uniform vec2 offset;
+uniform float scale;
 uniform float degrees;
 
 uniform mat4 proj;
@@ -59,9 +60,10 @@ float getOffsetX(const int trackID) {
 
 void main() {
 
+    vec2 scalePos = scale * position;
     float angle = radians(degrees);
-    vec2 rotation = vec2(cos(angle) * position.x - sin(angle) * position.y, sin(angle) * position.x + cos(angle) * position.y);
+    vec2 rotationPos = vec2(cos(angle) * scalePos.x - sin(angle) * scalePos.y, sin(angle) * scalePos.x + cos(angle) * scalePos.y);
 
-    gl_Position = proj * vec4(rotation + offset + vec2(getOffsetX(trackID), -33.0f), 1, 1);
+    gl_Position = proj * vec4(rotationPos + offset + vec2(getOffsetX(trackID), -33.0f), 1, 1);
 
 }

@@ -105,10 +105,12 @@ public class PianorollCanvas implements GLEventListener {
         for (Particle particle : particleGenerator.getParticleList()) {
             particle.update(deltaTime);
 
-            if(particle.getLife()>0.0f) {
+            if (particle.getLife() > 0.0f) {
                 gl.glBindVertexArray(particle.getVao().get(0));
                 gl.glUniform1i(particleProgram.get("trackID"), particle.getTrackID());
+                gl.glUniform1i(particleProgram.get("colorID"), particle.getColorID());
                 gl.glUniform2f(particleProgram.get("offset"), particle.getOffsetX(), particle.getOffsetY());
+                gl.glUniform1f(particleProgram.get("scale"), particle.getScale());
                 gl.glUniform1f(particleProgram.get("degrees"), particle.getDegrees());
                 gl.glUniform1f(particleProgram.get("life"), particle.getLife());
                 gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -131,7 +133,7 @@ public class PianorollCanvas implements GLEventListener {
 
     private void initProgram(GL3 gl) {
         pianorollProgram = new Program(gl, getClass(), "shaders", "Pianoroll.vert", "Pianoroll.frag", "trackID", "scaleY", "offsetY", "proj", "colorID");
-        particleProgram = new Program(gl, getClass(), "shaders", "Particle.vert", "Particle.frag", "trackID", "offset", "degrees", "proj", "life");
+        particleProgram = new Program(gl, getClass(), "shaders", "Particle.vert", "Particle.frag", "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
         checkError(gl, "initProgram");
     }
 
@@ -213,6 +215,7 @@ public class PianorollCanvas implements GLEventListener {
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);
         gl.glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        gl.glEnable(GL_MULTISAMPLE);
 
         gl.setSwapInterval(1);
 
