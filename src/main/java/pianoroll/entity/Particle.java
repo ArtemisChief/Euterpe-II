@@ -32,7 +32,7 @@ public class Particle extends GraphicElement{
     public void update(float deltaTime) {
         life -= deltaTime;
         if (life > 0.0f) {
-            degrees += deltaTime;
+            degrees += deltaTime * 500.0f;
             offsetX += velocityX * deltaTime;
             offsetY += velocityY * deltaTime;
         }
