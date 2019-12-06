@@ -58,7 +58,7 @@ vec4 getColor(int colorID, float life){
 
     int h = (colorID * 5 + 330) % 360;
 
-    color =  vec4(hsvToRgb(vec3(h, s, v)), life);
+    color =  vec4(hsvToRgb(vec3(h, s, v)), sqrt(life));
 
     return color;
 }

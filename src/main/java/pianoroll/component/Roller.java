@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Roller {
 
-    private float speed = 25.0f;
+    private float speed = 30.0f;
 
     private List<Roll> rollList;
 

@@ -68,15 +68,15 @@ public class ParticleGenerator {
 
     private void respawnParticle(Particle particle, int trackID) {
         int randomColor = random.nextInt(4) - 2 + trackID;
-        float randomScale = (random.nextFloat() + 0.9f) * 1.2f;
+        float randomScale = (random.nextFloat() + 0.6f) * 1.2f;
         float randomDegrees = random.nextFloat() * 90.0f;
         float randomX = (random.nextFloat() - 0.5f) * 2.0f;
         float randomY = random.nextFloat() + 0.1f;
 
         particle.setTrackID(trackID);
         particle.setColorID(randomColor);
-        particle.setOffset(randomX * 1.1f, 0.0f);
-        particle.setVelocity(randomX, randomY * 11.0f);
+        particle.setOffset(randomX, 0.0f);
+        particle.setVelocity(randomX, randomY * 10.0f);
         particle.setScale(randomScale);
         particle.setDegrees(randomDegrees);
         particle.setLife(1.0f);
