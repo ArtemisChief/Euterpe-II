@@ -116,7 +116,7 @@ public class Interpreter {
         if (code == null)
             return false;
 
-        MainWindow.GetInstance().outputTextArea.setText("================================================\nMidi Successfully Generated");
+        MainWindow.GetInstance().outputTextArea.setText("==============================================\nMidi Successfully Generated");
 
         return true;
     }

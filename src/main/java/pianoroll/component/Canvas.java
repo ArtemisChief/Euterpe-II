@@ -20,13 +20,13 @@ import static glm.GlmKt.glm;
 import static uno.buffer.UtilKt.destroyBuffers;
 import static uno.gl.GlErrorKt.checkError;
 
-public class PianorollCanvas implements GLEventListener {
+public class Canvas implements GLEventListener {
 
     // 单例
-    private static PianorollCanvas instance = new PianorollCanvas();
+    private static Canvas instance = new Canvas();
 
     // 获取单例
-    public static PianorollCanvas GetInstance() {
+    public static Canvas GetInstance() {
         return instance;
     }
 
@@ -37,9 +37,9 @@ public class PianorollCanvas implements GLEventListener {
 
     private static Queue<GraphicElement> graphicElementQueue = new LinkedList<>();
 
-    private Piano piano;
-    private Roller roller;
-    private ParticleGenerator particleGenerator;
+    private PianoRenderer pianoRenderer;
+    private RollRenderer rollRenderer;
+    private ParticleRenderer particleRenderer;
 
     private FloatBuffer clearColor;
     private FloatBuffer clearDepth;
@@ -51,73 +51,10 @@ public class PianorollCanvas implements GLEventListener {
     private long timeLastFrame;
     private float deltaTime;
 
-    private PianorollCanvas() {
+    private Canvas() {
         clearColor = GLBuffers.newDirectFloatBuffer(4);
         clearDepth = GLBuffers.newDirectFloatBuffer(1);
         matBuffer = GLBuffers.newDirectFloatBuffer(16);
-    }
-
-    private void drawKeys(GL3 gl) {
-        gl.glUniform1f(pianorollProgram.get("scaleY"), 1f);
-        gl.glUniform1f(pianorollProgram.get("offsetY"), 0);
-
-        for (Key key : piano.getKeyList()) {
-            gl.glBindVertexArray(key.getVao().get(0));
-            gl.glUniform1i(pianorollProgram.get("trackID"), key.getTrackID());
-            gl.glUniform1i(pianorollProgram.get("colorID"), key.getColorID());
-            gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
-
-        gl.glBindVertexArray(0);
-    }
-
-    private void drawRolls(GL3 gl) {
-
-        for (Roll roll : roller.getRollList()) {
-            if (roll.getOffsetY() - roll.getScaleY() > 80.0f) {
-                glcanvas.invoke(false, drawable -> {
-                    roller.getRollList().remove(roll);
-                    return true;
-                });
-                gl.glDeleteVertexArrays(1,roll.getVao());
-            } else {
-                roll.update(deltaTime * roller.getSpeed());
-
-                gl.glBindVertexArray(roll.getVao().get(0));
-                gl.glUniform1i(pianorollProgram.get("trackID"), roll.getTrackID());
-                gl.glUniform1i(pianorollProgram.get("colorID"), roll.getColorID());
-                gl.glUniform1f(pianorollProgram.get("scaleY"), roll.getScaleY());
-                gl.glUniform1f(pianorollProgram.get("offsetY"), roll.getOffsetY());
-                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            }
-        }
-
-        gl.glBindVertexArray(0);
-    }
-
-    private void drawParticles(GL3 gl) {
-        if (!particleGenerator.getGenerateParticleTrackList().isEmpty()) {
-            for (int trackID : particleGenerator.getGenerateParticleTrackList()) {
-                particleGenerator.newParticle(trackID);
-            }
-        }
-
-        for (Particle particle : particleGenerator.getParticleList()) {
-            particle.update(deltaTime);
-
-            if (particle.getLife() > 0.0f) {
-                gl.glBindVertexArray(particle.getVao().get(0));
-                gl.glUniform1i(particleProgram.get("trackID"), particle.getTrackID());
-                gl.glUniform1i(particleProgram.get("colorID"), particle.getColorID());
-                gl.glUniform2f(particleProgram.get("offset"), particle.getOffsetX(), particle.getOffsetY());
-                gl.glUniform1f(particleProgram.get("scale"), particle.getScale());
-                gl.glUniform1f(particleProgram.get("degrees"), particle.getDegrees());
-                gl.glUniform1f(particleProgram.get("life"), particle.getLife());
-                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            }
-        }
-
-        gl.glBindVertexArray(0);
     }
 
     public static void Setup() {
@@ -192,16 +129,19 @@ public class PianorollCanvas implements GLEventListener {
         checkError(gl, "initVao");
     }
 
+    private void update(GL3 gl, float deltaTime) {
+        while (!graphicElementQueue.isEmpty())
+            initVertexArrays(gl);
+
+        for (Roll roll : rollRenderer.getRollList())
+            roll.update(deltaTime * rollRenderer.getSpeed());
+
+        for (Particle particle : particleRenderer.getParticleList())
+            particle.update(deltaTime);
+    }
+
     public static void OfferGraphicElementQueue(GraphicElement graphicElement) {
         graphicElementQueue.offer(graphicElement);
-    }
-
-    public static GLCanvas GetGlcanvas() {
-        return glcanvas;
-    }
-
-    public static IntBuffer GetBufferName() {
-        return bufferName;
     }
 
     @Override
@@ -221,38 +161,31 @@ public class PianorollCanvas implements GLEventListener {
 
         timeLastFrame = System.currentTimeMillis();
 
-        piano = new Piano();
-        roller = new Roller();
-        particleGenerator = new ParticleGenerator();
-        glcanvas.addKeyListener(new InputProcessor(piano, roller, particleGenerator));
+        pianoRenderer = new PianoRenderer();
+        rollRenderer = new RollRenderer();
+        particleRenderer = new ParticleRenderer();
+        glcanvas.addKeyListener(new InputProcessor(pianoRenderer, rollRenderer, particleRenderer));
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
 
+        GL3 gl = drawable.getGL().getGL3();
+
         long timeCurrentFrame = System.currentTimeMillis();
         deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
         timeLastFrame = timeCurrentFrame;
 
-        GL3 gl = drawable.getGL().getGL3();
-
-        while (!graphicElementQueue.isEmpty())
-            initVertexArrays(gl);
+        update(gl, deltaTime);
 
         gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .266f).put(1, .266f).put(2, .266f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
-        gl.glUseProgram(pianorollProgram.name);
+        pianoRenderer.drawKeys(gl, pianorollProgram);
 
-        drawKeys(gl);
+        rollRenderer.drawRolls(gl, pianorollProgram);
 
-        drawRolls(gl);
-
-        gl.glUseProgram(particleProgram.name);
-
-        drawParticles(gl);
-
-        gl.glUseProgram(0);
+        particleRenderer.drawParticles(gl, particleProgram);
 
         checkError(gl, "display");
     }
@@ -279,11 +212,18 @@ public class PianorollCanvas implements GLEventListener {
 
         gl.glDeleteProgram(pianorollProgram.name);
         gl.glDeleteProgram(particleProgram.name);
-        for(Key key:piano.getKeyList())
+        for(Key key: pianoRenderer.getKeyList())
         gl.glDeleteVertexArrays(1, key.getVao());
         gl.glDeleteBuffers(Semantic.Buffer.MAX, bufferName);
 
         destroyBuffers(bufferName, matBuffer, clearColor, clearDepth);
     }
 
+    public static GLCanvas GetGlcanvas() {
+        return glcanvas;
+    }
+
+    public static IntBuffer GetBufferName() {
+        return bufferName;
+    }
 }

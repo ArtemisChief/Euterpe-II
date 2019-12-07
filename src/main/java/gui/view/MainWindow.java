@@ -12,7 +12,7 @@ import javax.swing.*;
 
 import gui.controller.InputTexts;
 import gui.controller.Menus;
-import pianoroll.component.PianorollCanvas;
+import pianoroll.component.Canvas;
 import midi.component.MidiPlayer;
 import net.miginfocom.swing.*;
 
@@ -40,10 +40,10 @@ public class MainWindow extends JFrame {
         initComponents();
 
         // 初始化钢琴卷帘组件
-        PianorollCanvas.Setup();
+        Canvas.Setup();
 
         // 钢琴卷帘组件加入到窗口
-        getContentPane().add(PianorollCanvas.GetGlcanvas(), "cell 2 0");
+        getContentPane().add(Canvas.GetGlcanvas(), "cell 2 0");
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();

@@ -1,18 +1,21 @@
 package pianoroll.component;
 
-import glm.vec._2.Vec2;
+import com.jogamp.opengl.GL3;
 import pianoroll.entity.Particle;
 import pianoroll.util.Semantic;
+import uno.glsl.Program;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ParticleGenerator {
+import static com.jogamp.opengl.GL.GL_TRIANGLE_STRIP;
+
+public class ParticleRenderer {
 
     private int amount;
 
-    private int lastUsedParticle;
+    private int lastUnusedParticle;
 
     private List<Particle> particleList;
 
@@ -20,10 +23,10 @@ public class ParticleGenerator {
 
     private List<Integer> generateParticleTrackList;
 
-    public ParticleGenerator() {
-        this.amount = 500;
+    public ParticleRenderer() {
+        amount = 500;
 
-        lastUsedParticle = 0;
+        lastUnusedParticle = 0;
 
         particleList = new ArrayList<>();
 
@@ -31,38 +34,36 @@ public class ParticleGenerator {
 
         generateParticleTrackList = new ArrayList<>();
 
-        int vbo = PianorollCanvas.GetBufferName().get(Semantic.Buffer.PARTICLE);
-
         for (int i = 0; i < amount; ++i) {
             Particle particle = new Particle();
 
-            particle.setVbo(vbo);
-            PianorollCanvas.OfferGraphicElementQueue(particle);
+            particle.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.PARTICLE));
+            Canvas.OfferGraphicElementQueue(particle);
             particleList.add(particle);
         }
     }
 
-    public void newParticle(int trackID) {
+    private void newParticle(int trackID) {
         int unusedParticle = firstUnusedParticle();
         respawnParticle(particleList.get(unusedParticle), trackID);
     }
 
     private int firstUnusedParticle() {
-        for (int i = lastUsedParticle; i < amount; ++i) {
+        for (int i = lastUnusedParticle; i < amount; ++i) {
             if (particleList.get(i).getLife() <= 0.0f) {
-                lastUsedParticle = i;
+                lastUnusedParticle = i;
                 return i;
             }
         }
 
-        for (int i = 0; i < lastUsedParticle; ++i) {
+        for (int i = 0; i < lastUnusedParticle; ++i) {
             if (particleList.get(i).getLife() <= 0.0f) {
-                lastUsedParticle = i;
+                lastUnusedParticle = i;
                 return i;
             }
         }
 
-        lastUsedParticle = 0;
+        lastUnusedParticle = 0;
         return 0;
     }
 
@@ -82,6 +83,31 @@ public class ParticleGenerator {
         particle.setLife(1.0f);
     }
 
+    public void drawParticles(GL3 gl, Program program) {
+        gl.glUseProgram(program.name);
+
+        if (!generateParticleTrackList.isEmpty()) {
+            for (int trackID : generateParticleTrackList) {
+                newParticle(trackID);
+            }
+        }
+
+        for (Particle particle : particleList) {
+            if (particle.getLife() > 0.0f) {
+                gl.glBindVertexArray(particle.getVao().get(0));
+                gl.glUniform1i(program.get("trackID"), particle.getTrackID());
+                gl.glUniform1i(program.get("colorID"), particle.getColorID());
+                gl.glUniform2f(program.get("offset"), particle.getOffsetX(), particle.getOffsetY());
+                gl.glUniform1f(program.get("scale"), particle.getScale());
+                gl.glUniform1f(program.get("degrees"), particle.getDegrees());
+                gl.glUniform1f(program.get("life"), particle.getLife());
+                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            }
+        }
+
+        gl.glBindVertexArray(0);
+    }
+
     public void addParticlesToTrack(int trackID){
         generateParticleTrackList.add(trackID);
     }
@@ -92,10 +118,6 @@ public class ParticleGenerator {
 
     public List<Particle> getParticleList() {
         return particleList;
-    }
-
-    public List<Integer> getGenerateParticleTrackList(){
-        return generateParticleTrackList;
     }
 
 }
