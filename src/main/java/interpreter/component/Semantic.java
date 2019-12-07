@@ -10,8 +10,6 @@ import java.util.*;
 
 public class Semantic {
 
-    private Node abstractSyntaxTree;
-
     private List<Integer> errorLines;
 
     private StringBuilder errorInfo;
@@ -27,7 +25,6 @@ public class Semantic {
     private List<MidiTrack> midiTracks;
 
     public String interpret(Node abstractSyntaxTree) {
-        this.abstractSyntaxTree = abstractSyntaxTree;
 
         errorLines = new ArrayList<>();
         errorInfo = new StringBuilder();
@@ -39,7 +36,7 @@ public class Semantic {
 
         midiTracks = new ArrayList<>();
 
-        processTreeNode(this.abstractSyntaxTree, null);
+        processTreeNode(abstractSyntaxTree, null);
 
         if (getIsError())
             return null;
@@ -396,7 +393,7 @@ public class Semantic {
                                 midiTrack.insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
                                 reduceDeltaTimeInQueue(bufferNotes, tempNote.getDeltaTime());
                             }
-                            while (!bufferNotes.isEmpty() && (tempNote.getIsPrimary() != true || bufferNotes.peek().getDeltaTime() == 0));
+                            while (!bufferNotes.isEmpty() && (!tempNote.getIsPrimary() || bufferNotes.peek().getDeltaTime() == 0));
                         }
                         break;
 

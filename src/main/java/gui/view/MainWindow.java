@@ -22,7 +22,7 @@ import net.miginfocom.swing.*;
 public class MainWindow extends JFrame {
 
     // 单例
-    private static MainWindow instance = new MainWindow();
+    private static final MainWindow instance = new MainWindow();
 
     // 获取单例
     public static MainWindow GetInstance() {

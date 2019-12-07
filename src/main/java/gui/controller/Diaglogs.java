@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class Diaglogs {
 
-    private static Diaglogs instance = new Diaglogs();
+    private static final Diaglogs instance = new Diaglogs();
 
     public static Diaglogs GetInstance() {
         return instance;

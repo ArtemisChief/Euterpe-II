@@ -7,13 +7,13 @@ import java.util.List;
 
 public class InputProcessor implements KeyListener{
 
-    private PianoRenderer pianoRenderer;
+    private final PianoRenderer pianoRenderer;
 
-    private RollRenderer rollRenderer;
+    private final RollRenderer rollRenderer;
 
-    private ParticleRenderer particleRenderer;
+    private final ParticleRenderer particleRenderer;
 
-    private List<Integer> keyDownList;
+    private final List<Integer> keyDownList;
 
     public InputProcessor(PianoRenderer pianoRenderer, RollRenderer rollRenderer, ParticleRenderer particleRenderer) {
         this.pianoRenderer = pianoRenderer;
@@ -53,7 +53,7 @@ public class InputProcessor implements KeyListener{
                 rollRenderer.stopUpdatingScaleY(trackID);
                 particleRenderer.stopAddingParticlesToTrack(trackID);
 
-                keyDownList.remove(keyDownList.indexOf(e.getKeyCode()));
+                keyDownList.remove((Integer) e.getKeyCode());
             }
         }
     }

@@ -6,7 +6,7 @@ import javax.sound.midi.ShortMessage;
 
 public abstract class Key extends GraphicElement{
 
-    private int pitch;
+    private final int pitch;
 
     public Key(int trackID, int colorID) {
         super(trackID,colorID);

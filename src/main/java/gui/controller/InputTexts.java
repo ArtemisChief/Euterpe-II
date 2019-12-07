@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class InputTexts {
 
-    private static InputTexts instance = new InputTexts();
+    private static final InputTexts instance = new InputTexts();
 
     public static InputTexts GetInstance() {
         return instance;
@@ -135,7 +135,7 @@ public class InputTexts {
         inputTextPane.setDocument(inputStyledDocument);
         statementPattern = Pattern.compile("\\bparagraph\\b|\\bend\\b|\\bplay");
         keywordPattern = Pattern.compile("\\bspeed=|\\binstrument=|\\bvolume=|\\b1=");
-        parenPattern = Pattern.compile("<(\\s*\\{?\\s*(1|2|4|8|g|w|\\*)+\\s*\\}?\\s*)+>");
+        parenPattern = Pattern.compile("<(\\s*\\{?\\s*([1248gw*])+\\s*}?\\s*)+>");
         sameNotePattern = Pattern.compile("\\|");
 
 

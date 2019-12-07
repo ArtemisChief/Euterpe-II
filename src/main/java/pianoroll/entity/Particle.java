@@ -2,7 +2,7 @@ package pianoroll.entity;
 
 public class Particle extends GraphicElement{
 
-    private static float[] vertexData = {
+    private static final float[] vertexData = {
             -0.3f,   0.3f,          // Left-Top
             -0.3f,  -0.3f,          // Left-Bottom
              0.3f,   0.3f,          // Right-Top

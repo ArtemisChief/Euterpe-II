@@ -2,7 +2,7 @@ package pianoroll.entity;
 
 public class KeyWhite extends Key{
 
-    private static float[] vertexData = {
+    private static final float[] vertexData = {
             -1.1f,  0.0f,           // Left-Top
             -1.1f, -11.5f,          // Left-Bottom
              1.1f,  0.0f,           // Right-Top

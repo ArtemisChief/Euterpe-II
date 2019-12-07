@@ -16,7 +16,7 @@ import static com.jogamp.opengl.GL.GL_TRIANGLE_STRIP;
 
 public class PianoRenderer {
 
-    private List<Key> keyList;
+    private final List<Key> keyList;
 
     private int pitchOffset;
 
@@ -39,7 +39,7 @@ public class PianoRenderer {
             }
 
             key.setVbo(vbo);
-            Canvas.OfferGraphicElementQueue(key);
+            Canvas.getGraphicElementQueue().offer(key);
             keyList.add(key);
         }
 

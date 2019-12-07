@@ -12,11 +12,11 @@ import java.util.List;
 
 public class Interpreter {
 
-    private Lexical lexical;
-    private Syntactic syntactic;
-    private Semantic semantic;
+    private final Lexical lexical;
+    private final Syntactic syntactic;
+    private final Semantic semantic;
 
-    private static Interpreter instance = new Interpreter();
+    private static final Interpreter instance = new Interpreter();
 
     public static Interpreter GetInstance() {
         return instance;
@@ -30,8 +30,7 @@ public class Interpreter {
 
     // 词法分析
     public List<Token> runLex(String input, StringBuilder output) {
-        lexical.Lex(input);
-        List<Token> tokens = lexical.getTokens();
+        List<Token> tokens = lexical.Lex(input);
 
         if (lexical.getError()) {
             output.append(lexical.getErrorInfo(tokens));

@@ -8,11 +8,11 @@ package interpreter.entity;
 
 public class Token {
 
-    private int type;
+    private final int type;
 
-    private String content;
+    private final String content;
 
-    private int line;
+    private final int line;
 
     public Token(int type, String content, int line) {
         this.type = type;

@@ -9,8 +9,6 @@ public class Syntactic {
 
     private List<Token> tokens;
 
-    private Node AbstractSyntaxTree;
-
     private int index;
 
     private boolean sentenceError;
@@ -22,7 +20,7 @@ public class Syntactic {
         index = 0;
         errorList = new ArrayList<>();
         this.tokens = tokens;
-        AbstractSyntaxTree = new Node("root");
+        Node abstractSyntaxTree = new Node("root");
 
         boolean hadPlay = false;
         for (index = 0; index < tokens.size(); ++index) {
@@ -33,29 +31,29 @@ public class Syntactic {
             if (hadPlay && tokens.get(index).getType() == 8) {
                 if (index + 1 < tokens.size()) {
                     errorList.add(tokens.get(index + 1).getLine());
-                    AbstractSyntaxTree.addChild(new Node("Error", "Line:" + tokens.get(index + 1).getLine() + "  乐谱请写在play语句之前"));
-                    return AbstractSyntaxTree;
+                    abstractSyntaxTree.addChild(new Node("Error", "Line:" + tokens.get(index + 1).getLine() + "  乐谱请写在play语句之前"));
+                    return abstractSyntaxTree;
                 }
                 break;
             }
         }
         if (!hadPlay) {
             errorList.add(0);
-            AbstractSyntaxTree.addChild(new Node("Error", "缺少play函数"));
-            return AbstractSyntaxTree;
+            abstractSyntaxTree.addChild(new Node("Error", "缺少play函数"));
+            return abstractSyntaxTree;
         }
 
         index = 0;
 
         while (index < tokens.size() && tokens.get(index).getType() != 6) {
             Node paragraph = parseParagraph();
-            AbstractSyntaxTree.addChild(paragraph);
+            abstractSyntaxTree.addChild(paragraph);
         }
 
 
         if (index < tokens.size()) {
             Node execution = parseExecution();
-            AbstractSyntaxTree.addChild(execution);
+            abstractSyntaxTree.addChild(execution);
         }
 
 //        if (index<tokens.size()) {
@@ -63,7 +61,7 @@ public class Syntactic {
 //            AbstractSyntaxTree.addChild(new Node("Error","Line:" + tokens.get(index).getLine() + "  乐谱请写再play语句之前！"));
 //        }
 
-        return AbstractSyntaxTree;
+        return abstractSyntaxTree;
     }
 
     //paragraph -> 'paragraph' identifier speed tone { sentence } 'end'

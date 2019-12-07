@@ -2,12 +2,12 @@ package gui.entity;
 
 public enum Status {
 
-    NEW_FILE(false), SAVED_FILE(false);
+    NEW_FILE(), SAVED_FILE();
 
     private boolean isEdited;
 
-    Status(boolean isEdited) {
-        this.isEdited = isEdited;
+    Status() {
+        this.isEdited = false;
     }
 
     private static Status CurrentStatus = NEW_FILE;

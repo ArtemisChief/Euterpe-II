@@ -90,7 +90,7 @@ public class Lexical {
                     if (i + 1 < input.length()) {
                         while (input.charAt(i) != '*' || input.charAt(i + 1) != '/') {
                             if (input.charAt(i) == '\n')
-                                temp.append(String.valueOf(input.charAt(i)));
+                                temp.append(input.charAt(i));
                             ++i;//继续扫描
                             if (i == input.length()) {
                                 count = -1;
@@ -109,7 +109,7 @@ public class Lexical {
             if (i < input.length() && input.charAt(i) == '\t') {//若出现\t则替换成空格
                 temp.append(" ");
             } else if (i < input.length() && input.charAt(i) != '\r') {//若出现无用字符，则过滤；否则加载
-                temp.append(String.valueOf(input.charAt(i)));
+                temp.append(input.charAt(i));
             }
         }
 
@@ -118,31 +118,31 @@ public class Lexical {
         for (int i = 0; i < temp.length(); ++i) {
             //读取到=时将其后跟着的连续空格删去
             if (temp.charAt(i) == '=') {
-                output.append(String.valueOf(temp.charAt(i)));
+                output.append(temp.charAt(i));
                 ++i;
                 while (i + 1 < temp.length() && (temp.charAt(i) == ' ' || temp.charAt(i) == '#' || temp.charAt(i) == 'b')) {
                     if (temp.charAt(i) == '#' || temp.charAt(i) == 'b')
-                        output.append(String.valueOf(temp.charAt(i)));
+                        output.append(temp.charAt(i));
                     ++i;
                 }
             }
             //处理<>间的空格
             if (i + 1 < temp.length() && temp.charAt(i) == '<') {
                 //读取到<时，将到>为止其中的空格删去
-                output.append(String.valueOf(temp.charAt(i)));
+                output.append(temp.charAt(i));
                 ++i;
                 while (i + 1 < temp.length() && temp.charAt(i) != '>') {
                     if (temp.charAt(i) == ' ')
                         ++i;
                     else {
-                        output.append(String.valueOf(temp.charAt(i)));
+                        output.append(temp.charAt(i));
                         ++i;
                     }
                 }
             }
 
             if (i < temp.length())
-                output.append(String.valueOf(temp.charAt(i)));
+                output.append(temp.charAt(i));
         }
         return output.toString();
     }
@@ -523,7 +523,7 @@ public class Lexical {
 
     public List<Token> Lex(String input) {
         skipLine = -1;
-        tokens = new ArrayList();
+        tokens = new ArrayList<>();
         errorLine = new ArrayList<>();
         //初始化行号
         count = 1;
@@ -597,10 +597,6 @@ public class Lexical {
 
     public List<Integer> getErrorLine() {
         return errorLine;
-    }
-
-    public List<Token> getTokens() {
-        return tokens;
     }
 
 }

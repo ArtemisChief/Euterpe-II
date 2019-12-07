@@ -14,12 +14,12 @@ public class RollRenderer {
 
     private float speed = 30.0f;
 
-    private int amount;
+    private final int amount;
 
     private int lastUnusedRollWhite;
     private int lastUnusedRollBlack;
 
-    private List<Roll> rollList;
+    private final List<Roll> rollList;
 
     public RollRenderer() {
         amount = 200;
@@ -33,7 +33,7 @@ public class RollRenderer {
             Roll roll = new RollWhite();
 
             roll.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLWHITE));
-            Canvas.OfferGraphicElementQueue(roll);
+            Canvas.getGraphicElementQueue().offer(roll);
             rollList.add(roll);
         }
 
@@ -41,7 +41,7 @@ public class RollRenderer {
             Roll roll = new RollBlack();
 
             roll.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLBLACK));
-            Canvas.OfferGraphicElementQueue(roll);
+            Canvas.getGraphicElementQueue().offer(roll);
             rollList.add(roll);
         }
     }

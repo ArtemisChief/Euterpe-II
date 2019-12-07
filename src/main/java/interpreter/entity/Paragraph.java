@@ -16,11 +16,11 @@ public class Paragraph {
 
     private byte instrument;
 
-    private List<Integer> noteList;
+    private final List<Integer> noteList;
 
-    private List<Integer> durationList;
+    private final List<Integer> durationList;
 
-    private Queue<Symbol> symbolQueue;
+    private final Queue<Symbol> symbolQueue;
 
     public Paragraph() {
         Speed = 0.0F;

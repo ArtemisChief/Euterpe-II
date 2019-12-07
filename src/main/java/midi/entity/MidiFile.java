@@ -8,7 +8,7 @@ public class MidiFile {
 
     private byte[] midiFileData;
 
-    private List<MidiTrack> midiTracks;
+    private final List<MidiTrack> midiTracks;
 
     private final static byte[] MIDI_HEADER = new byte[]{0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x01};
 
@@ -26,7 +26,7 @@ public class MidiFile {
         }
     }
 
-    public boolean writeToFile(java.io.File midiFile) {
+    public boolean writeToFile(File midiFile) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(midiFile);
             fileOutputStream.write(midiFileData);
@@ -40,10 +40,10 @@ public class MidiFile {
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder(MidiUtil.bytesToHex(midiFileData));
-        for (int i = 48; i < stringBuilder.length(); i += 49) {
-            if (i < stringBuilder.length())
-                stringBuilder.replace(i, i, "\n");
-        }
+
+        for (int i = 48; i < stringBuilder.length(); i += 49)
+            stringBuilder.replace(i, i, "\n");
+
         return stringBuilder.toString();
     }
 

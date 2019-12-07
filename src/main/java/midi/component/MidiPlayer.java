@@ -8,7 +8,7 @@ import java.io.File;
 
 public class MidiPlayer {
 
-    private static MidiPlayer instance = new MidiPlayer();
+    private static final MidiPlayer instance = new MidiPlayer();
 
     public static MidiPlayer GetInstance() {
         return instance;

@@ -10,11 +10,11 @@ import java.util.ArrayList;
 
 public class Node {
 
-    private ArrayList<Node> childNodes;
+    private final ArrayList<Node> childNodes;
 
-    private String content;
+    private final String content;
 
-    private String type;
+    private final String type;
 
     private int line;
 

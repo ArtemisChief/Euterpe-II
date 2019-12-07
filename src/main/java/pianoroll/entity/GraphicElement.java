@@ -6,7 +6,7 @@ import java.nio.IntBuffer;
 
 public abstract class GraphicElement {
 
-    private IntBuffer vao;
+    private final IntBuffer vao;
 
     private int vbo;
 

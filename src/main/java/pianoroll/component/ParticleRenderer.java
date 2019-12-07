@@ -13,15 +13,15 @@ import static com.jogamp.opengl.GL.GL_TRIANGLE_STRIP;
 
 public class ParticleRenderer {
 
-    private int amount;
+    private final int amount;
 
     private int lastUnusedParticle;
 
-    private List<Particle> particleList;
+    private final List<Particle> particleList;
 
-    private Random random;
+    private final Random random;
 
-    private List<Integer> generateParticleTrackList;
+    private final List<Integer> generateParticleTrackList;
 
     public ParticleRenderer() {
         amount = 500;
@@ -38,7 +38,7 @@ public class ParticleRenderer {
             Particle particle = new Particle();
 
             particle.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.PARTICLE));
-            Canvas.OfferGraphicElementQueue(particle);
+            Canvas.getGraphicElementQueue().offer(particle);
             particleList.add(particle);
         }
     }
@@ -113,7 +113,7 @@ public class ParticleRenderer {
     }
 
     public void stopAddingParticlesToTrack(int trackID) {
-        generateParticleTrackList.remove(generateParticleTrackList.indexOf(trackID));
+        generateParticleTrackList.remove((Integer) trackID);
     }
 
     public List<Particle> getParticleList() {

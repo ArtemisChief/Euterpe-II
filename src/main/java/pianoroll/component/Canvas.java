@@ -14,7 +14,6 @@ import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.GL2ES3.*;
 import static glm.GlmKt.glm;
 import static uno.buffer.UtilKt.destroyBuffers;
@@ -23,7 +22,7 @@ import static uno.gl.GlErrorKt.checkError;
 public class Canvas implements GLEventListener {
 
     // 单例
-    private static Canvas instance = new Canvas();
+    private static final Canvas instance = new Canvas();
 
     // 获取单例
     public static Canvas GetInstance() {
@@ -31,25 +30,23 @@ public class Canvas implements GLEventListener {
     }
 
     private static GLCanvas glcanvas;
-    private static Animator animator;
 
-    private static IntBuffer bufferName = GLBuffers.newDirectIntBuffer(Semantic.Buffer.MAX);
+    private static final IntBuffer bufferName = GLBuffers.newDirectIntBuffer(Semantic.Buffer.MAX);
 
-    private static Queue<GraphicElement> graphicElementQueue = new LinkedList<>();
+    private static final Queue<GraphicElement> graphicElementQueue = new LinkedList<>();
 
     private PianoRenderer pianoRenderer;
     private RollRenderer rollRenderer;
     private ParticleRenderer particleRenderer;
 
-    private FloatBuffer clearColor;
-    private FloatBuffer clearDepth;
-    private FloatBuffer matBuffer;
+    private final FloatBuffer clearColor;
+    private final FloatBuffer clearDepth;
+    private final FloatBuffer matBuffer;
 
     private Program pianorollProgram;
     private Program particleProgram;
 
     private long timeLastFrame;
-    private float deltaTime;
 
     private Canvas() {
         clearColor = GLBuffers.newDirectFloatBuffer(4);
@@ -64,46 +61,40 @@ public class Canvas implements GLEventListener {
         glcanvas = new GLCanvas(glCapabilities);
         glcanvas.addGLEventListener(instance);
 
-        animator = new Animator(glcanvas);
+        Animator animator = new Animator(glcanvas);
         animator.start();
     }
 
     private void initProgram(GL3 gl) {
-        pianorollProgram = new Program(gl, getClass(), "shaders", "Pianoroll.vert", "Pianoroll.frag", "trackID", "scaleY", "offsetY", "proj", "colorID");
-        particleProgram = new Program(gl, getClass(), "shaders", "Particle.vert", "Particle.frag", "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
+        pianorollProgram = new Program(gl, getClass(),
+                "shaders", "Pianoroll.vert", "Pianoroll.frag",
+                "trackID", "scaleY", "offsetY", "proj", "colorID");
+
+        particleProgram = new Program(gl, getClass(),
+                "shaders", "Particle.vert", "Particle.frag",
+                "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
+
         checkError(gl, "initProgram");
     }
 
     private void initBuffers(GL3 gl) {
-        FloatBuffer vertexBufferKeyWhite = GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData());
-        FloatBuffer vertexBufferKeyBlack = GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData());
-        FloatBuffer vertexBufferRollWhite = GLBuffers.newDirectFloatBuffer(RollWhite.GetVertexData());
-        FloatBuffer vertexBufferRollBlack = GLBuffers.newDirectFloatBuffer(RollBlack.GetVertexData());
-        FloatBuffer vertexBufferParticle = GLBuffers.newDirectFloatBuffer(Particle.GetVertexData());
+        FloatBuffer[] floatBuffers = {
+                GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData()),
+                GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData()),
+                GLBuffers.newDirectFloatBuffer(RollWhite.GetVertexData()),
+                GLBuffers.newDirectFloatBuffer(RollBlack.GetVertexData()),
+                GLBuffers.newDirectFloatBuffer(Particle.GetVertexData())
+        };
 
         gl.glGenBuffers(Semantic.Buffer.MAX, bufferName);
 
-        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_KEYWHITE));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferKeyWhite.capacity() * Float.BYTES, vertexBufferKeyWhite, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        for (int buffer = Semantic.Buffer.VERTEX_KEYWHITE; buffer < Semantic.Buffer.MAX; ++buffer) {
+            gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(buffer));
+            gl.glBufferData(GL_ARRAY_BUFFER, floatBuffers[buffer].capacity() * Float.BYTES, floatBuffers[buffer], GL_STATIC_DRAW);
+            gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_KEYBLACK));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferKeyBlack.capacity() * Float.BYTES, vertexBufferKeyBlack, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_ROLLWHITE));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollWhite.capacity() * Float.BYTES, vertexBufferRollWhite, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.VERTEX_ROLLBLACK));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollBlack.capacity() * Float.BYTES, vertexBufferRollBlack, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Semantic.Buffer.PARTICLE));
-        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferParticle.capacity() * Float.BYTES, vertexBufferParticle, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        destroyBuffers(vertexBufferKeyWhite, vertexBufferKeyBlack, vertexBufferRollWhite, vertexBufferRollBlack, vertexBufferParticle);
+            destroyBuffers(floatBuffers[buffer]);
+        }
 
         checkError(gl, "initBuffers");
     }
@@ -140,10 +131,6 @@ public class Canvas implements GLEventListener {
             particle.update(deltaTime);
     }
 
-    public static void OfferGraphicElementQueue(GraphicElement graphicElement) {
-        graphicElementQueue.offer(graphicElement);
-    }
-
     @Override
     public void init(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
@@ -164,6 +151,7 @@ public class Canvas implements GLEventListener {
         pianoRenderer = new PianoRenderer();
         rollRenderer = new RollRenderer();
         particleRenderer = new ParticleRenderer();
+
         glcanvas.addKeyListener(new InputProcessor(pianoRenderer, rollRenderer, particleRenderer));
     }
 
@@ -173,7 +161,7 @@ public class Canvas implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
 
         long timeCurrentFrame = System.currentTimeMillis();
-        deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
+        float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
         timeLastFrame = timeCurrentFrame;
 
         update(gl, deltaTime);
@@ -182,9 +170,7 @@ public class Canvas implements GLEventListener {
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
         pianoRenderer.drawKeys(gl, pianorollProgram);
-
         rollRenderer.drawRolls(gl, pianorollProgram);
-
         particleRenderer.drawParticles(gl, particleProgram);
 
         checkError(gl, "display");
@@ -226,4 +212,9 @@ public class Canvas implements GLEventListener {
     public static IntBuffer GetBufferName() {
         return bufferName;
     }
+
+    public static Queue<GraphicElement> getGraphicElementQueue() {
+        return graphicElementQueue;
+    }
+
 }

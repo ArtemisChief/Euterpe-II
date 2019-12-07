@@ -6,7 +6,7 @@ import gui.entity.Status;
 
 public class Menus {
 
-    private static Menus instance = new Menus();
+    private static final Menus instance = new Menus();
 
     public static Menus GetInstance() {
         return instance;

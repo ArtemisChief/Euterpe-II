@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 public class FileIO {
 
-    private static FileIO instance = new FileIO();
+    private static final FileIO instance = new FileIO();
 
     public static FileIO GetInstance() {
         return instance;

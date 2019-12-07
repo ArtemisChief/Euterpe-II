@@ -10,9 +10,9 @@ public class Note {
 
     private int deltaTime;
 
-    private byte note;
+    private final byte note;
 
-    private boolean isPrimary;
+    private final boolean isPrimary;
 
     public Note(int deltaTime, byte note, boolean isPrimary) {
         this.deltaTime = deltaTime;

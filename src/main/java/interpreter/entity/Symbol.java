@@ -12,9 +12,9 @@ package interpreter.entity;
 
 public class Symbol {
 
-    private int symbol;
+    private final int symbol;
 
-    private int position;
+    private final int position;
 
     public Symbol(int symbol, int position) {
         this.position = position;
