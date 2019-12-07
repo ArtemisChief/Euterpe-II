@@ -11,7 +11,7 @@ new FormModel {
 			name: "this"
 			"defaultCloseOperation": 3
 			"componentOrientation": sfield java.awt.ComponentOrientation LEFT_TO_RIGHT
-			"title": "Euterpe 2"
+			"title": "Euterpe II"
 			"resizable": false
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "lineScrollPane"
@@ -328,7 +328,7 @@ new FormModel {
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "titleMenu"
-					"text": "                                                                                               Euterpe 2                                                                                                                                             "
+					"text": "                                                                                                                     Euterpe II                                                                                                                                                     "
 					"opaque": false
 					"borderPainted": false
 					"enabled": false

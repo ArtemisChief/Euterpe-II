@@ -153,7 +153,7 @@ public class MainWindow extends JFrame {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-        setTitle("Euterpe 2");
+        setTitle("Euterpe II");
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new MigLayout(
@@ -259,7 +259,7 @@ public class MainWindow extends JFrame {
 
             //======== titleMenu ========
             {
-                titleMenu.setText("                                                                                               Euterpe 2                                                                                                                                             ");
+                titleMenu.setText("                                                                                                                     Euterpe II                                                                                                                                                     ");
                 titleMenu.setOpaque(false);
                 titleMenu.setBorderPainted(false);
                 titleMenu.setEnabled(false);
