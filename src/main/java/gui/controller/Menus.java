@@ -122,6 +122,13 @@ public class Menus {
 
         // 退出
         MainWindow.GetInstance().exitMenuItem.addActionListener(e -> {
+            if (Status.GetCurrentStatus().getIsEdited())
+                if (!Diaglogs.GetInstance().askSaving())
+                    return;
+
+            if (FileIO.GetInstance().getTempMidiFile() != null && FileIO.GetInstance().getTempMidiFile().exists())
+                FileIO.GetInstance().getTempMidiFile().delete();
+
             MidiPlayer.GetInstance().close();
             System.exit(0);
         });

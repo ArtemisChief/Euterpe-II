@@ -10,8 +10,11 @@ import javax.swing.border.*;
 import java.awt.*;
 import javax.swing.*;
 
+import gui.controller.Diaglogs;
+import gui.controller.FileIO;
 import gui.controller.InputTexts;
 import gui.controller.Menus;
+import gui.entity.Status;
 import pianoroll.component.Canvas;
 import midi.component.MidiPlayer;
 import net.miginfocom.swing.*;
@@ -74,6 +77,13 @@ public class MainWindow extends JFrame {
 
     // 关闭窗口
     private void closeButtonActionPerformed(ActionEvent e) {
+        if (Status.GetCurrentStatus().getIsEdited())
+            if (!Diaglogs.GetInstance().askSaving())
+                return;
+
+        if (FileIO.GetInstance().getTempMidiFile() != null && FileIO.GetInstance().getTempMidiFile().exists())
+            FileIO.GetInstance().getTempMidiFile().delete();
+
         MidiPlayer.GetInstance().close();
         System.exit(0);
     }
