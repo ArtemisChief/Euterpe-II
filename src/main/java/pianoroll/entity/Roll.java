@@ -1,6 +1,6 @@
 package pianoroll.entity;
 
-public abstract class Roll extends GraphicElement {
+public class Roll extends GraphicElement {
 
     private float offsetY;
 
@@ -11,7 +11,7 @@ public abstract class Roll extends GraphicElement {
     boolean isUnused;
 
     public Roll() {
-        super(-1, -1);
+        super(-1);
 
         offsetY = 0.0f;
         scaleY = 1.0f;

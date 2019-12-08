@@ -14,10 +14,9 @@ public abstract class GraphicElement {
 
     private int colorID;
 
-    public GraphicElement(int trackID, int colorID) {
+    public GraphicElement(int trackID) {
         vao = GLBuffers.newDirectIntBuffer(1);
         this.trackID = trackID;
-        this.colorID = colorID;
     }
 
     public IntBuffer getVao() {

@@ -5,8 +5,6 @@ import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Roll;
-import pianoroll.entity.RollBlack;
-import pianoroll.entity.RollWhite;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
@@ -19,8 +17,6 @@ import static com.jogamp.opengl.GL.*;
 import static uno.buffer.UtilKt.destroyBuffers;
 
 public class RollRenderer {
-
-    private float speed = 30.0f;
 
     private final int amount;
 
@@ -39,10 +35,24 @@ public class RollRenderer {
     }
 
     public void init(GL3 gl) {
+        final float[] vertexDataRollWhite = {
+                -0.95f,  0.0f,           // Left-Top
+                -0.95f, -1.0f,           // Left-Bottom
+                 0.95f,  0.0f,           // Right-Top
+                 0.95f, -1.0f            // Right-Bottom
+        };
+
+        final float[] vertexDataRollBlack = {
+                -0.5f,  0.0f,            // Left-Top
+                -0.5f, -1.0f,            // Left-Bottom
+                 0.5f,  0.0f,            // Right-Top
+                 0.5f, -1.0f             // Right-Bottom
+        };
+
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);
 
-        FloatBuffer vertexBufferRollWhite = GLBuffers.newDirectFloatBuffer(RollWhite.GetVertexData());
-        FloatBuffer vertexBufferRollBlack = GLBuffers.newDirectFloatBuffer(RollBlack.GetVertexData());
+        FloatBuffer vertexBufferRollWhite = GLBuffers.newDirectFloatBuffer(vertexDataRollWhite);
+        FloatBuffer vertexBufferRollBlack = GLBuffers.newDirectFloatBuffer(vertexDataRollBlack);
 
         gl.glGenBuffers(2, buffer);
 
@@ -57,14 +67,14 @@ public class RollRenderer {
         destroyBuffers(vertexBufferRollWhite, vertexBufferRollBlack);
 
         for (int i = 0; i < amount / 2; ++i) {
-            Roll roll = new RollWhite();
+            Roll roll = new Roll();
 
             roll.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROLLWHITE));
             rollList.add(roll);
         }
 
         for (int i = amount / 2; i < amount; ++i) {
-            Roll roll = new RollBlack();
+            Roll roll = new Roll();
 
             roll.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROLLBLACK));
             rollList.add(roll);
@@ -87,6 +97,23 @@ public class RollRenderer {
 
         gl.glDeleteBuffers(2, buffer);
         destroyBuffers(buffer);
+    }
+
+    public void drawRolls(GL3 gl, Program program) {
+        gl.glUseProgram(program.name);
+
+        for (Roll roll : rollList) {
+            if (!roll.isUnused()) {
+                gl.glBindVertexArray(roll.getVao().get(0));
+                gl.glUniform1i(program.get("trackID"), roll.getTrackID());
+                gl.glUniform1i(program.get("colorID"), roll.getColorID());
+                gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
+                gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
+                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            }
+        }
+
+        gl.glBindVertexArray(0);
     }
 
     public void newRoll(int trackID) {
@@ -153,27 +180,6 @@ public class RollRenderer {
                 roll.setColorID(trackID);
             }
         }
-    }
-
-    public void drawRolls(GL3 gl, Program program) {
-        gl.glUseProgram(program.name);
-
-        for (Roll roll : rollList) {
-            if (!roll.isUnused()) {
-                gl.glBindVertexArray(roll.getVao().get(0));
-                gl.glUniform1i(program.get("trackID"), roll.getTrackID());
-                gl.glUniform1i(program.get("colorID"), roll.getColorID());
-                gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
-                gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
-                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            }
-        }
-
-        gl.glBindVertexArray(0);
-    }
-
-    public float getSpeed() {
-        return speed;
     }
 
     public List<Roll> getRollList() {

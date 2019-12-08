@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL3;
 import pianoroll.entity.Key;
 import pianoroll.entity.Particle;
 import pianoroll.entity.Roll;
+import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
 import java.nio.FloatBuffer;
@@ -24,11 +25,9 @@ public class GraphicEngine {
     }
 
     public void init(GL3 gl) {
-
         pianoRenderer.init(gl);
         rollRenderer.init(gl);
         particleRenderer.init(gl);
-
 
         pianorollProgram = new Program(gl, getClass(),
                 "shaders", "Pianoroll.vert", "Pianoroll.frag",
@@ -37,12 +36,11 @@ public class GraphicEngine {
         particleProgram = new Program(gl, getClass(),
                 "shaders", "Particle.vert", "Particle.frag",
                 "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
-
     }
 
     public void update(float deltaTime) {
         for (Roll roll : rollRenderer.getRollList())
-            roll.update(deltaTime * rollRenderer.getSpeed());
+            roll.update(deltaTime * Semantic.Roll.SPEED);
 
         for (Particle particle : particleRenderer.getParticleList())
             particle.update(deltaTime);

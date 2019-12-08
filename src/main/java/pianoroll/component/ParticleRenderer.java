@@ -41,9 +41,16 @@ public class ParticleRenderer {
     }
 
     public void init(GL3 gl) {
+        final float[] vertexDataParticle = {
+                -0.3f,  0.3f,          // Left-Top
+                -0.3f, -0.3f,          // Left-Bottom
+                 0.3f,  0.3f,          // Right-Top
+                 0.3f, -0.3f           // Right-Bottom
+        };
+
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(1);
 
-        FloatBuffer vertexBufferParticle = GLBuffers.newDirectFloatBuffer(Particle.GetVertexData());
+        FloatBuffer vertexBufferParticle = GLBuffers.newDirectFloatBuffer(vertexDataParticle);
 
         gl.glGenBuffers(1, buffer);
 
@@ -77,6 +84,31 @@ public class ParticleRenderer {
 
         gl.glDeleteBuffers(1, buffer);
         destroyBuffers(buffer);
+    }
+
+    public void drawParticles(GL3 gl, Program program) {
+        gl.glUseProgram(program.name);
+
+        if (!generateParticleTrackList.isEmpty()) {
+            for (int trackID : generateParticleTrackList) {
+                newParticle(trackID);
+            }
+        }
+
+        for (Particle particle : particleList) {
+            if (particle.getLife() > 0.0f) {
+                gl.glBindVertexArray(particle.getVao().get(0));
+                gl.glUniform1i(program.get("trackID"), particle.getTrackID());
+                gl.glUniform1i(program.get("colorID"), particle.getColorID());
+                gl.glUniform2f(program.get("offset"), particle.getOffsetX(), particle.getOffsetY());
+                gl.glUniform1f(program.get("scale"), particle.getScale());
+                gl.glUniform1f(program.get("degrees"), particle.getDegrees());
+                gl.glUniform1f(program.get("life"), particle.getLife());
+                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            }
+        }
+
+        gl.glBindVertexArray(0);
     }
 
     private void newParticle(int trackID) {
@@ -117,31 +149,6 @@ public class ParticleRenderer {
         particle.setScale(randomScale);
         particle.setDegrees(randomDegrees);
         particle.setLife(1.0f);
-    }
-
-    public void drawParticles(GL3 gl, Program program) {
-        gl.glUseProgram(program.name);
-
-        if (!generateParticleTrackList.isEmpty()) {
-            for (int trackID : generateParticleTrackList) {
-                newParticle(trackID);
-            }
-        }
-
-        for (Particle particle : particleList) {
-            if (particle.getLife() > 0.0f) {
-                gl.glBindVertexArray(particle.getVao().get(0));
-                gl.glUniform1i(program.get("trackID"), particle.getTrackID());
-                gl.glUniform1i(program.get("colorID"), particle.getColorID());
-                gl.glUniform2f(program.get("offset"), particle.getOffsetX(), particle.getOffsetY());
-                gl.glUniform1f(program.get("scale"), particle.getScale());
-                gl.glUniform1f(program.get("degrees"), particle.getDegrees());
-                gl.glUniform1f(program.get("life"), particle.getLife());
-                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            }
-        }
-
-        gl.glBindVertexArray(0);
     }
 
     public void addParticlesToTrack(int trackID) {

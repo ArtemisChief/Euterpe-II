@@ -4,12 +4,18 @@ import midi.component.MidiPlayer;
 
 import javax.sound.midi.ShortMessage;
 
-public abstract class Key extends GraphicElement{
+public class Key extends GraphicElement {
 
     private final int pitch;
 
-    public Key(int trackID, int colorID) {
-        super(trackID,colorID);
+    public Key(int trackID) {
+        super(trackID);
+
+        if (IsWhite(trackID))
+            setColorID(200);
+        else
+            setColorID(201);
+
         this.pitch = trackID + 21;
     }
 
@@ -17,6 +23,8 @@ public abstract class Key extends GraphicElement{
         try {
             ShortMessage shortMessage = new ShortMessage(144, 0, pitch, 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
+
+            setColorID(getTrackID());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -26,6 +34,11 @@ public abstract class Key extends GraphicElement{
         try {
             ShortMessage shortMessage = new ShortMessage(128, 0, pitch, 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
+
+            if (IsWhite(getTrackID()))
+                setColorID(200);
+            else
+                setColorID(201);
         } catch (Exception e) {
             e.printStackTrace();
         }

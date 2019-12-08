@@ -2,13 +2,6 @@ package pianoroll.entity;
 
 public class Particle extends GraphicElement{
 
-    private static final float[] vertexData = {
-            -0.3f,   0.3f,          // Left-Top
-            -0.3f,  -0.3f,          // Left-Bottom
-             0.3f,   0.3f,          // Right-Top
-             0.3f,  -0.3f           // Right-Bottom
-    };
-
     private float offsetX;
     private float offsetY;
 
@@ -26,7 +19,8 @@ public class Particle extends GraphicElement{
     private float scaleConst;
 
     public Particle() {
-        super(-1, -1);
+        super(-1);
+
         offsetX = 0.0f;
         offsetY = 0.0f;
         velocityX = 0.0f;
@@ -48,10 +42,6 @@ public class Particle extends GraphicElement{
             timeSum += deltaTime;
             scale = (float) Math.sqrt((lifeConst - timeSum) / lifeConst) * scaleConst;
         }
-    }
-
-    public static float[] GetVertexData() {
-        return vertexData;
     }
 
     public float getOffsetX() {

@@ -5,8 +5,6 @@ import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
 import midi.component.MidiPlayer;
 import pianoroll.entity.Key;
-import pianoroll.entity.KeyBlack;
-import pianoroll.entity.KeyWhite;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
@@ -41,10 +39,24 @@ public class PianoRenderer {
     }
 
     public void init(GL3 gl) {
+        final float[] vertexDataKeyWhite = {
+                -1.1f, 0.0f,           // Left-Top
+                -1.1f, -11.5f,          // Left-Bottom
+                 1.1f, 0.0f,           // Right-Top
+                 1.1f, -11.5f           // Right-Bottom
+        };
+
+        final float[] vertexDataKeyBlack = {
+                -0.65f,  0.0f,          // Left-Top
+                -0.65f, -8.0f,          // Left-Bottom
+                 0.65f,  0.0f,          // Right-Top
+                 0.65f, -8.0f           // Right-Bottom
+        };
+
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);
 
-        FloatBuffer vertexBufferKeyWhite = GLBuffers.newDirectFloatBuffer(KeyWhite.GetVertexData());
-        FloatBuffer vertexBufferKeyBlack = GLBuffers.newDirectFloatBuffer(KeyBlack.GetVertexData());
+        FloatBuffer vertexBufferKeyWhite = GLBuffers.newDirectFloatBuffer(vertexDataKeyWhite);
+        FloatBuffer vertexBufferKeyBlack = GLBuffers.newDirectFloatBuffer(vertexDataKeyBlack);
 
         gl.glGenBuffers(2, buffer);
 
@@ -63,10 +75,10 @@ public class PianoRenderer {
             int vbo;
 
             if (Key.IsWhite(trackID)) {
-                key = new KeyWhite(trackID);
+                key = new Key(trackID);
                 vbo = buffer.get(Semantic.Buffer.VERTEX_KEYWHITE);
             } else {
-                key = new KeyBlack(trackID);
+                key = new Key(trackID);
                 vbo = buffer.get(Semantic.Buffer.VERTEX_KEYBLACK);
             }
 
