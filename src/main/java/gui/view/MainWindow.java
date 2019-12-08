@@ -15,7 +15,7 @@ import gui.controller.FileIO;
 import gui.controller.InputTexts;
 import gui.controller.Menus;
 import gui.entity.Status;
-import pianoroll.component.Canvas;
+import gui.controller.Canvas;
 import midi.component.MidiPlayer;
 import net.miginfocom.swing.*;
 

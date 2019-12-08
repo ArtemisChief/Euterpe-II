@@ -1,15 +1,20 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.util.GLBuffers;
+import glm.vec._2.Vec2;
 import pianoroll.entity.Particle;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.jogamp.opengl.GL.GL_TRIANGLE_STRIP;
+import static com.jogamp.opengl.GL.*;
+import static uno.buffer.UtilKt.destroyBuffers;
 
 public class ParticleRenderer {
 
@@ -33,14 +38,45 @@ public class ParticleRenderer {
         random = new Random(System.currentTimeMillis());
 
         generateParticleTrackList = new ArrayList<>();
+    }
+
+    public void init(GL3 gl) {
+        IntBuffer buffer = GLBuffers.newDirectIntBuffer(1);
+
+        FloatBuffer vertexBufferParticle = GLBuffers.newDirectFloatBuffer(Particle.GetVertexData());
+
+        gl.glGenBuffers(1, buffer);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.PARTICLE));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferParticle.capacity() * Float.BYTES, vertexBufferParticle, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        destroyBuffers(vertexBufferParticle);
 
         for (int i = 0; i < amount; ++i) {
             Particle particle = new Particle();
 
-            particle.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.PARTICLE));
-            Canvas.getGraphicElementQueue().offer(particle);
+            particle.setVbo(buffer.get(Semantic.Buffer.PARTICLE));
             particleList.add(particle);
         }
+
+        for (Particle particle : particleList) {
+            gl.glGenVertexArrays(1, particle.getVao());
+
+            gl.glBindVertexArray(particle.getVao().get(0));
+            {
+                gl.glBindBuffer(GL_ARRAY_BUFFER, particle.getVbo());
+                {
+                    gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
+                    gl.glVertexAttribPointer(Semantic.Attr.POSITION, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
+                }
+                gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
+            gl.glBindVertexArray(0);
+        }
+
+        gl.glDeleteBuffers(1, buffer);
+        destroyBuffers(buffer);
     }
 
     private void newParticle(int trackID) {
@@ -108,7 +144,7 @@ public class ParticleRenderer {
         gl.glBindVertexArray(0);
     }
 
-    public void addParticlesToTrack(int trackID){
+    public void addParticlesToTrack(int trackID) {
         generateParticleTrackList.add(trackID);
     }
 

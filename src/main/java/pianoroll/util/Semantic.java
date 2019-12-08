@@ -9,10 +9,9 @@ public abstract class Semantic {
     public interface Buffer {
         int VERTEX_KEYWHITE = 0;
         int VERTEX_KEYBLACK = 1;
-        int VERTEX_ROLLWHITE = 2;
-        int VERTEX_ROLLBLACK = 3;
-        int PARTICLE = 4;
-        int MAX = 5;
+        int VERTEX_ROLLWHITE = 0;
+        int VERTEX_ROLLBLACK = 1;
+        int PARTICLE = 0;
     }
 
     public interface Piano {

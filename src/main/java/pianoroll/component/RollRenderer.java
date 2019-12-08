@@ -1,14 +1,22 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
-import pianoroll.entity.*;
+import com.jogamp.opengl.util.GLBuffers;
+import glm.vec._2.Vec2;
+import pianoroll.entity.GraphicElement;
+import pianoroll.entity.Roll;
+import pianoroll.entity.RollBlack;
+import pianoroll.entity.RollWhite;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jogamp.opengl.GL.GL_TRIANGLE_STRIP;
+import static com.jogamp.opengl.GL.*;
+import static uno.buffer.UtilKt.destroyBuffers;
 
 public class RollRenderer {
 
@@ -28,22 +36,57 @@ public class RollRenderer {
         lastUnusedRollBlack = amount / 2;
 
         rollList = new ArrayList<>();
+    }
+
+    public void init(GL3 gl) {
+        IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);
+
+        FloatBuffer vertexBufferRollWhite = GLBuffers.newDirectFloatBuffer(RollWhite.GetVertexData());
+        FloatBuffer vertexBufferRollBlack = GLBuffers.newDirectFloatBuffer(RollBlack.GetVertexData());
+
+        gl.glGenBuffers(2, buffer);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_ROLLWHITE));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollWhite.capacity() * Float.BYTES, vertexBufferRollWhite, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_ROLLBLACK));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRollBlack.capacity() * Float.BYTES, vertexBufferRollBlack, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        destroyBuffers(vertexBufferRollWhite, vertexBufferRollBlack);
 
         for (int i = 0; i < amount / 2; ++i) {
             Roll roll = new RollWhite();
 
-            roll.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLWHITE));
-            Canvas.getGraphicElementQueue().offer(roll);
+            roll.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROLLWHITE));
             rollList.add(roll);
         }
 
         for (int i = amount / 2; i < amount; ++i) {
             Roll roll = new RollBlack();
 
-            roll.setVbo(Canvas.GetBufferName().get(Semantic.Buffer.VERTEX_ROLLBLACK));
-            Canvas.getGraphicElementQueue().offer(roll);
+            roll.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROLLBLACK));
             rollList.add(roll);
         }
+
+        for (Roll roll : rollList) {
+            gl.glGenVertexArrays(1, roll.getVao());
+
+            gl.glBindVertexArray(roll.getVao().get(0));
+            {
+                gl.glBindBuffer(GL_ARRAY_BUFFER, roll.getVbo());
+                {
+                    gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
+                    gl.glVertexAttribPointer(Semantic.Attr.POSITION, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
+                }
+                gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
+            gl.glBindVertexArray(0);
+        }
+
+        gl.glDeleteBuffers(2, buffer);
+        destroyBuffers(buffer);
     }
 
     public void newRoll(int trackID) {
@@ -57,7 +100,7 @@ public class RollRenderer {
     }
 
     private int firstUnusedRollWhite() {
-        for (int i = lastUnusedRollWhite; i < amount/2; ++i) {
+        for (int i = lastUnusedRollWhite; i < amount / 2; ++i) {
             if (rollList.get(i).isUnused()) {
                 lastUnusedRollWhite = i;
                 return i;
