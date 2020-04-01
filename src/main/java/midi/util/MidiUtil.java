@@ -13,6 +13,10 @@ public class MidiUtil {
         return (int) (60 / bpm * 1000000);
     }
 
+    public static float mptToBpm(int mpt) {
+        return (60f / mpt * 1000000);
+    }
+
     public static byte[] intToBytes(int val, int byteCount) {
         byte[] buffer = new byte[byteCount];
 
@@ -30,12 +34,34 @@ public class MidiUtil {
         return buffer;
     }
 
+    public static int bytesToInt(byte[] val) {
+        int buffer = 0;
+
+        for (int i = 0; i < val.length; ++i) {
+            int dexToInt = val[val.length - i - 1];
+            dexToInt = dexToInt > 0 ? dexToInt : 256 + dexToInt;
+
+            buffer += dexToInt * Math.pow(16, i * 2);
+        }
+
+        return buffer;
+    }
+
     private static final String HEX = "0123456789ABCDEF";
 
-    private static String byteToHex(byte b) {
+    public static char byteHighToHex(byte b) {
+        int high = (b & 0xF0) >> 4;
+        return HEX.charAt(high);
+    }
+
+    public static char byteLowToHex(byte b) {
+        int low = (b & 0x0F);
+        return HEX.charAt(low);
+    }
+
+    public static String byteToHex(byte b) {
         int high = (b & 0xF0) >> 4;
         int low = (b & 0x0F);
-
         return "" + HEX.charAt(high) + HEX.charAt(low);
     }
 
