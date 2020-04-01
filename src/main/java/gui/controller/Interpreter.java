@@ -6,7 +6,7 @@ import interpreter.component.Semantic;
 import interpreter.component.Syntactic;
 import interpreter.entity.Node;
 import interpreter.entity.Token;
-import midi.entity.MidiFile;
+import midi.component.MidiFile;
 
 import java.util.List;
 

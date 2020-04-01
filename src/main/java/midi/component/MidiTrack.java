@@ -1,4 +1,4 @@
-package midi.entity;
+package midi.component;
 
 import midi.util.MidiUtil;
 

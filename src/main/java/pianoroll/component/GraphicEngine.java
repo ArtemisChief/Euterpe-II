@@ -1,7 +1,7 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
-import midi.component.MidiConverter;
+import midi.component.MidiParser;
 import pianoroll.entity.Key;
 import pianoroll.entity.Particle;
 import pianoroll.entity.Roll;
@@ -16,7 +16,7 @@ public class GraphicEngine {
     private PianoRenderer pianoRenderer;
     private RollRenderer rollRenderer;
     private ParticleRenderer particleRenderer;
-    private MidiConverter midiConverter;
+    private MidiParser midiParser;
 
     private Program pianorollProgram;
     private Program particleProgram;
@@ -25,8 +25,8 @@ public class GraphicEngine {
         pianoRenderer = new PianoRenderer();
         rollRenderer = new RollRenderer();
         particleRenderer = new ParticleRenderer();
-        midiConverter=new MidiConverter();
-        midiConverter.convert(new File("Lemon.mid"));
+        midiParser =new MidiParser();
+        midiParser.convert(new File("River Flows In You.mid"));
     }
 
     public void init(GL3 gl) {
