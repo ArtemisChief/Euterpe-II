@@ -47,17 +47,15 @@ public class MidiUtil {
         return buffer;
     }
 
+    public static int byteHighToDec(byte b) {
+        return (b & 0xF0) >> 4;
+    }
+
+    public static int byteLowToDec(byte b) {
+        return b & 0x0F;
+    }
+
     private static final String HEX = "0123456789ABCDEF";
-
-    public static char byteHighToHex(byte b) {
-        int high = (b & 0xF0) >> 4;
-        return HEX.charAt(high);
-    }
-
-    public static char byteLowToHex(byte b) {
-        int low = (b & 0x0F);
-        return HEX.charAt(low);
-    }
 
     public static String byteToHex(byte b) {
         int high = (b & 0xF0) >> 4;

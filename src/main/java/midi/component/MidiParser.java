@@ -28,12 +28,12 @@ public class MidiParser {
                     byte[] messageData = midiEvent.getMessage().getMessage();
 
                     long tick = midiEvent.getTick();
-                    char type = MidiUtil.byteHighToHex(messageData[0]);
-                    char channel = MidiUtil.byteLowToHex(messageData[0]);
+                    int type = MidiUtil.byteHighToDec(messageData[0]);
+                    int channel = MidiUtil.byteLowToDec(messageData[0]);
 
                     switch (type) {
-                        case 'F': {   // meta-event
-                            if (channel == 'F')
+                        case 15: {   // meta-event
+                            if (channel == 15)
                                 if (messageData[1] == 81) {
                                     float bpm = MidiUtil.mptToBpm(MidiUtil.bytesToInt(new byte[]{messageData[3], messageData[4], messageData[5]}));
 
@@ -43,7 +43,7 @@ public class MidiParser {
                             break;
                         }
 
-                        case '9': {   // possibly note-on
+                        case 9: {   // possibly note-on
                             int pitch = messageData[1];
                             int intensity = messageData[2];
 
@@ -52,7 +52,7 @@ public class MidiParser {
                             } else {                // definitely note-off
                                 for (int j = noteList.size() - 1; j >= 0; --j) {
                                     Note note = noteList.get(j);
-                                    if (note.getChannel() == channel && note.getPitch() == pitch && note.getDurationTicks() == -1 && intensity == 0) {
+                                    if (note.getChannel() == channel && note.getPitch() == pitch && note.getDurationTicks() == -1) {
                                         note.setDurationTicks(tick - note.getTriggerTick());
                                         break;
                                     }
@@ -61,7 +61,7 @@ public class MidiParser {
                             break;
                         }
 
-                        case '8': {   // definitely note-off
+                        case 8: {   // definitely note-off
                             int pitch = messageData[1];
 
                             for (int j = noteList.size() - 1; j >= 0; --j) {
@@ -84,7 +84,7 @@ public class MidiParser {
                 if (note.getDurationTicks() == -1)
                     System.out.println("Error");
                 else
-                    System.out.println("At tick "+note.getTriggerTick()+": Note " + note.getPitch() + " triggered in channel " + note.getChannel() + " with intensity " + note.getIntensity() + " for " + note.getDurationTicks() + " ticks");
+                    System.out.println("At tick " + note.getTriggerTick() + ": Note " + note.getPitch() + " triggered in channel " + note.getChannel() + " with intensity " + note.getIntensity() + " for " + note.getDurationTicks() + " ticks");
             }
 
         } catch (Exception e) {
