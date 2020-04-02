@@ -285,9 +285,27 @@ public class Lexical {
                         tokens.add(new Token(-1, "\"speed=\"后缺少对应速度", count));
                         return;
                     }
-                    //扫描speed=后的字符，出现非数字则报错
+                    //扫描speed=后的字符，出现非法数字则报错
+                    boolean point=false;  //判断是否出现过小数点
                     for (int i = 6; i < inputWord.length(); ++i) {
-                        if (!isNumber(inputWord.charAt(i))) {
+                        if(inputWord.charAt(i)=='.'){
+                            if(i==6) {
+                                skipLine = count;
+                                errorLine.add(skipLine);
+                                tokens.add(new Token(-1, "速度不能以小数点开头：" + inputWord.charAt(i), count));
+                                return;
+                            }
+                            else if(point){
+                                skipLine = count;
+                                errorLine.add(skipLine);
+                                tokens.add(new Token(-1, "速度中不能出现多个小数点：" + inputWord.charAt(i), count));
+                                return;
+                            }
+                            else {
+                                point=true;
+                            }
+                        }
+                        else if (!isNumber(inputWord.charAt(i))) {
                             skipLine = count;
                             errorLine.add(skipLine);
                             tokens.add(new Token(-1, "速度中出现非法字符：" + inputWord.charAt(i), count));
@@ -509,9 +527,6 @@ public class Lexical {
             tokens.add(new Token(syn, String.valueOf(inputWord.charAt(0)), count));
             if (inputWord.length() > 1)
                 Scanner(inputWord.substring(1), false);
-        }
-        //输入为\n时，直接返回（已在Lex函数中添加换行token）
-        else if (inputWord.equals("\n")) {
         }
         //其他非法字符开头则报错
         else {
