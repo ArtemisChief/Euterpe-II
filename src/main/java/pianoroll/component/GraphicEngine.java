@@ -26,7 +26,7 @@ public class GraphicEngine {
         rollRenderer = new RollRenderer();
         particleRenderer = new ParticleRenderer();
         midiParser =new MidiParser();
-        midiParser.convert(new File("Lemon.mid"));
+        midiParser.parse(new File("Heartache.mid"));
     }
 
     public void init(GL3 gl) {
