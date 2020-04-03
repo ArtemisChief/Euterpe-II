@@ -1,11 +1,11 @@
 package midi.entity;
 
-public class BpmEvent extends Event{
+public class BpmEvent extends Event {
 
     private final float bpm;
 
-    public BpmEvent(int channel, long triggerTick, float bpm) {
-        super(channel,triggerTick);
+    public BpmEvent(long triggerTick, float bpm) {
+        super(-1, triggerTick);
         this.bpm = bpm;
     }
 

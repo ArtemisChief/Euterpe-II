@@ -59,7 +59,7 @@ public class MidiParser {
                             if (channel == 15)
                                 if (messageData[1] == 81) {
                                     float bpm = MidiUtil.mptToBpm(MidiUtil.bytesToInt(new byte[]{messageData[3], messageData[4], messageData[5]}));
-                                    mtrack.getEventList().add(new BpmEvent(channel, tick, bpm));
+                                    mtrack.getEventList().add(new BpmEvent(tick, bpm));
                                     break;
                                 }
                             break;
