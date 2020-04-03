@@ -1,6 +1,8 @@
-package midi.entity;
+package midipaser.entity.events;
 
-public class InstrumentEvent extends Event{
+import midipaser.entity.MidiEvent;
+
+public class InstrumentEvent extends MidiEvent {
 
     private final int instrumentNumber;
 

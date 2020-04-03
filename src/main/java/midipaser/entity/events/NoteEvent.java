@@ -1,6 +1,8 @@
-package midi.entity;
+package midipaser.entity.events;
 
-public class NoteEvent extends Event {
+import midipaser.entity.MidiEvent;
+
+public class NoteEvent extends MidiEvent {
 
     private final int pitch;
 

@@ -1,18 +1,17 @@
-package midi.component;
+package midipaser.component;
 
-import midi.entity.BpmEvent;
-import midi.entity.Event;
-import midi.entity.InstrumentEvent;
-import midi.entity.NoteEvent;
+import midipaser.entity.*;
 import midi.util.MidiUtil;
+import midipaser.entity.events.BpmEvent;
+import midipaser.entity.events.InstrumentEvent;
+import midipaser.entity.MidiEvent;
+import midipaser.entity.events.NoteEvent;
+import midipaser.util.MidiParserUtil;
 
-import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MidiParser {
 
@@ -22,35 +21,27 @@ public class MidiParser {
         return instance;
     }
 
-    private int resolution;
-
-    private final List<midi.entity.Track> trackList;
-
-    private MidiParser() {
-        resolution = 0;
-        trackList = new ArrayList<>();
-    }
-
-    public void parse(File midiFile) {
+    public MidiContent parse(File midiFile) {
         try {
             Sequence sequence = MidiSystem.getSequence(midiFile);
-            resolution = sequence.getResolution();
+
+            MidiContent midiContent = new MidiContent(sequence.getResolution());
             System.out.println("Midi Info - Ticks per quarter note: " + sequence.getResolution());
 
             int trackCount = 0;
 
             for (Track track : sequence.getTracks()) {
-                midi.entity.Track mtrack = new midi.entity.Track(trackCount++);
-                trackList.add(mtrack);
+                MidiTrack mtrack = new MidiTrack(trackCount++);
+                midiContent.getMidiTrackList().add(mtrack);
 
                 for (int i = 0; i < track.size(); ++i) {
-                    MidiEvent midiEvent = track.get(i);
+                    javax.sound.midi.MidiEvent midiEvent = track.get(i);
 
                     byte[] messageData = midiEvent.getMessage().getMessage();
 
                     long tick = midiEvent.getTick();
-                    int type = MidiUtil.byteHighToDec(messageData[0]);
-                    int channel = MidiUtil.byteLowToDec(messageData[0]);
+                    int type = MidiParserUtil.byteHighToDec(messageData[0]);
+                    int channel = MidiParserUtil.byteLowToDec(messageData[0]);
 
 //                    System.out.println(tick + ": " + MidiUtil.bytesToHex(messageData));
 
@@ -58,15 +49,15 @@ public class MidiParser {
                         case 15: {   // meta-event
                             if (channel == 15)
                                 if (messageData[1] == 81) {
-                                    float bpm = MidiUtil.mptToBpm(MidiUtil.bytesToInt(new byte[]{messageData[3], messageData[4], messageData[5]}));
-                                    mtrack.getEventList().add(new BpmEvent(tick, bpm));
+                                    float bpm = MidiParserUtil.mptToBpm(MidiParserUtil.bytesToInt(new byte[]{messageData[3], messageData[4], messageData[5]}));
+                                    mtrack.getMidiEventList().add(new BpmEvent(tick, bpm));
                                     break;
                                 }
                             break;
                         }
 
                         case 12:    // instrument
-                            mtrack.getEventList().add(new InstrumentEvent(channel, tick, messageData[1]));
+                            mtrack.getMidiEventList().add(new InstrumentEvent(channel, tick, messageData[1]));
                             break;
 
                         case 9: {   // possibly note-on
@@ -74,10 +65,10 @@ public class MidiParser {
                             int intensity = messageData[2];
 
                             if (intensity != 0) {   // definitely note-on
-                                mtrack.getEventList().add(new NoteEvent(channel, tick, pitch, intensity));
+                                mtrack.getMidiEventList().add(new NoteEvent(channel, tick, pitch, intensity));
                             } else {                // definitely note-off
-                                for (int j = mtrack.getEventList().size() - 1; j >= 0; --j) {
-                                    Event event = mtrack.getEventList().get(j);
+                                for (int j = mtrack.getMidiEventList().size() - 1; j >= 0; --j) {
+                                    MidiEvent event = mtrack.getMidiEventList().get(j);
 
                                     if (event instanceof NoteEvent) {
                                         NoteEvent noteEvent = (NoteEvent) event;
@@ -95,8 +86,8 @@ public class MidiParser {
                         case 8: {   // definitely note-off
                             int pitch = messageData[1];
 
-                            for (int j = mtrack.getEventList().size() - 1; j >= 0; --j) {
-                                Event event = mtrack.getEventList().get(j);
+                            for (int j = mtrack.getMidiEventList().size() - 1; j >= 0; --j) {
+                                MidiEvent event = mtrack.getMidiEventList().get(j);
 
                                 if (event instanceof NoteEvent) {
                                     NoteEvent noteEvent = (NoteEvent) event;
@@ -116,36 +107,31 @@ public class MidiParser {
                 }
             }
 
-            for (midi.entity.Track track : trackList) {
-                System.out.println("---------------------------------------------------------------------------\nTrack No. " + track.getTrackNumber());
-                for (Event event : track.getEventList()) {
-                    if (event instanceof NoteEvent) {
-                        NoteEvent noteEvent = (NoteEvent) event;
+            for (MidiTrack midiTrack : midiContent.getMidiTrackList()) {
+                System.out.println("---------------------------------------------------------------------------\nTrack No. " + midiTrack.getTrackNumber());
+                for (MidiEvent midiEvent : midiTrack.getMidiEventList()) {
+                    if (midiEvent instanceof NoteEvent) {
+                        NoteEvent noteEvent = (NoteEvent) midiEvent;
                         if (noteEvent.getDurationTicks() == -1)
                             System.out.println("Error");
                         else
                             System.out.println("At tick " + noteEvent.getTriggerTick() + ": Note " + noteEvent.getPitch() + " triggered in channel " + noteEvent.getChannel() + " with intensity " + noteEvent.getIntensity() + " for " + noteEvent.getDurationTicks() + " ticks");
-                    } else if (event instanceof BpmEvent) {
-                        BpmEvent bpmEvent = (BpmEvent) event;
+                    } else if (midiEvent instanceof BpmEvent) {
+                        BpmEvent bpmEvent = (BpmEvent) midiEvent;
                         System.out.println("At tick " + bpmEvent.getTriggerTick() + ": Controller set BPM to " + bpmEvent.getBpm());
                     } else {
-                        InstrumentEvent instrumentEvent = (InstrumentEvent) event;
+                        InstrumentEvent instrumentEvent = (InstrumentEvent) midiEvent;
                         System.out.println("At tick " + instrumentEvent.getTriggerTick() + ": Change instrument to " + instrumentEvent.getInstrumentNumber());
                     }
                 }
             }
 
+            return midiContent;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-    }
-
-    public int getResolution() {
-        return resolution;
-    }
-
-    public List<midi.entity.Track> getTrackList() {
-        return trackList;
     }
 
 }

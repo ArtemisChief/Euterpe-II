@@ -4,8 +4,8 @@ import interpreter.entity.Node;
 import interpreter.entity.Note;
 import interpreter.entity.Paragraph;
 import interpreter.entity.Symbol;
-import midi.component.MidiFile;
-import midi.component.MidiTrack;
+import midi.entity.MidiFile;
+import midi.entity.MidiTrack;
 import java.util.*;
 
 public class Semantic {

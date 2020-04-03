@@ -1,4 +1,4 @@
-package midi.component;
+package midi.entity;
 
 import midi.util.MidiUtil;
 import java.io.*;

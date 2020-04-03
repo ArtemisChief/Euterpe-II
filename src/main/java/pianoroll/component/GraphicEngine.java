@@ -1,14 +1,12 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
-import midi.component.MidiParser;
 import pianoroll.entity.Key;
 import pianoroll.entity.Particle;
 import pianoroll.entity.Roll;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
-import java.io.File;
 import java.nio.FloatBuffer;
 
 public class GraphicEngine {
@@ -16,7 +14,6 @@ public class GraphicEngine {
     private PianoRenderer pianoRenderer;
     private RollRenderer rollRenderer;
     private ParticleRenderer particleRenderer;
-    private MidiParser midiParser;
 
     private Program pianorollProgram;
     private Program particleProgram;
@@ -25,8 +22,6 @@ public class GraphicEngine {
         pianoRenderer = new PianoRenderer();
         rollRenderer = new RollRenderer();
         particleRenderer = new ParticleRenderer();
-        midiParser = MidiParser.GetInstance();
-        midiParser.parse(new File("1.mid"));
     }
 
     public void init(GL3 gl) {

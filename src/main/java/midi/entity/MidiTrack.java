@@ -1,4 +1,4 @@
-package midi.component;
+package midi.entity;
 
 import midi.util.MidiUtil;
 
@@ -77,7 +77,7 @@ public class MidiTrack {
         this.midiTrackContentData = MidiUtil.mergeByte(this.midiTrackContentData, midiTrack.midiTrackContentData);
     }
 
-    byte[] getMidiTrackData() {
+    protected byte[] getMidiTrackData() {
         return midiTrackData;
     }
 

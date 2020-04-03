@@ -1,6 +1,8 @@
-package midi.entity;
+package midipaser.entity.events;
 
-public class BpmEvent extends Event {
+import midipaser.entity.MidiEvent;
+
+public class BpmEvent extends MidiEvent {
 
     private final float bpm;
 
