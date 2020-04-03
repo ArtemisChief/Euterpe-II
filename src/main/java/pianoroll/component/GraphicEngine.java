@@ -26,7 +26,7 @@ public class GraphicEngine {
         rollRenderer = new RollRenderer();
         particleRenderer = new ParticleRenderer();
         midiParser = MidiParser.GetInstance();
-        midiParser.parse(new File("Heartache.mid"));
+        midiParser.parse(new File("1.mid"));
     }
 
     public void init(GL3 gl) {

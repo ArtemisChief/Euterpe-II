@@ -44,8 +44,7 @@ public class MidiTrack {
     }
 
     public void setInstrument(byte channel, byte type) {
-        byte[] instrument = new byte[]{0x00, (byte) (0xC0 + channel), type,
-                0x00, (byte) (0xB0 + channel), 0x0A, 0x40};
+        byte[] instrument = new byte[]{0x00, (byte) (0xC0 + channel), type};
         midiTrackContentData = MidiUtil.mergeByte(midiTrackContentData, instrument);
     }
 
