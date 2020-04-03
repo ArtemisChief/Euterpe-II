@@ -25,7 +25,7 @@ public class GraphicEngine {
         pianoRenderer = new PianoRenderer();
         rollRenderer = new RollRenderer();
         particleRenderer = new ParticleRenderer();
-        midiParser =new MidiParser();
+        midiParser = MidiParser.GetInstance();
         midiParser.parse(new File("Heartache.mid"));
     }
 

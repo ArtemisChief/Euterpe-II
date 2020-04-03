@@ -15,11 +15,17 @@ import java.util.List;
 
 public class MidiParser {
 
+    private static final MidiParser instance = new MidiParser();
+
+    public static MidiParser GetInstance() {
+        return instance;
+    }
+
     private int resolution;
 
     private final List<Event> eventList;
 
-    public MidiParser() {
+    private MidiParser() {
         resolution = 0;
         eventList = new ArrayList<>();
     }
@@ -27,7 +33,7 @@ public class MidiParser {
     public void parse(File midiFile) {
         try {
             Sequence sequence = MidiSystem.getSequence(midiFile);
-            resolution=sequence.getResolution();
+            resolution = sequence.getResolution();
             System.out.println("Ticks per quarter note: " + sequence.getResolution());
 
             for (Track track : sequence.getTracks()) {
@@ -123,4 +129,5 @@ public class MidiParser {
     public List<Event> getEventList() {
         return eventList;
     }
+
 }
