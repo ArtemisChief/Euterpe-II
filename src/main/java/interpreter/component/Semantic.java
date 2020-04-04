@@ -4,8 +4,10 @@ import interpreter.entity.Node;
 import interpreter.entity.Note;
 import interpreter.entity.Paragraph;
 import interpreter.entity.Symbol;
-import midi.entity.MidiFile;
-import midi.entity.MidiTrack;
+import midibuilder.component.MidiFileBuilder;
+import midibuilder.component.MidiTrackBuilder;
+import midibuilder.entity.MidiFile;
+import midibuilder.entity.MidiTrack;
 import java.util.*;
 
 public class Semantic {
@@ -42,7 +44,7 @@ public class Semantic {
             return null;
 
         midiFile = new MidiFile(midiTracks);
-        midiFile.construct();
+        MidiFileBuilder.GetInstance().constructMidiFile(midiFile);
 
         return midiFile.toString();
     }
@@ -326,7 +328,7 @@ public class Semantic {
                                 } else {
                                     midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), 0, (byte) index);
                                     if (midiTrack != null)
-                                        midiTracks.get(index).merge(midiTrack);
+                                        MidiTrackBuilder.GetInstance().merge(midiTracks.get(index),midiTrack);
                                 }
 
                                 if (paraName.equals("Drums"))
@@ -338,7 +340,7 @@ public class Semantic {
 
                     if (!getIsError())
                         for (MidiTrack midiTrack : midiTracks)
-                            midiTrack.setEnd();
+                            MidiTrackBuilder.GetInstance().setEnd(midiTrack);
             }
         }
     }
@@ -347,13 +349,14 @@ public class Semantic {
         if (getIsError())
             return null;
 
-        MidiTrack midiTrack = new MidiTrack();
-        midiTrack.setBpm(paragraph.getSpeed());
-        midiTrack.setInstrument(channel, paragraph.getInstrument());
-        midiTrack.addController(channel, (byte) 0x07, paragraph.getVolume());
+        MidiTrackBuilder.GetInstance().createMidiTrack()
+                .setStart()
+                .setBpm(paragraph.getSpeed())
+                .setInstrument(channel,paragraph.getInstrument())
+                .addController(channel, (byte) 0x07, paragraph.getVolume());
 
         if (duration != 0)
-            midiTrack.setDuration(duration);
+            MidiTrackBuilder.GetInstance().setDuration(duration);
 
         List<Integer> noteList = paragraph.getNoteList();
         List<Integer> durationList = paragraph.getDurationList();
@@ -379,7 +382,7 @@ public class Semantic {
                             }
 
                             for (boolean isPrimary = true; true; isPrimary = false) {
-                                midiTrack.insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
+                                MidiTrackBuilder.GetInstance().insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
                                 tempNote = new Note(durationList.get(index), noteList.get(index++).byteValue(), isPrimary);
                                 bufferNotes.offer(tempNote);
 
@@ -390,7 +393,7 @@ public class Semantic {
                             symbolQueue.poll();
                             do {
                                 tempNote = bufferNotes.poll();
-                                midiTrack.insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
+                                MidiTrackBuilder.GetInstance().insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
                                 reduceDeltaTimeInQueue(bufferNotes, tempNote.getDeltaTime());
                             }
                             while (!bufferNotes.isEmpty() && (!tempNote.getIsPrimary() || bufferNotes.peek().getDeltaTime() == 0));
@@ -414,8 +417,8 @@ public class Semantic {
                                 currentNote = noteList.get(index).byteValue();
                                 if (currentNote != lastNote) {
                                     if (lastNote != -1) {
-                                        midiTrack.insertNoteOn(channel, lastNote, (byte) 80);
-                                        midiTrack.insertNoteOff(totalDuration, channel, lastNote);
+                                        MidiTrackBuilder.GetInstance().insertNoteOn(channel, lastNote, (byte) 80);
+                                        MidiTrackBuilder.GetInstance().insertNoteOff(totalDuration, channel, lastNote);
                                         totalDuration = 0;
                                     }
                                     lastNote = noteList.get(index).byteValue();
@@ -426,8 +429,8 @@ public class Semantic {
 
                             symbolQueue.poll();
 
-                            midiTrack.insertNoteOn(channel, lastNote, (byte) 80);
-                            midiTrack.insertNoteOff(totalDuration, channel, lastNote);
+                            MidiTrackBuilder.GetInstance().insertNoteOn(channel, lastNote, (byte) 80);
+                            MidiTrackBuilder.GetInstance().insertNoteOff(totalDuration, channel, lastNote);
                         }
                         break;
                 }
@@ -435,31 +438,31 @@ public class Semantic {
 
             if (index < count) {
                 //特殊符号外的音
-                midiTrack.insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
+                MidiTrackBuilder.GetInstance().insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
 
                 if (!bufferNotes.isEmpty()) {
                     //还有同时音在播放中
                     while (!bufferNotes.isEmpty() && durationList.get(index) >= bufferNotes.peek().getDeltaTime()) {
                         tempNote = bufferNotes.poll();
-                        midiTrack.insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
+                        MidiTrackBuilder.GetInstance().insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
                         reduceDeltaTimeInQueue(bufferNotes, tempNote.getDeltaTime());
                         durationList.set(index, durationList.get(index) - tempNote.getDeltaTime());
                     }
                     reduceDeltaTimeInQueue(bufferNotes, durationList.get(index));
                 }
 
-                midiTrack.insertNoteOff(durationList.get(index), channel, noteList.get(index).byteValue());
+                MidiTrackBuilder.GetInstance().insertNoteOff(durationList.get(index), channel, noteList.get(index).byteValue());
             }
         }
 
         while (!bufferNotes.isEmpty()) {
             //还有同时音在播放中
             tempNote = bufferNotes.poll();
-            midiTrack.insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
+            MidiTrackBuilder.GetInstance().insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
             reduceDeltaTimeInQueue(bufferNotes, tempNote.getDeltaTime());
         }
 
-        return midiTrack;
+        return MidiTrackBuilder.GetInstance().returnCurrentMidiTrack();
     }
 
     private void reduceDeltaTimeInQueue(Queue<Note> bufferNotes, int deltaTime) {

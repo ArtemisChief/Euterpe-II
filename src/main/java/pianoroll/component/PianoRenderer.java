@@ -3,7 +3,7 @@ package pianoroll.component;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
-import midi.component.MidiPlayer;
+import midiplayer.component.MidiPlayer;
 import pianoroll.entity.Key;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;

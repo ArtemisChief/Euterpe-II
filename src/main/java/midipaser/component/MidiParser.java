@@ -1,7 +1,6 @@
 package midipaser.component;
 
 import midipaser.entity.*;
-import midi.util.MidiUtil;
 import midipaser.entity.events.BpmEvent;
 import midipaser.entity.events.InstrumentEvent;
 import midipaser.entity.MidiEvent;
@@ -20,6 +19,8 @@ public class MidiParser {
     public static MidiParser GetInstance() {
         return instance;
     }
+
+    private MidiParser(){}
 
     public MidiContent parse(File midiFile) {
         try {

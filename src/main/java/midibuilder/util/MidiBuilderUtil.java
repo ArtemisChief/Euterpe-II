@@ -1,6 +1,6 @@
-package midi.util;
+package midibuilder.util;
 
-public class MidiUtil {
+public class MidiBuilderUtil {
 
     public static byte[] mergeByte(byte[] b1, byte[] b2) {
         byte[] result = new byte[b1.length + b2.length];

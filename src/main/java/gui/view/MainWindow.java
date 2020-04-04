@@ -16,7 +16,7 @@ import gui.controller.InputTexts;
 import gui.controller.Menus;
 import gui.entity.Status;
 import gui.controller.Canvas;
-import midi.component.MidiPlayer;
+import midiplayer.component.MidiPlayer;
 import net.miginfocom.swing.*;
 
 /**

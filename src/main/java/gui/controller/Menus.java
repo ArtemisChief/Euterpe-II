@@ -1,7 +1,7 @@
 package gui.controller;
 
 import gui.view.MainWindow;
-import midi.component.MidiPlayer;
+import midiplayer.component.MidiPlayer;
 import gui.entity.Status;
 
 public class Menus {

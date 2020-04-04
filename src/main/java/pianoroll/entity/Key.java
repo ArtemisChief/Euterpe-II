@@ -1,6 +1,6 @@
 package pianoroll.entity;
 
-import midi.component.MidiPlayer;
+import midiplayer.component.MidiPlayer;
 
 import javax.sound.midi.ShortMessage;
 

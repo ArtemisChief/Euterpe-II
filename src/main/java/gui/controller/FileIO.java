@@ -1,7 +1,8 @@
 package gui.controller;
 
 import gui.view.MainWindow;
-import midi.component.MidiPlayer;
+import midibuilder.component.MidiFileBuilder;
+import midiplayer.component.MidiPlayer;
 import gui.entity.Status;
 
 import javax.swing.*;
@@ -130,7 +131,7 @@ public class FileIO {
 
             File midiFile = new File(fileStr);
 
-            if (!Interpreter.GetInstance().getMidiFile().writeToFile(midiFile))
+            if (!MidiFileBuilder.GetInstance().writeToFile(Interpreter.GetInstance().getMidiFile(), midiFile))
                 Diaglogs.GetInstance().showErrorInfo("目标文件被占用，无法导出");
         }
     }
@@ -143,7 +144,7 @@ public class FileIO {
             tempMidiFile = new File("tempMidi.mid");
         }
 
-        if (!Interpreter.GetInstance().getMidiFile().writeToFile(tempMidiFile)) {
+        if (!MidiFileBuilder.GetInstance().writeToFile(Interpreter.GetInstance().getMidiFile(), tempMidiFile)) {
             Diaglogs.GetInstance().showErrorInfo("目标文件被占用，无法导出");
             return false;
         }
