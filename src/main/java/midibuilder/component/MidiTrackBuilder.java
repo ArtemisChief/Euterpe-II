@@ -23,7 +23,7 @@ public class MidiTrackBuilder {
         return this;
     }
 
-    public MidiTrack returnCurrentMidiTrack(){
+    public MidiTrack returnCurrentMidiTrack() {
         return currentMidiTrack;
     }
 
@@ -104,7 +104,7 @@ public class MidiTrackBuilder {
         return this;
     }
 
-    public MidiTrackBuilder setEnd(MidiTrack midiTrack) {
+    public void setEnd(MidiTrack midiTrack) {
         byte[] midiTrackData = midiTrack.getMidiTrackData();
         byte[] midiTrackContentData = midiTrack.getMidiTrackContentData();
 
@@ -113,14 +113,10 @@ public class MidiTrackBuilder {
         midiTrackData = MidiBuilderUtil.mergeByte(midiTrackData, new byte[]{0x00, (byte) 0xFF, 0x2F, 0x00});
 
         midiTrack.setMidiTrackData(midiTrackData);
-
-        return this;
     }
 
-    public MidiTrackBuilder merge(MidiTrack midiTrack1, MidiTrack midiTrack2) {
+    public void merge(MidiTrack midiTrack1, MidiTrack midiTrack2) {
         midiTrack1.setMidiTrackContentData(MidiBuilderUtil.mergeByte(midiTrack1.getMidiTrackContentData(), midiTrack2.getMidiTrackContentData()));
-
-        return this;
     }
 
 }

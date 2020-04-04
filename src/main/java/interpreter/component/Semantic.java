@@ -43,8 +43,8 @@ public class Semantic {
         if (getIsError())
             return null;
 
-        midiFile = new MidiFile(midiTracks);
-        MidiFileBuilder.GetInstance().constructMidiFile(midiFile);
+        MidiFileBuilder.GetInstance().createMidiFile(midiTracks).constructMidiFile();
+        midiFile = MidiFileBuilder.GetInstance().getCurrentMidiFile();
 
         return midiFile.toString();
     }
@@ -328,7 +328,7 @@ public class Semantic {
                                 } else {
                                     midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), 0, (byte) index);
                                     if (midiTrack != null)
-                                        MidiTrackBuilder.GetInstance().merge(midiTracks.get(index),midiTrack);
+                                        MidiTrackBuilder.GetInstance().merge(midiTracks.get(index), midiTrack);
                                 }
 
                                 if (paraName.equals("Drums"))
@@ -352,7 +352,7 @@ public class Semantic {
         MidiTrackBuilder.GetInstance().createMidiTrack()
                 .setStart()
                 .setBpm(paragraph.getSpeed())
-                .setInstrument(channel,paragraph.getInstrument())
+                .setInstrument(channel, paragraph.getInstrument())
                 .addController(channel, (byte) 0x07, paragraph.getVolume());
 
         if (duration != 0)
