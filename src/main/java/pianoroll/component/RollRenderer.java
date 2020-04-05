@@ -3,14 +3,12 @@ package pianoroll.component;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
-import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Roll;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
@@ -20,18 +18,11 @@ public class RollRenderer {
 
     private final int amount;
 
-    private int lastUnusedRollWhite;
-    private int lastUnusedRollBlack;
-
     private final List<Roll> rollList;
 
-    public RollRenderer() {
-        amount = 200;
-
-        lastUnusedRollWhite = 0;
-        lastUnusedRollBlack = amount / 2;
-
-        rollList = new ArrayList<>();
+    public RollRenderer(int amount,List<Roll> rollList) {
+        this.amount = amount;
+        this.rollList = rollList;
     }
 
     public void init(GL3 gl) {
@@ -114,76 +105,6 @@ public class RollRenderer {
         }
 
         gl.glBindVertexArray(0);
-    }
-
-    public void newRoll(int trackID) {
-        int unusedRoll;
-        if (GraphicElement.IsWhite(trackID))
-            unusedRoll = firstUnusedRollWhite();
-        else
-            unusedRoll = firstUnusedRollBlack();
-
-        respawnRoll(rollList.get(unusedRoll), trackID);
-    }
-
-    private int firstUnusedRollWhite() {
-        for (int i = lastUnusedRollWhite; i < amount / 2; ++i) {
-            if (rollList.get(i).isUnused()) {
-                lastUnusedRollWhite = i;
-                return i;
-            }
-        }
-
-        for (int i = 0; i < lastUnusedRollWhite; ++i) {
-            if (rollList.get(i).isUnused()) {
-                lastUnusedRollWhite = i;
-                return i;
-            }
-        }
-
-        lastUnusedRollWhite = 0;
-        return 0;
-    }
-
-    private int firstUnusedRollBlack() {
-        for (int i = lastUnusedRollBlack; i < amount / 2; ++i) {
-            if (rollList.get(i).isUnused()) {
-                lastUnusedRollBlack = i;
-                return i;
-            }
-        }
-
-        for (int i = amount / 2; i < lastUnusedRollBlack; ++i) {
-            if (rollList.get(i).isUnused()) {
-                lastUnusedRollBlack = i;
-                return i;
-            }
-        }
-
-        lastUnusedRollBlack = amount / 2;
-        return amount / 2;
-    }
-
-    private void respawnRoll(Roll roll, int trackID) {
-        roll.setTrackID(trackID);
-        roll.setColorID(trackID + 100);
-        roll.setOffsetY(0.0f);
-        roll.setScaleY(1.0f);
-        roll.setUpdatingScaleY(true);
-        roll.setUnused(false);
-    }
-
-    public void stopUpdatingScaleY(int trackID) {
-        for (Roll roll : rollList) {
-            if (roll.getTrackID() == trackID && roll.isUpdatingScaleY()) {
-                roll.setUpdatingScaleY(false);
-                roll.setColorID(trackID);
-            }
-        }
-    }
-
-    public List<Roll> getRollList() {
-        return rollList;
     }
 
 }

@@ -9,7 +9,7 @@ public class InputProcessor implements KeyListener {
 
     private final PianoManager pianoManager;
 
-    private final RollRenderer rollRenderer;
+    private final RollManager rollManager;
 
     private final ParticleManager particleManager;
 
@@ -17,7 +17,7 @@ public class InputProcessor implements KeyListener {
 
     public InputProcessor(GraphicEngine graphicEngine) {
         this.pianoManager = graphicEngine.getPianoManager();
-        this.rollRenderer = graphicEngine.getRollRenderer();
+        this.rollManager = graphicEngine.getRollManager();
         this.particleManager = graphicEngine.getParticleManager();
 
         keyDownList = new ArrayList<>();
@@ -35,7 +35,7 @@ public class InputProcessor implements KeyListener {
             if (!keyDownList.contains(e.getKeyCode())) {
                 pianoManager.getKeyList().get(trackID).press();
 
-                rollRenderer.newRoll(trackID);
+                rollManager.respawnRoll(trackID);
                 particleManager.triggerTrack(trackID);
 
                 keyDownList.add(e.getKeyCode());
@@ -51,7 +51,7 @@ public class InputProcessor implements KeyListener {
             if (keyDownList.contains(e.getKeyCode())) {
                 pianoManager.getKeyList().get(trackID).release();
 
-                rollRenderer.stopUpdatingScaleY(trackID);
+                rollManager.stopUpdatingScaleY(trackID);
                 particleManager.suspendTrack(trackID);
 
                 keyDownList.remove((Integer) e.getKeyCode());

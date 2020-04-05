@@ -28,7 +28,7 @@ public class GraphicEngine {
         pianoRenderer = new PianoRenderer(pianoManager.getKeyList());
 
         rollManager = new RollManager();
-        rollRenderer = new RollRenderer();
+        rollRenderer = new RollRenderer(rollManager.getAmount(), rollManager.getRollList());
 
         particleManager = new ParticleManager();
         particleRenderer = new ParticleRenderer(particleManager.getAmount(), particleManager.getParticleList());
@@ -52,7 +52,7 @@ public class GraphicEngine {
 
         particleManager.respawnParticle();
 
-        for (Roll roll : rollRenderer.getRollList())
+        for (Roll roll : rollManager.getRollList())
             roll.update(deltaTime * Semantic.Roll.SPEED);
 
         for (Particle particle : particleManager.getParticleList())
@@ -79,7 +79,7 @@ public class GraphicEngine {
         for (Key key : pianoManager.getKeyList())
             gl.glDeleteVertexArrays(1, key.getVao());
 
-        for (Roll roll : rollRenderer.getRollList())
+        for (Roll roll : rollManager.getRollList())
             gl.glDeleteVertexArrays(1, roll.getVao());
 
         for (Particle particle : particleManager.getParticleList())
@@ -92,10 +92,6 @@ public class GraphicEngine {
 
     public RollManager getRollManager() {
         return rollManager;
-    }
-
-    public RollRenderer getRollRenderer() {
-        return rollRenderer;
     }
 
     public ParticleManager getParticleManager() {
