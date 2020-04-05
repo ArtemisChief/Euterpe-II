@@ -13,20 +13,22 @@ public class PianoController {
     private final List<Key> keyList;
 
     private final List<Integer> triggeredTrackList;
+    private final List<Integer> triggeringTrackList;
 
     private int pitchOffset;
 
     public PianoController(List<Integer> triggeredTrackList) {
         keyList = new ArrayList<>();
 
-        this.triggeredTrackList=triggeredTrackList;
+        this.triggeredTrackList = triggeredTrackList;
+        triggeringTrackList = new ArrayList<>();
 
         pitchOffset = 0;
 
         try {
-            //todo sustain
-            ShortMessage shortMessage = new ShortMessage(176, 0, 64, 127);
-            MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
+//            todo sustain
+//            ShortMessage shortMessage = new ShortMessage(176, 0, 64, 127);
+//            MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }

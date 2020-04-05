@@ -6,6 +6,7 @@ import pianoroll.util.Semantic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class RollController {
 
@@ -14,6 +15,7 @@ public class RollController {
     private final List<Roll> rollList;
 
     private final List<Integer> triggeredTrackList;
+    private final List<Integer> triggeringTrackList;
 
     private int lastUnusedRollWhite;
     private int lastUnusedRollBlack;
@@ -24,41 +26,56 @@ public class RollController {
         rollList = new ArrayList<>();
 
         this.triggeredTrackList = triggeredTrackList;
+        triggeringTrackList = new ArrayList<>();
 
         lastUnusedRollWhite = 0;
         lastUnusedRollBlack = amount / 2;
     }
 
-    public void trigger(int trackID) {
-        int unusedRoll;
-
-        if (GraphicElement.IsWhite(trackID))
-            unusedRoll = firstUnusedRollWhite();
-        else
-            unusedRoll = firstUnusedRollBlack();
-
-        Roll roll = rollList.get(unusedRoll);
-
-        roll.setTrackID(trackID);
-        roll.setColorID(trackID + 100);
-        roll.setOffsetY(0.0f);
-        roll.setScaleY(1.0f);
-        roll.setUpdatingScaleY(true);
-        roll.setUnused(false);
+    public void trigger(Integer trackID) {
+        if (!triggeredTrackList.contains(trackID))
+            triggeredTrackList.add(trackID);
     }
 
-    public void suspend(int trackID) {
+    public void suspend(Integer trackID) {
         for (Roll roll : rollList) {
             if (roll.getTrackID() == trackID && roll.isUpdatingScaleY()) {
                 roll.setUpdatingScaleY(false);
                 roll.setColorID(trackID);
             }
         }
+
+        if (triggeredTrackList.contains(trackID))
+            triggeredTrackList.remove(trackID);
+
+        triggeringTrackList.remove(trackID);
     }
 
     public void updateRolls(float deltaTime) {
+        // spawn a new roll if needed
+        for (Integer trackID : triggeredTrackList) {
+            if (!triggeringTrackList.contains(trackID)) {
+                int unusedRoll;
 
+                if (GraphicElement.IsWhite(trackID))
+                    unusedRoll = firstUnusedRollWhite();
+                else
+                    unusedRoll = firstUnusedRollBlack();
 
+                Roll roll = rollList.get(unusedRoll);
+
+                roll.setTrackID(trackID);
+                roll.setColorID(trackID + 100);
+                roll.setOffsetY(0.0f);
+                roll.setScaleY(1.0f);
+                roll.setUpdatingScaleY(true);
+                roll.setUnused(false);
+
+                triggeringTrackList.add(trackID);
+            }
+        }
+
+        // update all rolls
         float deltaY = deltaTime * Semantic.Roll.SPEED;
 
         for (Roll roll : rollList) {

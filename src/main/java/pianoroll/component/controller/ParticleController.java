@@ -1,6 +1,7 @@
 package pianoroll.component.controller;
 
 import pianoroll.entity.Particle;
+import pianoroll.entity.Roll;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,35 +28,35 @@ public class ParticleController {
     }
 
     public void trigger(int trackID) {
-        triggeredTrackList.add(trackID);
+        if (!triggeredTrackList.contains(trackID))
+            triggeredTrackList.add(trackID);
     }
 
     public void suspend(int trackID) {
-        triggeredTrackList.remove((Integer) trackID);
+        if (triggeredTrackList.contains(trackID))
+            triggeredTrackList.remove(trackID);
     }
 
     public void updateParticles(float deltaTime) {
-        // spawn new particle
-        if (!triggeredTrackList.isEmpty()) {
-            for (int trackID : triggeredTrackList) {
-                Particle particle = particleList.get(firstUnusedParticle());
-                int randomColor = random.nextInt(4) - 2 + trackID;
-                float randomScale = (random.nextFloat() + 0.6f) * 1.2f;
-                float randomDegrees = random.nextFloat() * 90.0f;
-                float randomX = (random.nextFloat() - 0.5f) * 2.0f;
-                float randomY = random.nextFloat() + 0.1f;
+        // spawn a new particle if needed
+        for (int trackID : triggeredTrackList) {
+            Particle particle = particleList.get(firstUnusedParticle());
+            int randomColor = random.nextInt(4) - 2 + trackID;
+            float randomScale = (random.nextFloat() + 0.6f) * 1.2f;
+            float randomDegrees = random.nextFloat() * 90.0f;
+            float randomX = (random.nextFloat() - 0.5f) * 2.0f;
+            float randomY = random.nextFloat() + 0.1f;
 
-                particle.setTrackID(trackID);
-                particle.setColorID(randomColor);
-                particle.setOffset(randomX, 0.0f);
-                particle.setVelocity(randomX, randomY * 10.0f);
-                particle.setScale(randomScale);
-                particle.setScaleConst(randomScale);
-                particle.setDegrees(randomDegrees);
-                particle.setLife(1.0f);
-                particle.setLifeConst(1.0f);
-                particle.setTimeSum(0.0f);
-            }
+            particle.setTrackID(trackID);
+            particle.setColorID(randomColor);
+            particle.setOffset(randomX, 0.0f);
+            particle.setVelocity(randomX, randomY * 10.0f);
+            particle.setScale(randomScale);
+            particle.setScaleConst(randomScale);
+            particle.setDegrees(randomDegrees);
+            particle.setLife(1.0f);
+            particle.setLifeConst(1.0f);
+            particle.setTimeSum(0.0f);
         }
 
         // update all particles
