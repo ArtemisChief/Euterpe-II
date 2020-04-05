@@ -1,30 +1,35 @@
-package pianoroll.component;
+package pianoroll.component.controller;
 
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Roll;
+import pianoroll.util.Semantic;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RollManager {
+public class RollController {
 
     private final int amount;
 
     private final List<Roll> rollList;
 
+    private final List<Integer> triggeredTrackList;
+
     private int lastUnusedRollWhite;
     private int lastUnusedRollBlack;
 
-    public RollManager() {
+    public RollController(List<Integer> triggeredTrackList) {
         amount = 100;
+
+        rollList = new ArrayList<>();
+
+        this.triggeredTrackList = triggeredTrackList;
 
         lastUnusedRollWhite = 0;
         lastUnusedRollBlack = amount / 2;
-
-        rollList = new ArrayList<>();
     }
 
-    public void respawnRoll(int trackID) {
+    public void trigger(int trackID) {
         int unusedRoll;
 
         if (GraphicElement.IsWhite(trackID))
@@ -40,6 +45,33 @@ public class RollManager {
         roll.setScaleY(1.0f);
         roll.setUpdatingScaleY(true);
         roll.setUnused(false);
+    }
+
+    public void suspend(int trackID) {
+        for (Roll roll : rollList) {
+            if (roll.getTrackID() == trackID && roll.isUpdatingScaleY()) {
+                roll.setUpdatingScaleY(false);
+                roll.setColorID(trackID);
+            }
+        }
+    }
+
+    public void updateRolls(float deltaTime) {
+
+
+        float deltaY = deltaTime * Semantic.Roll.SPEED;
+
+        for (Roll roll : rollList) {
+            if (!roll.isUnused()) {
+                roll.setOffsetY(roll.getOffsetY() + deltaY);
+
+                if (roll.isUpdatingScaleY())
+                    roll.setScaleY(roll.getScaleY() + deltaY);
+
+                if (roll.getOffsetY() - roll.getScaleY() > 80.0f)
+                    roll.setUnused(true);
+            }
+        }
     }
 
     private int firstUnusedRollWhite() {
@@ -78,15 +110,6 @@ public class RollManager {
 
         lastUnusedRollBlack = amount / 2;
         return amount / 2;
-    }
-
-    public void stopUpdatingScaleY(int trackID) {
-        for (Roll roll : rollList) {
-            if (roll.getTrackID() == trackID && roll.isUpdatingScaleY()) {
-                roll.setUpdatingScaleY(false);
-                roll.setColorID(trackID);
-            }
-        }
     }
 
     public int getAmount() {

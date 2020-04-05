@@ -1,5 +1,9 @@
 package pianoroll.component;
 
+import pianoroll.component.controller.ParticleController;
+import pianoroll.component.controller.PianoController;
+import pianoroll.component.controller.RollController;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -7,18 +11,12 @@ import java.util.List;
 
 public class InputProcessor implements KeyListener {
 
-    private final PianoManager pianoManager;
-
-    private final RollManager rollManager;
-
-    private final ParticleManager particleManager;
+    private final PianoRoll pianoRoll;
 
     private final List<Integer> keyDownList;
 
-    public InputProcessor(GraphicEngine graphicEngine) {
-        this.pianoManager = graphicEngine.getPianoManager();
-        this.rollManager = graphicEngine.getRollManager();
-        this.particleManager = graphicEngine.getParticleManager();
+    public InputProcessor(PianoRoll pianoRoll) {
+        this.pianoRoll = pianoRoll;
 
         keyDownList = new ArrayList<>();
     }
@@ -33,10 +31,9 @@ public class InputProcessor implements KeyListener {
 
         if (trackID != -1) {
             if (!keyDownList.contains(e.getKeyCode())) {
-                pianoManager.getKeyList().get(trackID).press();
-
-                rollManager.respawnRoll(trackID);
-                particleManager.triggerTrack(trackID);
+                pianoRoll.getPianoController().trigger(trackID);
+                pianoRoll.getRollController().trigger(trackID);
+                pianoRoll.getParticleController().trigger(trackID);
 
                 keyDownList.add(e.getKeyCode());
             }
@@ -49,10 +46,9 @@ public class InputProcessor implements KeyListener {
 
         if (trackID != -1) {
             if (keyDownList.contains(e.getKeyCode())) {
-                pianoManager.getKeyList().get(trackID).release();
-
-                rollManager.stopUpdatingScaleY(trackID);
-                particleManager.suspendTrack(trackID);
+                pianoRoll.getPianoController().suspend(trackID);
+                pianoRoll.getRollController().suspend(trackID);
+                pianoRoll.getParticleController().suspend(trackID);
 
                 keyDownList.remove((Integer) e.getKeyCode());
             }
@@ -60,51 +56,53 @@ public class InputProcessor implements KeyListener {
     }
 
     private int parseKey(KeyEvent keyEvent) {
+        int pitchOffset = pianoRoll.getPianoController().getPitchOffset();
+
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_LEFT:
-                return 27 + pianoManager.getPitchOffset();
+                return 27 + pitchOffset;
             case KeyEvent.VK_DOWN:
-                return 29 + pianoManager.getPitchOffset();
+                return 29 + pitchOffset;
             case KeyEvent.VK_RIGHT:
-                return 31 + pianoManager.getPitchOffset();
+                return 31 + pitchOffset;
             case KeyEvent.VK_UP:
-                return 32 + pianoManager.getPitchOffset();
+                return 32 + pitchOffset;
             case KeyEvent.VK_NUMPAD0:
-                return 34 + pianoManager.getPitchOffset();
+                return 34 + pitchOffset;
             case KeyEvent.VK_DECIMAL:
-                return 36 + pianoManager.getPitchOffset();
+                return 36 + pitchOffset;
             case KeyEvent.VK_ENTER:
                 if (keyEvent.getKeyLocation() == KeyEvent.KEY_LOCATION_NUMPAD)
-                    return 38 + pianoManager.getPitchOffset();
+                    return 38 + pitchOffset;
                 break;
             case KeyEvent.VK_NUMPAD1:
-                return 39 + pianoManager.getPitchOffset();
+                return 39 + pitchOffset;
             case KeyEvent.VK_NUMPAD2:
-                return 41 + pianoManager.getPitchOffset();
+                return 41 + pitchOffset;
             case KeyEvent.VK_NUMPAD3:
-                return 43 + pianoManager.getPitchOffset();
+                return 43 + pitchOffset;
             case KeyEvent.VK_NUMPAD4:
-                return 44 + pianoManager.getPitchOffset();
+                return 44 + pitchOffset;
             case KeyEvent.VK_NUMPAD5:
-                return 46 + pianoManager.getPitchOffset();
+                return 46 + pitchOffset;
             case KeyEvent.VK_NUMPAD6:
-                return 48 + pianoManager.getPitchOffset();
+                return 48 + pitchOffset;
             case KeyEvent.VK_NUMPAD7:
-                return 50 + pianoManager.getPitchOffset();
+                return 50 + pitchOffset;
             case KeyEvent.VK_NUMPAD8:
-                return 51 + pianoManager.getPitchOffset();
+                return 51 + pitchOffset;
             case KeyEvent.VK_NUMPAD9:
-                return 53 + pianoManager.getPitchOffset();
+                return 53 + pitchOffset;
             case KeyEvent.VK_ADD:
-                return 55 + pianoManager.getPitchOffset();
+                return 55 + pitchOffset;
             case KeyEvent.VK_NUM_LOCK:
-                return 56 + pianoManager.getPitchOffset();
+                return 56 + pitchOffset;
             case KeyEvent.VK_DIVIDE:
-                return 58 + pianoManager.getPitchOffset();
+                return 58 + pitchOffset;
             case KeyEvent.VK_MULTIPLY:
-                return 60 + pianoManager.getPitchOffset();
+                return 60 + pitchOffset;
             case KeyEvent.VK_SUBTRACT:
-                return 62 + pianoManager.getPitchOffset();
+                return 62 + pitchOffset;
         }
         return -1;
     }

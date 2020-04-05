@@ -6,6 +6,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import pianoroll.component.GraphicEngine;
 import pianoroll.component.InputProcessor;
+import pianoroll.component.PianoRoll;
 
 import java.nio.FloatBuffer;
 
@@ -31,6 +32,7 @@ public class Canvas implements GLEventListener {
 
     private long timeLastFrame;
 
+    private PianoRoll pianoRoll;
     private GraphicEngine graphicEngine;
 
     private Canvas() {
@@ -56,10 +58,11 @@ public class Canvas implements GLEventListener {
 
         timeLastFrame = System.currentTimeMillis();
 
-        graphicEngine = new GraphicEngine();
+        pianoRoll = new PianoRoll();
+        graphicEngine = pianoRoll.getGraphicEngine();
         graphicEngine.init(gl);
 
-        glcanvas.addKeyListener(new InputProcessor(graphicEngine));
+        glcanvas.addKeyListener(pianoRoll.getInputProcessor());
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);
@@ -101,7 +104,7 @@ public class Canvas implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        graphicEngine.dispose(gl);
+        graphicEngine.dispose(gl, pianoRoll.getPianoController().getKeyList(), pianoRoll.getRollController().getRollList(), pianoRoll.getParticleController().getParticleList());
 
         destroyBuffers(matBuffer, clearColor, clearDepth);
     }

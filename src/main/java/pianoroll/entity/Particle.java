@@ -33,17 +33,6 @@ public class Particle extends GraphicElement{
         scaleConst = 0.0f;
     }
 
-    public void update(float deltaTime) {
-        if (life > 0.0f) {
-            life -= deltaTime;
-            degrees += deltaTime * 300.0f;
-            offsetX += velocityX * deltaTime;
-            offsetY += velocityY * deltaTime;
-            timeSum += deltaTime;
-            scale = (float) Math.sqrt((lifeConst - timeSum) / lifeConst) * scaleConst;
-        }
-    }
-
     public float getOffsetX() {
         return offsetX;
     }
@@ -57,6 +46,14 @@ public class Particle extends GraphicElement{
         this.offsetY = offsetY;
     }
 
+    public float getVelocityX() {
+        return velocityX;
+    }
+
+    public float getVelocityY() {
+        return velocityY;
+    }
+
     public void setVelocity(float velocityX, float velocityY) {
         this.velocityX = velocityX;
         this.velocityY = velocityY;
@@ -68,7 +65,6 @@ public class Particle extends GraphicElement{
 
     public void setScale(float scale) {
         this.scale = scale;
-        this.scaleConst = scale;
     }
 
     public float getDegrees() {
@@ -85,8 +81,30 @@ public class Particle extends GraphicElement{
 
     public void setLife(float life) {
         this.life = life;
-        this.lifeConst = life;
-        this.timeSum = 0.0f;
+    }
+
+    public float getTimeSum() {
+        return timeSum;
+    }
+
+    public void setTimeSum(float timeSum) {
+        this.timeSum = timeSum;
+    }
+
+    public float getLifeConst() {
+        return lifeConst;
+    }
+
+    public void setLifeConst(float lifeConst) {
+        this.lifeConst = lifeConst;
+    }
+
+    public float getScaleConst() {
+        return scaleConst;
+    }
+
+    public void setScaleConst(float scaleConst) {
+        this.scaleConst = scaleConst;
     }
 
 }

@@ -1,4 +1,4 @@
-package pianoroll.component;
+package pianoroll.component.controller;
 
 import pianoroll.entity.Particle;
 
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ParticleManager {
+public class ParticleController {
 
     private final int amount;
 
@@ -14,27 +14,28 @@ public class ParticleManager {
 
     private final List<Integer> triggeredTrackList;
 
-    private int lastUnusedParticle;
-
     private final Random random;
 
-    public ParticleManager() {
+    private int lastUnusedParticle;
+
+    public ParticleController(List<Integer> triggeredTrackList) {
         amount = 500;
         particleList = new ArrayList<>();
-        triggeredTrackList = new ArrayList<>();
-        lastUnusedParticle = 0;
+        this.triggeredTrackList = triggeredTrackList;
         random = new Random(System.currentTimeMillis());
+        lastUnusedParticle = 0;
     }
 
-    public void triggerTrack(int trackID) {
+    public void trigger(int trackID) {
         triggeredTrackList.add(trackID);
     }
 
-    public void suspendTrack(int trackID) {
+    public void suspend(int trackID) {
         triggeredTrackList.remove((Integer) trackID);
     }
 
-    public void respawnParticle() {
+    public void updateParticles(float deltaTime) {
+        // spawn new particle
         if (!triggeredTrackList.isEmpty()) {
             for (int trackID : triggeredTrackList) {
                 Particle particle = particleList.get(firstUnusedParticle());
@@ -49,8 +50,22 @@ public class ParticleManager {
                 particle.setOffset(randomX, 0.0f);
                 particle.setVelocity(randomX, randomY * 10.0f);
                 particle.setScale(randomScale);
+                particle.setScaleConst(randomScale);
                 particle.setDegrees(randomDegrees);
                 particle.setLife(1.0f);
+                particle.setLifeConst(1.0f);
+                particle.setTimeSum(0.0f);
+            }
+        }
+
+        // update all particles
+        for (Particle particle : particleList) {
+            if (particle.getLife() > 0.0f) {
+                particle.setLife(particle.getLife() - deltaTime);
+                particle.setDegrees(particle.getDegrees() + deltaTime * 300.0f);
+                particle.setOffset(particle.getOffsetX() + particle.getVelocityX() * deltaTime, particle.getOffsetY() + particle.getVelocityY() * deltaTime);
+                particle.setTimeSum(particle.getTimeSum() + deltaTime);
+                particle.setScale((float) Math.sqrt((particle.getLifeConst() - particle.getTimeSum()) / particle.getLifeConst()) * particle.getScaleConst());
             }
         }
     }

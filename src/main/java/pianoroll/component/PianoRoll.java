@@ -1,0 +1,56 @@
+package pianoroll.component;
+
+import com.jogamp.opengl.GL3;
+import pianoroll.component.controller.ParticleController;
+import pianoroll.component.controller.PianoController;
+import pianoroll.component.controller.RollController;
+import pianoroll.component.renderer.ParticleRenderer;
+import pianoroll.component.renderer.PianoRenderer;
+import pianoroll.component.renderer.RollRenderer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PianoRoll {
+
+    private final List<Integer> triggeredTrackList;
+
+    private final PianoController pianoController;
+    private final RollController rollController;
+    private final ParticleController particleController;
+
+    private final GraphicEngine graphicEngine;
+    private final InputProcessor inputProcessor;
+
+    public PianoRoll() {
+        triggeredTrackList = new ArrayList<>();
+
+        pianoController = new PianoController(triggeredTrackList);
+        rollController = new RollController(triggeredTrackList);
+        particleController = new ParticleController(triggeredTrackList);
+
+        graphicEngine = new GraphicEngine(this);
+        inputProcessor=new InputProcessor(this);
+    }
+
+    public PianoController getPianoController() {
+        return pianoController;
+    }
+
+    public RollController getRollController() {
+        return rollController;
+    }
+
+    public ParticleController getParticleController() {
+        return particleController;
+    }
+
+    public GraphicEngine getGraphicEngine() {
+        return graphicEngine;
+    }
+
+    public InputProcessor getInputProcessor() {
+        return inputProcessor;
+    }
+
+}

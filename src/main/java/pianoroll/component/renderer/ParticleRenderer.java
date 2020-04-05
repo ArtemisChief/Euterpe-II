@@ -1,4 +1,4 @@
-package pianoroll.component;
+package pianoroll.component.renderer;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;

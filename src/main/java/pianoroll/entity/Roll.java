@@ -20,18 +20,6 @@ public class Roll extends GraphicElement {
         isUnused = true;
     }
 
-    public void update(float deltaY) {
-        if (!isUnused) {
-            offsetY += deltaY;
-
-            if (isUpdatingScaleY)
-                scaleY += deltaY;
-
-            if (offsetY - scaleY > 80.0f)
-                isUnused = true;
-        }
-    }
-
     public float getScaleY() {
         return scaleY;
     }

@@ -1,37 +1,41 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
+import pianoroll.component.controller.ParticleController;
+import pianoroll.component.controller.PianoController;
+import pianoroll.component.controller.RollController;
+import pianoroll.component.renderer.ParticleRenderer;
+import pianoroll.component.renderer.PianoRenderer;
+import pianoroll.component.renderer.RollRenderer;
 import pianoroll.entity.Key;
 import pianoroll.entity.Particle;
 import pianoroll.entity.Roll;
-import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 
 public class GraphicEngine {
 
-    private PianoManager pianoManager;
-    private PianoRenderer pianoRenderer;
+    private final PianoRoll pianoRoll;
 
-    private RollManager rollManager;
-    private RollRenderer rollRenderer;
+    private final PianoRenderer pianoRenderer;
 
-    private ParticleManager particleManager;
-    private ParticleRenderer particleRenderer;
+    private final RollRenderer rollRenderer;
+
+    private final ParticleRenderer particleRenderer;
 
     private Program pianorollProgram;
     private Program particleProgram;
 
-    public GraphicEngine() {
-        pianoManager = new PianoManager();
-        pianoRenderer = new PianoRenderer(pianoManager.getKeyList());
+    public GraphicEngine(PianoRoll pianoRoll) {
+        this.pianoRoll=pianoRoll;
 
-        rollManager = new RollManager();
-        rollRenderer = new RollRenderer(rollManager.getAmount(), rollManager.getRollList());
+        pianoRenderer = new PianoRenderer(pianoRoll.getPianoController().getKeyList());
 
-        particleManager = new ParticleManager();
-        particleRenderer = new ParticleRenderer(particleManager.getAmount(), particleManager.getParticleList());
+        rollRenderer = new RollRenderer(pianoRoll.getRollController().getAmount(), pianoRoll.getRollController().getRollList());
+
+        particleRenderer = new ParticleRenderer(pianoRoll.getParticleController().getAmount(), pianoRoll.getParticleController().getParticleList());
     }
 
     public void init(GL3 gl) {
@@ -50,13 +54,10 @@ public class GraphicEngine {
 
     public void update(float deltaTime) {
 
-        particleManager.respawnParticle();
+        pianoRoll.getParticleController().updateParticles(deltaTime);
 
-        for (Roll roll : rollManager.getRollList())
-            roll.update(deltaTime * Semantic.Roll.SPEED);
+        pianoRoll.getRollController().updateRolls(deltaTime);
 
-        for (Particle particle : particleManager.getParticleList())
-            particle.update(deltaTime);
     }
 
     public void render(GL3 gl) {
@@ -72,30 +73,18 @@ public class GraphicEngine {
         gl.glUniformMatrix4fv(particleProgram.get("proj"), 1, false, buffer);
     }
 
-    public void dispose(GL3 gl) {
+    public void dispose(GL3 gl, List<Key> keyList, List<Roll> rollList, List<Particle> particleList) {
         gl.glDeleteProgram(pianorollProgram.name);
         gl.glDeleteProgram(particleProgram.name);
 
-        for (Key key : pianoManager.getKeyList())
+        for (Key key : keyList)
             gl.glDeleteVertexArrays(1, key.getVao());
 
-        for (Roll roll : rollManager.getRollList())
+        for (Roll roll : rollList)
             gl.glDeleteVertexArrays(1, roll.getVao());
 
-        for (Particle particle : particleManager.getParticleList())
+        for (Particle particle : particleList)
             gl.glDeleteVertexArrays(1, particle.getVao());
-    }
-
-    public PianoManager getPianoManager() {
-        return pianoManager;
-    }
-
-    public RollManager getRollManager() {
-        return rollManager;
-    }
-
-    public ParticleManager getParticleManager() {
-        return particleManager;
     }
 
 }
