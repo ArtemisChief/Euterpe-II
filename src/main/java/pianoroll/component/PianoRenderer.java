@@ -3,15 +3,12 @@ package pianoroll.component;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
-import midiplayer.component.MidiPlayer;
 import pianoroll.entity.Key;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
-import javax.sound.midi.ShortMessage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
@@ -21,21 +18,8 @@ public class PianoRenderer {
 
     private final List<Key> keyList;
 
-    private int pitchOffset;
-
-    public PianoRenderer() {
-
-        pitchOffset = 0;
-
-        keyList = new ArrayList<>();
-
-        try {
-            //todo sustain
-            ShortMessage shortMessage = new ShortMessage(176, 0, 64, 127);
-            MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public PianoRenderer(List<Key> keyList) {
+        this.keyList = keyList;
     }
 
     public void init(GL3 gl) {
@@ -119,22 +103,6 @@ public class PianoRenderer {
         }
 
         gl.glBindVertexArray(0);
-    }
-
-    public void addHalfPitch() {
-        pitchOffset++;
-    }
-
-    public void reduceHalfPitch() {
-        pitchOffset--;
-    }
-
-    public List<Key> getKeyList() {
-        return keyList;
-    }
-
-    public int getPitchOffset() {
-        return pitchOffset;
     }
 
 }

@@ -24,8 +24,8 @@ public class GraphicEngine {
     private Program particleProgram;
 
     public GraphicEngine() {
-        particleManager = new ParticleManager();
-        pianoRenderer = new PianoRenderer();
+        pianoManager = new PianoManager();
+        pianoRenderer = new PianoRenderer(pianoManager.getKeyList());
 
         rollManager = new RollManager();
         rollRenderer = new RollRenderer();
@@ -76,7 +76,7 @@ public class GraphicEngine {
         gl.glDeleteProgram(pianorollProgram.name);
         gl.glDeleteProgram(particleProgram.name);
 
-        for (Key key : pianoRenderer.getKeyList())
+        for (Key key : pianoManager.getKeyList())
             gl.glDeleteVertexArrays(1, key.getVao());
 
         for (Roll roll : rollRenderer.getRollList())
@@ -90,10 +90,6 @@ public class GraphicEngine {
         return pianoManager;
     }
 
-    public PianoRenderer getPianoRenderer() {
-        return pianoRenderer;
-    }
-
     public RollManager getRollManager() {
         return rollManager;
     }
@@ -104,10 +100,6 @@ public class GraphicEngine {
 
     public ParticleManager getParticleManager() {
         return particleManager;
-    }
-
-    public ParticleRenderer getParticleRenderer() {
-        return particleRenderer;
     }
 
 }
