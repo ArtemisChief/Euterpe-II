@@ -59,7 +59,7 @@ public class Canvas implements GLEventListener {
         graphicEngine = new GraphicEngine();
         graphicEngine.init(gl);
 
-        glcanvas.addKeyListener(new InputProcessor(graphicEngine.getPianoRenderer(), graphicEngine.getRollRenderer(), graphicEngine.getParticleRenderer()));
+        glcanvas.addKeyListener(new InputProcessor(graphicEngine));
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);

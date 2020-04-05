@@ -11,17 +11,27 @@ import java.nio.FloatBuffer;
 
 public class GraphicEngine {
 
+    private PianoManager pianoManager;
     private PianoRenderer pianoRenderer;
+
+    private RollManager rollManager;
     private RollRenderer rollRenderer;
+
+    private ParticleManager particleManager;
     private ParticleRenderer particleRenderer;
 
     private Program pianorollProgram;
     private Program particleProgram;
 
     public GraphicEngine() {
+        particleManager = new ParticleManager();
         pianoRenderer = new PianoRenderer();
+
+        rollManager = new RollManager();
         rollRenderer = new RollRenderer();
-        particleRenderer = new ParticleRenderer();
+
+        particleManager = new ParticleManager();
+        particleRenderer = new ParticleRenderer(particleManager.getAmount(), particleManager.getParticleList());
     }
 
     public void init(GL3 gl) {
@@ -39,10 +49,13 @@ public class GraphicEngine {
     }
 
     public void update(float deltaTime) {
+
+        particleManager.respawnParticle();
+
         for (Roll roll : rollRenderer.getRollList())
             roll.update(deltaTime * Semantic.Roll.SPEED);
 
-        for (Particle particle : particleRenderer.getParticleList())
+        for (Particle particle : particleManager.getParticleList())
             particle.update(deltaTime);
     }
 
@@ -66,19 +79,31 @@ public class GraphicEngine {
         for (Key key : pianoRenderer.getKeyList())
             gl.glDeleteVertexArrays(1, key.getVao());
 
-        for(Roll roll:rollRenderer.getRollList())
+        for (Roll roll : rollRenderer.getRollList())
             gl.glDeleteVertexArrays(1, roll.getVao());
 
-        for(Particle particle:particleRenderer.getParticleList())
+        for (Particle particle : particleManager.getParticleList())
             gl.glDeleteVertexArrays(1, particle.getVao());
+    }
+
+    public PianoManager getPianoManager() {
+        return pianoManager;
     }
 
     public PianoRenderer getPianoRenderer() {
         return pianoRenderer;
     }
 
+    public RollManager getRollManager() {
+        return rollManager;
+    }
+
     public RollRenderer getRollRenderer() {
         return rollRenderer;
+    }
+
+    public ParticleManager getParticleManager() {
+        return particleManager;
     }
 
     public ParticleRenderer getParticleRenderer() {

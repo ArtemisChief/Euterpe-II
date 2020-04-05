@@ -11,14 +11,14 @@ public class InputProcessor implements KeyListener{
 
     private final RollRenderer rollRenderer;
 
-    private final ParticleRenderer particleRenderer;
+    private final ParticleManager particleManager;
 
     private final List<Integer> keyDownList;
 
-    public InputProcessor(PianoRenderer pianoRenderer, RollRenderer rollRenderer, ParticleRenderer particleRenderer) {
-        this.pianoRenderer = pianoRenderer;
-        this.rollRenderer = rollRenderer;
-        this.particleRenderer = particleRenderer;
+    public InputProcessor(GraphicEngine graphicEngine) {
+        this.pianoRenderer = graphicEngine.getPianoRenderer();
+        this.rollRenderer = graphicEngine.getRollRenderer();
+        this.particleManager = graphicEngine.getParticleManager();
 
         keyDownList = new ArrayList<>();
     }
@@ -35,7 +35,7 @@ public class InputProcessor implements KeyListener{
                 pianoRenderer.getKeyList().get(trackID).press();
 
                 rollRenderer.newRoll(trackID);
-                particleRenderer.addParticlesToTrack(trackID);
+                particleManager.triggerTrack(trackID);
 
                 keyDownList.add(e.getKeyCode());
             }
@@ -51,7 +51,7 @@ public class InputProcessor implements KeyListener{
                 pianoRenderer.getKeyList().get(trackID).release();
 
                 rollRenderer.stopUpdatingScaleY(trackID);
-                particleRenderer.stopAddingParticlesToTrack(trackID);
+                particleManager.suspendTrack(trackID);
 
                 keyDownList.remove((Integer) e.getKeyCode());
             }
