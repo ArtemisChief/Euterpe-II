@@ -131,7 +131,7 @@ public class FileIO {
 
             File midiFile = new File(fileStr);
 
-            if (!MidiFileBuilder.GetInstance().writeToFile(Interpreter.GetInstance().getMidiFile(), midiFile))
+            if (!MidiFileBuilder.WriteToFile(Interpreter.GetInstance().getMidiFile(), midiFile))
                 Diaglogs.GetInstance().showErrorInfo("目标文件被占用，无法导出");
         }
     }
@@ -144,7 +144,7 @@ public class FileIO {
             tempMidiFile = new File("tempMidi.mid");
         }
 
-        if (!MidiFileBuilder.GetInstance().writeToFile(Interpreter.GetInstance().getMidiFile(), tempMidiFile)) {
+        if (!MidiFileBuilder.WriteToFile(Interpreter.GetInstance().getMidiFile(), tempMidiFile)) {
             Diaglogs.GetInstance().showErrorInfo("目标文件被占用，无法导出");
             return false;
         }

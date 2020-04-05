@@ -13,13 +13,7 @@ public class MidiFileBuilder {
 
     private MidiFile currentMidiFile;
 
-    private static final MidiFileBuilder instance = new MidiFileBuilder();
-
-    public static MidiFileBuilder GetInstance() {
-        return instance;
-    }
-
-    private MidiFileBuilder() {
+    public MidiFileBuilder() {
         currentMidiFile = null;
     }
 
@@ -33,7 +27,7 @@ public class MidiFileBuilder {
         return currentMidiFile;
     }
 
-    public void constructMidiFile() {
+    public MidiFileBuilder constructMidiFile() {
 
         byte[] midiFileData = new byte[]{0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x01};
 
@@ -47,9 +41,11 @@ public class MidiFileBuilder {
 
         currentMidiFile.setMidiFileData(midiFileData);
 
+        return this;
+
     }
 
-    public boolean writeToFile(MidiFile midiFile, File file) {
+    public static boolean WriteToFile(MidiFile midiFile, File file) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(midiFile.getMidiFileData());

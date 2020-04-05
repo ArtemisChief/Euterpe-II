@@ -7,13 +7,7 @@ public class MidiTrackBuilder {
 
     private MidiTrack currentMidiTrack;
 
-    private static final MidiTrackBuilder instance = new MidiTrackBuilder();
-
-    public static MidiTrackBuilder GetInstance() {
-        return instance;
-    }
-
-    private MidiTrackBuilder() {
+    public MidiTrackBuilder() {
         currentMidiTrack = null;
     }
 
@@ -23,7 +17,7 @@ public class MidiTrackBuilder {
         return this;
     }
 
-    public MidiTrack returnCurrentMidiTrack() {
+    public MidiTrack getCurrentMidiTrack() {
         return currentMidiTrack;
     }
 
