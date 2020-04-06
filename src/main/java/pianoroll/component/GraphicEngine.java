@@ -53,11 +53,9 @@ public class GraphicEngine {
     }
 
     public void update(float deltaTime) {
-
         pianoRoll.getParticleController().updateParticles(deltaTime);
-
         pianoRoll.getRollController().updateRolls(deltaTime);
-
+        pianoRoll.getPianoController().updateKeys();
     }
 
     public void render(GL3 gl) {

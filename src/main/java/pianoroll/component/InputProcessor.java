@@ -1,9 +1,5 @@
 package pianoroll.component;
 
-import pianoroll.component.controller.ParticleController;
-import pianoroll.component.controller.PianoController;
-import pianoroll.component.controller.RollController;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -31,9 +27,9 @@ public class InputProcessor implements KeyListener {
 
         if (trackID != -1) {
             if (!keyDownList.contains(e.getKeyCode())) {
+                pianoRoll.trigger(trackID);
                 pianoRoll.getPianoController().trigger(trackID);
                 pianoRoll.getRollController().trigger(trackID);
-                pianoRoll.getParticleController().trigger(trackID);
 
                 keyDownList.add(e.getKeyCode());
             }
@@ -46,9 +42,9 @@ public class InputProcessor implements KeyListener {
 
         if (trackID != -1) {
             if (keyDownList.contains(e.getKeyCode())) {
+                pianoRoll.suspend(trackID);
                 pianoRoll.getPianoController().suspend(trackID);
                 pianoRoll.getRollController().suspend(trackID);
-                pianoRoll.getParticleController().suspend(trackID);
 
                 keyDownList.remove((Integer) e.getKeyCode());
             }

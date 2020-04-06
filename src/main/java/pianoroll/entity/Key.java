@@ -6,12 +6,6 @@ public class Key extends GraphicElement {
 
     public Key(int trackID) {
         super(trackID);
-
-        if (IsWhite(trackID))
-            setColorID(200);
-        else
-            setColorID(201);
-
         this.pitch = trackID + 21;
     }
 

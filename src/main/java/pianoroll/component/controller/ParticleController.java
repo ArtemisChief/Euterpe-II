@@ -27,16 +27,6 @@ public class ParticleController {
         lastUnusedParticle = 0;
     }
 
-    public void trigger(int trackID) {
-        if (!triggeredTrackList.contains(trackID))
-            triggeredTrackList.add(trackID);
-    }
-
-    public void suspend(int trackID) {
-        if (triggeredTrackList.contains(trackID))
-            triggeredTrackList.remove(trackID);
-    }
-
     public void updateParticles(float deltaTime) {
         // spawn a new particle if needed
         for (int trackID : triggeredTrackList) {

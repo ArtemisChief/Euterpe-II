@@ -29,6 +29,14 @@ public class PianoRoll {
         inputProcessor = new InputProcessor(this);
     }
 
+    public void trigger(Integer trackID) {
+        triggeredTrackList.add(trackID);
+    }
+
+    public void suspend(Integer trackID) {
+        triggeredTrackList.remove(trackID);
+    }
+
     public PianoController getPianoController() {
         return pianoController;
     }
