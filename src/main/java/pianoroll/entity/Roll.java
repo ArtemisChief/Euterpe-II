@@ -51,5 +51,4 @@ public class Roll extends GraphicElement {
     public void setUnused(boolean unused) {
         isUnused = unused;
     }
-
 }

@@ -18,8 +18,4 @@ public abstract class Semantic {
         int KEY_MAX = 88;
     }
 
-    public interface Roll {
-        float SPEED = 30.0f;
-    }
-
 }

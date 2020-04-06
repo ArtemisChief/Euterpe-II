@@ -1,12 +1,16 @@
 package pianoroll.component.controller;
 
+import midipaser.component.MidiParser;
+import midipaser.entity.MidiContent;
+import midipaser.entity.MidiEvent;
+import midipaser.entity.MidiTrack;
+import midipaser.entity.events.NoteEvent;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Roll;
-import pianoroll.util.Semantic;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class RollController {
 
@@ -19,8 +23,12 @@ public class RollController {
     private int lastUnusedRollWhite;
     private int lastUnusedRollBlack;
 
+    private boolean isLoadMidiFile;
+
+    private float speed;
+
     public RollController(List<Integer> triggeredTrackList) {
-        amount = 100;
+        amount = 10000;
 
         rollList = new ArrayList<>();
 
@@ -28,17 +36,51 @@ public class RollController {
 
         lastUnusedRollWhite = 0;
         lastUnusedRollBlack = amount / 2;
+
+        isLoadMidiFile = false;
+
+        speed=30.0f;
+    }
+
+    public void loadMidiFile(File midiFile) {
+        isLoadMidiFile = true;
+
+        MidiContent midiContent = MidiParser.GetInstance().parse(midiFile);
+        double resolution = midiContent.getResolution();
+
+
+        for (MidiTrack midiTrack : midiContent.getMidiTrackList()) {
+            for (MidiEvent midiEvent : midiTrack.getMidiEventList()) {
+                if (midiEvent instanceof NoteEvent) {
+                    NoteEvent noteEvent = (NoteEvent) midiEvent;
+
+                    double scaleY = noteEvent.getDurationTicks() / resolution * 8.0f;
+                    double offsetY = noteEvent.getTriggerTick() / resolution * 8.0f + scaleY;
+                    int trackID = noteEvent.getPitch() - 23;
+
+                    Roll roll = rollList.get(firstUnusedRoll(trackID));
+
+                    roll.setTrackID(trackID);
+                    roll.setColorID(trackID);
+                    roll.setOffsetY((float) offsetY);
+                    roll.setScaleY((float) scaleY);
+                    roll.setUpdatingScaleY(false);
+                    roll.setUnused(false);
+                }
+            }
+        }
+    }
+
+    public void unloadMidiFile() {
+        isLoadMidiFile = false;
+
+        for (Roll roll : rollList) {
+            roll.setUnused(true);
+        }
     }
 
     public void trigger(Integer trackID) {
-        int unusedRoll;
-
-        if (GraphicElement.IsWhite(trackID))
-            unusedRoll = firstUnusedRollWhite();
-        else
-            unusedRoll = firstUnusedRollBlack();
-
-        Roll roll = rollList.get(unusedRoll);
+        Roll roll = rollList.get(firstUnusedRoll(trackID));
 
         roll.setTrackID(trackID);
         roll.setColorID(trackID + 100);
@@ -58,19 +100,41 @@ public class RollController {
     }
 
     public void updateRolls(float deltaTime) {
-        float deltaY = deltaTime * Semantic.Roll.SPEED;
+        if (isLoadMidiFile) {
+            for (Roll roll : rollList) {
+                if (!roll.isUnused()) {
+                    roll.setOffsetY(roll.getOffsetY() - 10*deltaTime);
 
-        for (Roll roll : rollList) {
-            if (!roll.isUnused()) {
-                roll.setOffsetY(roll.getOffsetY() + deltaY);
+                    if (roll.getOffsetY() - roll.getScaleY() < -20.0f)
+                        roll.setUnused(true);
+                }
+            }
+        } else {
+            float deltaY = deltaTime * speed;
 
-                if (roll.isUpdatingScaleY())
-                    roll.setScaleY(roll.getScaleY() + deltaY);
+            for (Roll roll : rollList) {
+                if (!roll.isUnused()) {
+                    roll.setOffsetY(roll.getOffsetY() + deltaY);
 
-                if (roll.getOffsetY() - roll.getScaleY() > 80.0f)
-                    roll.setUnused(true);
+                    if (roll.isUpdatingScaleY())
+                        roll.setScaleY(roll.getScaleY() + deltaY);
+
+                    if (roll.getOffsetY() - roll.getScaleY() > 80.0f)
+                        roll.setUnused(true);
+                }
             }
         }
+    }
+
+    private int firstUnusedRoll(int trackID) {
+        int unusedRoll;
+
+        if (GraphicElement.IsWhite(trackID))
+            unusedRoll = firstUnusedRollWhite();
+        else
+            unusedRoll = firstUnusedRollBlack();
+
+        return unusedRoll;
     }
 
     private int firstUnusedRollWhite() {

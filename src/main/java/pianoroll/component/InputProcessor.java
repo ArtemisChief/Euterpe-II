@@ -2,6 +2,7 @@ package pianoroll.component;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +65,7 @@ public class InputProcessor implements KeyListener {
             case KeyEvent.VK_UP:
                 return 32 + pitchOffset;
             case KeyEvent.VK_NUMPAD0:
+                pianoRoll.getRollController().loadMidiFile(new File("1.mid"));
                 return 34 + pitchOffset;
             case KeyEvent.VK_DECIMAL:
                 return 36 + pitchOffset;
