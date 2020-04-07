@@ -1,16 +1,21 @@
 package pianoroll.component.controller;
 
+import javafx.util.Pair;
 import midipaser.component.MidiParser;
 import midipaser.entity.MidiContent;
 import midipaser.entity.MidiEvent;
 import midipaser.entity.MidiTrack;
+import midipaser.entity.events.BpmEvent;
 import midipaser.entity.events.NoteEvent;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Roll;
+import pianoroll.util.Semantic;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class RollController {
 
@@ -19,6 +24,7 @@ public class RollController {
     private final List<Roll> rollList;
 
     private final List<Integer> triggeredTrackList;
+    private final Queue<Pair<Long,Float>> bpmQueue;
 
     private int lastUnusedRollWhite;
     private int lastUnusedRollBlack;
@@ -31,6 +37,7 @@ public class RollController {
         amount = 10000;
 
         rollList = new ArrayList<>();
+        bpmQueue = new LinkedList<>();
 
         this.triggeredTrackList = triggeredTrackList;
 
@@ -39,7 +46,7 @@ public class RollController {
 
         isLoadMidiFile = false;
 
-        speed=30.0f;
+        speed = Semantic.Roll.DEFAULT_SPEED;
     }
 
     public void loadMidiFile(File midiFile) {
@@ -67,8 +74,18 @@ public class RollController {
                     roll.setUpdatingScaleY(false);
                     roll.setUnused(false);
                 }
+
+                if (midiEvent instanceof BpmEvent) {
+                    BpmEvent bpmEvent = (BpmEvent) midiEvent;
+                    bpmQueue.add(new Pair<>(bpmEvent.getTriggerTick(), bpmEvent.getBpm()));
+                }
             }
         }
+
+        if (bpmQueue.element().getKey() == 0) {
+            speed = bpmQueue.poll().getValue() / 60.0f * 8.0f;
+        }
+
     }
 
     public void unloadMidiFile() {
@@ -103,9 +120,9 @@ public class RollController {
         if (isLoadMidiFile) {
             for (Roll roll : rollList) {
                 if (!roll.isUnused()) {
-                    roll.setOffsetY(roll.getOffsetY() - 10*deltaTime);
+                    roll.setOffsetY(roll.getOffsetY() - speed * deltaTime);
 
-                    if (roll.getOffsetY() - roll.getScaleY() < -20.0f)
+                    if (roll.getOffsetY() < 0.0f)
                         roll.setUnused(true);
                 }
             }

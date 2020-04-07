@@ -65,7 +65,7 @@ public class InputProcessor implements KeyListener {
             case KeyEvent.VK_UP:
                 return 32 + pitchOffset;
             case KeyEvent.VK_NUMPAD0:
-                pianoRoll.getRollController().loadMidiFile(new File("1.mid"));
+                pianoRoll.getRollController().loadMidiFile(new File("2.mid"));
                 return 34 + pitchOffset;
             case KeyEvent.VK_DECIMAL:
                 return 36 + pitchOffset;
