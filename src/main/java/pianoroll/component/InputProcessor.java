@@ -20,6 +20,7 @@ public class InputProcessor implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+        pianoRoll.getRollController().loadMidiFile(new File("Luv Letter.mid"));
     }
 
     @Override
@@ -65,7 +66,6 @@ public class InputProcessor implements KeyListener {
             case KeyEvent.VK_UP:
                 return 32 + pitchOffset;
             case KeyEvent.VK_NUMPAD0:
-                pianoRoll.getRollController().loadMidiFile(new File("2.mid"));
                 return 34 + pitchOffset;
             case KeyEvent.VK_DECIMAL:
                 return 36 + pitchOffset;

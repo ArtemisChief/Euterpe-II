@@ -31,10 +31,16 @@ public class RollController {
 
     private boolean isLoadMidiFile;
 
+    private double resolution;
+    private float firstBpm;
     private float speed;
+    private float timeSum;
+    private float nextTime;
 
-    public RollController(List<Integer> triggeredTrackList) {
-        amount = 10000;
+    private final PianoController pianoController;
+
+    public RollController(List<Integer> triggeredTrackList,PianoController pianoController) {
+        amount = 100000;
 
         rollList = new ArrayList<>();
         bpmQueue = new LinkedList<>();
@@ -46,14 +52,20 @@ public class RollController {
 
         isLoadMidiFile = false;
 
+        resolution=0;
+        firstBpm=0.0f;
         speed = Semantic.Roll.DEFAULT_SPEED;
+        timeSum=0.0f;
+        nextTime=0.0f;
+
+        this.pianoController=pianoController;
     }
 
     public void loadMidiFile(File midiFile) {
         isLoadMidiFile = true;
 
         MidiContent midiContent = MidiParser.GetInstance().parse(midiFile);
-        double resolution = midiContent.getResolution();
+        resolution = midiContent.getResolution();
 
 
         for (MidiTrack midiTrack : midiContent.getMidiTrackList()) {
@@ -63,7 +75,7 @@ public class RollController {
 
                     double scaleY = noteEvent.getDurationTicks() / resolution * 8.0f;
                     double offsetY = noteEvent.getTriggerTick() / resolution * 8.0f + scaleY;
-                    int trackID = noteEvent.getPitch() - 23;
+                    int trackID = noteEvent.getPitch() - 21;
 
                     Roll roll = rollList.get(firstUnusedRoll(trackID));
 
@@ -82,10 +94,13 @@ public class RollController {
             }
         }
 
-        if (bpmQueue.element().getKey() == 0) {
-            speed = bpmQueue.poll().getValue() / 60.0f * 8.0f;
+        if (bpmQueue.peek().getKey() == 0) {
+            float bpm = bpmQueue.poll().getValue();
+            speed = bpm / 60.0f * 8.0f;
+            firstBpm=bpm;
+            if (bpmQueue.peek() != null)
+                nextTime = (float) (bpmQueue.peek().getKey() / resolution / bpm * 60.0f);
         }
-
     }
 
     public void unloadMidiFile() {
@@ -118,12 +133,35 @@ public class RollController {
 
     public void updateRolls(float deltaTime) {
         if (isLoadMidiFile) {
+            timeSum+=deltaTime;
+
+            if(timeSum>nextTime) {
+                if (bpmQueue.peek() != null) {
+                    float bpm = bpmQueue.poll().getValue();
+                    speed = bpm / 60.0f * 8.0f;
+                    if (bpmQueue.peek() != null)
+                        nextTime = (float) (bpmQueue.peek().getKey() / resolution / firstBpm * 60.0f);
+                }
+            }
+
             for (Roll roll : rollList) {
                 if (!roll.isUnused()) {
                     roll.setOffsetY(roll.getOffsetY() - speed * deltaTime);
 
-                    if (roll.getOffsetY() < 0.0f)
+                    if (roll.getOffsetY() - roll.getScaleY() < 0.0f) {
+                        if (!triggeredTrackList.contains(roll.getTrackID())) {
+                            roll.setColorID(roll.getTrackID()+100);
+                            triggeredTrackList.add(roll.getTrackID());
+                            pianoController.trigger(roll.getTrackID());
+                        }
+                    }
+
+                    if (roll.getOffsetY() < 0.0f) {
+                        triggeredTrackList.remove((Integer) roll.getTrackID());
+                        pianoController.suspend(roll.getTrackID());
                         roll.setUnused(true);
+                    }
+
                 }
             }
         } else {
@@ -174,7 +212,7 @@ public class RollController {
     }
 
     private int firstUnusedRollBlack() {
-        for (int i = lastUnusedRollBlack; i < amount / 2; ++i) {
+        for (int i = lastUnusedRollBlack; i < amount; ++i) {
             if (rollList.get(i).isUnused()) {
                 lastUnusedRollBlack = i;
                 return i;

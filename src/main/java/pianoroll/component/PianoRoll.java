@@ -23,7 +23,7 @@ public class PianoRoll {
         triggeredTrackList=new ArrayList<>();
 
         pianoController = new PianoController(triggeredTrackList);
-        rollController = new RollController(triggeredTrackList);
+        rollController = new RollController(triggeredTrackList,pianoController);
         particleController = new ParticleController(triggeredTrackList);
 
         graphicEngine = new GraphicEngine(this);

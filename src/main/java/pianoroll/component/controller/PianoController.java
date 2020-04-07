@@ -7,7 +7,6 @@ import pianoroll.entity.Key;
 import javax.sound.midi.ShortMessage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class PianoController {
 
