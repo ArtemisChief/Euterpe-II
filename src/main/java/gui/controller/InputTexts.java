@@ -122,14 +122,14 @@ public class InputTexts {
         errorAttributeSet = new SimpleAttributeSet();
         sameTimeNoteAttributeSet = new SimpleAttributeSet();
 
-        StyleConstants.setForeground(attributeSet, new Color(100, 158, 220));
+        StyleConstants.setForeground(attributeSet, new Color(92, 101, 192));
         StyleConstants.setBold(attributeSet, true);
-        StyleConstants.setForeground(statementAttributeSet, new Color(179, 210, 235));
+        StyleConstants.setForeground(statementAttributeSet, new Color(30, 80, 180));
         StyleConstants.setBold(statementAttributeSet, true);
-        StyleConstants.setForeground(durationAttributeSet, new Color(70, 170, 155));
-        StyleConstants.setForeground(commentAttributeSet, new Color(190, 190, 190));
+        StyleConstants.setForeground(durationAttributeSet, new Color(111, 150, 255));
+        StyleConstants.setForeground(commentAttributeSet, new Color(128, 128, 128));
         StyleConstants.setForeground(errorAttributeSet, new Color(238, 0, 1));
-        StyleConstants.setBackground(sameTimeNoteAttributeSet, new Color(130, 130, 130));
+        StyleConstants.setBackground(sameTimeNoteAttributeSet, new Color(245, 248, 255));
 
         inputStyledDocument = new MyDocument();
         inputTextPane.setDocument(inputStyledDocument);

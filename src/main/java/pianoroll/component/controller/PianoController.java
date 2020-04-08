@@ -60,7 +60,7 @@ public class PianoController {
 
         for (int trackID : triggeredTrackList) {
             Key key = keyList.get(trackID);
-            key.setColorID((key.getTrackID()));
+            key.setColorID(key.getTrackID() + 100);
         }
     }
 

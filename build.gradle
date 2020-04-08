@@ -28,8 +28,6 @@ dependencies {
     compile "com.miglayout:miglayout-core:$miglayoutVersion"
     compile "com.miglayout:miglayout-swing:$miglayoutVersion"
 
-    def weblafVersion = '1.2.10'
-    compile "com.weblookandfeel:weblaf-ui:$weblafVersion"
 }
 
 tasks.withType(JavaCompile) {

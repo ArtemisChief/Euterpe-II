@@ -171,7 +171,7 @@ public class MainWindow extends JFrame {
             // columns
             "[40,fill]" +
             "[430,fill]" +
-            "[930,fill]",
+            "[1130,fill]",
             // rows
             "[690,fill]0" +
             "[45,fill]0"));
@@ -472,8 +472,8 @@ public class MainWindow extends JFrame {
             pianoControllPanel.add(panel3, "cell 3 0");
         }
         contentPane.add(pianoControllPanel, "cell 2 1,grow");
-        pack();
-        setLocationRelativeTo(getOwner());
+        setSize(1600, 800);
+        setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 

@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
 			"$layoutConstraints": "insets 0,hidemode 3,gap 0 0"
-			"$columnConstraints": "[40,fill][430,fill][930,fill]"
+			"$columnConstraints": "[40,fill][430,fill][1130,fill]"
 			"$rowConstraints": "[690,fill]0[45,fill]0"
 		} ) {
 			name: "this"
@@ -13,6 +13,8 @@ new FormModel {
 			"componentOrientation": sfield java.awt.ComponentOrientation LEFT_TO_RIGHT
 			"title": "Euterpe II"
 			"resizable": false
+			"$sizePolicy": 1
+			"$locationPolicy": 1
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "lineScrollPane"
 				add( new FormComponent( "javax.swing.JTextArea" ) {
@@ -358,7 +360,7 @@ new FormModel {
 			}
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 1400, 795 )
+			"size": new java.awt.Dimension( 1600, 800 )
 		} )
 	}
 }

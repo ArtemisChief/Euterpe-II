@@ -20,7 +20,7 @@ public class InputProcessor implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        pianoRoll.getRollController().loadMidiFile(new File("Luv Letter.mid"));
+        pianoRoll.getRollController().loadMidiFile(new File("1.mid"));
     }
 
     @Override

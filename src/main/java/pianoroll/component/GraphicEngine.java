@@ -1,9 +1,6 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
-import pianoroll.component.controller.ParticleController;
-import pianoroll.component.controller.PianoController;
-import pianoroll.component.controller.RollController;
 import pianoroll.component.renderer.ParticleRenderer;
 import pianoroll.component.renderer.PianoRenderer;
 import pianoroll.component.renderer.RollRenderer;

@@ -12,7 +12,7 @@ float getOffsetX(const int trackID) {
     float width = 2.2f;
     float gap = 0.13f;
 
-    float offsetX = (-52 / 2 + trackID / 12 * 7) * (width + gap) + (width - gap) / 2;
+    float offsetX = (-52 / 2 + trackID / 12 * 7) * (width + gap) + (width - gap) / 2 + gap;
 
     int tone = trackID % 12;
 
@@ -66,7 +66,7 @@ float getPosZ(int trackID){
         case 6:
         case 9:
         case 11:
-        posZ = 1.0f;
+        posZ = 0.5f;
         break;
         default:
         posZ = 0.0f;
@@ -78,7 +78,7 @@ float getPosZ(int trackID){
 
 void main() {
 
-    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 33.0f, getPosZ(trackID), 1);
+    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 24.9f, getPosZ(trackID), 1);
 
 }
 

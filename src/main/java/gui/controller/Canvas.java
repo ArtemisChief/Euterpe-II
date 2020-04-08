@@ -5,7 +5,6 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import pianoroll.component.GraphicEngine;
-import pianoroll.component.InputProcessor;
 import pianoroll.component.PianoRoll;
 
 import java.nio.FloatBuffer;
@@ -93,7 +92,7 @@ public class Canvas implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
 
         float ratio = (float) glcanvas.getSize().width / (float) glcanvas.getSize().height;
-        glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.0222f).to(matBuffer);
+        glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.027033f).to(matBuffer);
 
         graphicEngine.reshape(gl, matBuffer);
 

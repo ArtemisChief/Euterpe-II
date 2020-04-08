@@ -1,9 +1,7 @@
-import com.alee.laf.WebLookAndFeel;
-import com.alee.skin.dark.DarkSkin;
 import gui.view.MainWindow;
-import midipaser.component.MidiParser;
+import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
-import java.io.File;
+import javax.swing.*;
 
 /**
  * ░░░░░░░░░░░▄▀▄▀▀▀▀▄▀▄░░░░░░░░░░░░░░░░░░
@@ -22,11 +20,17 @@ public class Main {
 
     public static void main(String[] args) {
 
-        WebLookAndFeel.install(DarkSkin.class);
+        try {
+            System.setProperty("sun.java2d.noddraw", "true");
+            UIManager.put("RootPane.setupButtonVisible", false);
+            BeautyEyeLNFHelper.translucencyAtFrameInactive = false;
+            BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
+            BeautyEyeLNFHelper.launchBeautyEyeLNF();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
 
         MainWindow.GetInstance().init().setVisible(true);
-
-        MidiParser.GetInstance().parse(new File("Heartache.mid"));
         
     }
 

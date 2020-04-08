@@ -2,6 +2,7 @@
 
 #define WHITE   200
 #define BLACK   201
+#define GREY    202
 
 uniform int colorID;
 
@@ -64,16 +65,20 @@ vec4 getColor(int colorID){
         color = vec4(0.07f, 0.07f, 0.07f, 1.0f);
         break;
 
+        case GREY:
+        color = vec4(0.04f, 0.04f, 0.04f, 1.0f);
+        break;
+
         default :
         float s = 0.5f;
         float v = 1.0f;
 
         if(colorID > 100){
             colorID -= 100;
-            s = 0.1f;
+            s = 0.3f;
         }
 
-        int h = (colorID * 5 + 330) % 360;
+        int h = (colorID * 5) % 360;
 
         color =  hsvToRgb(vec3(h, s, v));
         break;

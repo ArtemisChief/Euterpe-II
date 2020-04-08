@@ -27,17 +27,17 @@ public class RollRenderer {
 
     public void init(GL3 gl) {
         final float[] vertexDataRollWhite = {
-                -0.95f,  0.0f,           // Left-Top
-                -0.95f, -1.0f,           // Left-Bottom
-                 0.95f,  0.0f,           // Right-Top
-                 0.95f, -1.0f            // Right-Bottom
+                -1.021f,  0.0f,           // Left-Top
+                -1.021f, -1.0f,           // Left-Bottom
+                 1.021f, -1.0f,           // Right-Bottom
+                 1.021f,  0.0f            // Right-Top
         };
 
         final float[] vertexDataRollBlack = {
-                -0.5f,  0.0f,            // Left-Top
-                -0.5f, -1.0f,            // Left-Bottom
-                 0.5f,  0.0f,            // Right-Top
-                 0.5f, -1.0f             // Right-Bottom
+                -0.651f,  0.0f,           // Left-Top
+                -0.651f, -1.0f,           // Left-Bottom
+                 0.651f, -1.0f,           // Right-Bottom
+                 0.651f,  0.0f            // Right-Top
         };
 
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);
@@ -100,7 +100,7 @@ public class RollRenderer {
                 gl.glUniform1i(program.get("colorID"), roll.getColorID());
                 gl.glUniform1f(program.get("scaleY"), roll.getScaleY());
                 gl.glUniform1f(program.get("offsetY"), roll.getOffsetY());
-                gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
             }
         }
 

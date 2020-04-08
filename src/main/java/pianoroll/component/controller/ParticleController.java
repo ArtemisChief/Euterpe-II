@@ -31,7 +31,7 @@ public class ParticleController {
         // spawn a new particle if needed
         for (int trackID : triggeredTrackList) {
             Particle particle = particleList.get(firstUnusedParticle());
-            int randomColor = random.nextInt(4) - 2 + trackID;
+            int randomColor = random.nextInt(6) - 3 + trackID;
             float randomScale = (random.nextFloat() + 0.6f) * 1.2f;
             float randomDegrees = random.nextFloat() * 90.0f;
             float randomX = (random.nextFloat() - 0.5f) * 2.0f;
@@ -40,12 +40,12 @@ public class ParticleController {
             particle.setTrackID(trackID);
             particle.setColorID(randomColor);
             particle.setOffset(randomX, 0.0f);
-            particle.setVelocity(randomX, randomY * 10.0f);
+            particle.setVelocity(randomX, randomY * 16.0f);
             particle.setScale(randomScale);
             particle.setScaleConst(randomScale);
             particle.setDegrees(randomDegrees);
-            particle.setLife(1.0f);
-            particle.setLifeConst(1.0f);
+            particle.setLife(0.7f);
+            particle.setLifeConst(0.7f);
             particle.setTimeSum(0.0f);
         }
 

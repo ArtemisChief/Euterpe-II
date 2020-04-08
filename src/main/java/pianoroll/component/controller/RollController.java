@@ -36,6 +36,7 @@ public class RollController {
     private float speed;
     private float timeSum;
     private float nextTime;
+    private final float quarterLength;
 
     private final PianoController pianoController;
 
@@ -57,6 +58,7 @@ public class RollController {
         speed = Semantic.Roll.DEFAULT_SPEED;
         timeSum=0.0f;
         nextTime=0.0f;
+        quarterLength=10.0f;
 
         this.pianoController=pianoController;
     }
@@ -73,8 +75,8 @@ public class RollController {
                 if (midiEvent instanceof NoteEvent) {
                     NoteEvent noteEvent = (NoteEvent) midiEvent;
 
-                    double scaleY = noteEvent.getDurationTicks() / resolution * 8.0f;
-                    double offsetY = noteEvent.getTriggerTick() / resolution * 8.0f + scaleY;
+                    double scaleY = noteEvent.getDurationTicks() / resolution * quarterLength -0.15f;
+                    double offsetY = noteEvent.getTriggerTick() / resolution * quarterLength + scaleY;
                     int trackID = noteEvent.getPitch() - 21;
 
                     Roll roll = rollList.get(firstUnusedRoll(trackID));
@@ -96,7 +98,7 @@ public class RollController {
 
         if (bpmQueue.peek().getKey() == 0) {
             float bpm = bpmQueue.poll().getValue();
-            speed = bpm / 60.0f * 8.0f;
+            speed = bpm / 60.0f * quarterLength;
             firstBpm=bpm;
             if (bpmQueue.peek() != null)
                 nextTime = (float) (bpmQueue.peek().getKey() / resolution / bpm * 60.0f);
@@ -133,12 +135,12 @@ public class RollController {
 
     public void updateRolls(float deltaTime) {
         if (isLoadMidiFile) {
-            timeSum+=deltaTime;
+            timeSum += deltaTime;
 
-            if(timeSum>nextTime) {
+            if (timeSum > nextTime) {
                 if (bpmQueue.peek() != null) {
                     float bpm = bpmQueue.poll().getValue();
-                    speed = bpm / 60.0f * 8.0f;
+                    speed = bpm / 60.0f * quarterLength;
                     if (bpmQueue.peek() != null)
                         nextTime = (float) (bpmQueue.peek().getKey() / resolution / firstBpm * 60.0f);
                 }
@@ -150,7 +152,7 @@ public class RollController {
 
                     if (roll.getOffsetY() - roll.getScaleY() < 0.0f) {
                         if (!triggeredTrackList.contains(roll.getTrackID())) {
-                            roll.setColorID(roll.getTrackID()+100);
+                            roll.setColorID(roll.getTrackID() + 100);
                             triggeredTrackList.add(roll.getTrackID());
                             pianoController.trigger(roll.getTrackID());
                         }

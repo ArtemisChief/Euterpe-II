@@ -24,17 +24,17 @@ public class PianoRenderer {
 
     public void init(GL3 gl) {
         final float[] vertexDataKeyWhite = {
-                -1.1f, 0.0f,           // Left-Top
-                -1.1f, -11.5f,          // Left-Bottom
-                 1.1f, 0.0f,           // Right-Top
-                 1.1f, -11.5f           // Right-Bottom
+                -1.11f,  0.0f,            // Left-Top
+                -1.11f, -12.0f,           // Left-Bottom
+                 1.11f, -12.0f,           // Right-Bottom
+                 1.11f,  0.0f             // Right-Top
         };
 
         final float[] vertexDataKeyBlack = {
-                -0.65f,  0.0f,          // Left-Top
-                -0.65f, -8.0f,          // Left-Bottom
-                 0.65f,  0.0f,          // Right-Top
-                 0.65f, -8.0f           // Right-Bottom
+                -0.681f,  0.0f,           // Left-Top
+                -0.681f, -8.3f,           // Left-Bottom
+                 0.681f, -8.3f,           // Right-Bottom
+                 0.681f,  0.0f            // Right-Top
         };
 
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);
@@ -99,7 +99,7 @@ public class PianoRenderer {
             gl.glBindVertexArray(key.getVao().get(0));
             gl.glUniform1i(program.get("trackID"), key.getTrackID());
             gl.glUniform1i(program.get("colorID"), key.getColorID());
-            gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
         }
 
         gl.glBindVertexArray(0);
