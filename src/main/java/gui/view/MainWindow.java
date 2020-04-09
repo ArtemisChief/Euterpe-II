@@ -5,7 +5,6 @@
 package gui.view;
 
 import java.awt.event.*;
-import javax.swing.border.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -15,7 +14,7 @@ import gui.controller.FileIO;
 import gui.controller.InputTexts;
 import gui.controller.Menus;
 import gui.entity.Status;
-import gui.controller.Canvas;
+import pianoroll.component.PianorollCanvas;
 import midiplayer.component.MidiPlayer;
 import net.miginfocom.swing.*;
 
@@ -36,17 +35,14 @@ public class MainWindow extends JFrame {
 
     private MainWindow() {
 
-        // 取消Windows自带顶边框
-        setUndecorated(true);
-
         // 初始化组件
         initComponents();
 
         // 初始化钢琴卷帘组件
-        Canvas.Setup();
+        PianorollCanvas.Setup();
 
         // 钢琴卷帘组件加入到窗口
-        getContentPane().add(Canvas.GetGlcanvas(), "cell 2 0");
+        layeredPane.add(PianorollCanvas.GetGlcanvas(),new Integer(100));
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
@@ -60,6 +56,22 @@ public class MainWindow extends JFrame {
         lineScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         inputScrollPane.getVerticalScrollBar().addAdjustmentListener(
                 e -> lineScrollPane.getVerticalScrollBar().setValue(inputScrollPane.getVerticalScrollBar().getValue()));
+
+        // 关闭窗口
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (Status.GetCurrentStatus().getIsEdited())
+                    if (!Diaglogs.GetInstance().askSaving())
+                        return;
+
+                if (FileIO.GetInstance().getTempMidiFile() != null && FileIO.GetInstance().getTempMidiFile().exists())
+                    FileIO.GetInstance().getTempMidiFile().delete();
+
+                MidiPlayer.GetInstance().close();
+                System.exit(0);
+            }
+        });
     }
 
     public MainWindow init() {
@@ -70,53 +82,10 @@ public class MainWindow extends JFrame {
         return instance;
     }
 
-    // 最小化窗口
-    private void minimizeButtonActionPerformed(ActionEvent e) {
-        setExtendedState(JFrame.ICONIFIED);
-    }
-
-    // 关闭窗口
-    private void closeButtonActionPerformed(ActionEvent e) {
-        if (Status.GetCurrentStatus().getIsEdited())
-            if (!Diaglogs.GetInstance().askSaving())
-                return;
-
-        if (FileIO.GetInstance().getTempMidiFile() != null && FileIO.GetInstance().getTempMidiFile().exists())
-            FileIO.GetInstance().getTempMidiFile().delete();
-
-        MidiPlayer.GetInstance().close();
-        System.exit(0);
-    }
-
-    // 拖动窗口-按下鼠标
-    private void titleMenuMousePressed(MouseEvent e) {
-        pressedPoint = e.getPoint();
-    }
-
-    // 拖动窗口-移动位置
-    private void titleMenuMouseDragged(MouseEvent e) {
-        Point point = e.getPoint();
-        Point locationPoint = getLocation();
-        int x = locationPoint.x + point.x - pressedPoint.x;
-        int y = locationPoint.y + point.y - pressedPoint.y;
-        setLocation(x, y);
-    }
-
-    private void keyLabelMousePressed(MouseEvent e) {
-        // TODO add your code here
-    }
-
-    private void sustainLabelMousePressed(MouseEvent e) {
-        // TODO add your code here
-    }
-
-    private void OctaveLabelMousePressed(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        menuBar1 = new JMenuBar();
+        leftPanel = new JPanel();
+        menuBar2 = new JMenuBar();
         JMenu fileMenu = new JMenu();
         newEmptyMenuItem = new JMenuItem();
         newTemplateMenuItem = new JMenuItem();
@@ -132,33 +101,23 @@ public class MainWindow extends JFrame {
         loadSoundFontMenuItem = new JMenuItem();
         playDirectMenuItem = new JMenuItem();
         stopDirectMenuItem = new JMenuItem();
+        menu1 = new JMenu();
+        convertToMuiMenuItem = new JMenuItem();
+        convertToStaveMenuItem = new JMenuItem();
+        convertToNmnMenuItem = new JMenuItem();
         JMenu toolMenu = new JMenu();
         transposerMenuItem = new JMenuItem();
         JMenu helpMenu = new JMenu();
         instruMenuItem = new JMenuItem();
         tipsMenuItem = new JMenuItem();
         aboutMenuItem = new JMenuItem();
-        titleMenu = new JMenu();
-        minimizeButton = new JButton();
-        closeButton = new JButton();
         lineScrollPane = new JScrollPane();
         lineTextArea = new JTextArea();
         inputScrollPane = new JScrollPane();
         inputTextPane = new JTextPane();
-        button1 = new JButton();
+        layeredPane = new JLayeredPane();
         outputScrollPane = new JScrollPane();
         outputTextArea = new JTextArea();
-        pianoControllPanel = new JPanel();
-        progressBar1 = new JProgressBar();
-        panel1 = new JPanel();
-        JLabel label1 = new JLabel();
-        keyLabel = new JLabel();
-        panel2 = new JPanel();
-        JLabel label2 = new JLabel();
-        sustainLabel = new JLabel();
-        panel3 = new JPanel();
-        JLabel label3 = new JLabel();
-        OctaveLabel = new JLabel();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -169,316 +128,183 @@ public class MainWindow extends JFrame {
         contentPane.setLayout(new MigLayout(
             "insets 0,hidemode 3,gap 0 0",
             // columns
-            "[40,fill]" +
-            "[430,fill]" +
-            "[1130,fill]",
+            "[450,fill]" +
+            "[1150,fill]",
             // rows
-            "[690,fill]0" +
-            "[45,fill]0"));
+            "[770,fill]0"));
 
-        //======== menuBar1 ========
+        //======== leftPanel ========
         {
-            menuBar1.setMinimumSize(new Dimension(100, 30));
-            menuBar1.setPreferredSize(new Dimension(100, 30));
-            menuBar1.setMaximumSize(new Dimension(100, 32768));
-
-            //======== fileMenu ========
-            {
-                fileMenu.setText("File");
-
-                //---- newEmptyMenuItem ----
-                newEmptyMenuItem.setText("New - Empty");
-                fileMenu.add(newEmptyMenuItem);
-
-                //---- newTemplateMenuItem ----
-                newTemplateMenuItem.setText("New - Template");
-                fileMenu.add(newTemplateMenuItem);
-                fileMenu.add(separator2);
-
-                //---- openMenuItem ----
-                openMenuItem.setText("Open");
-                fileMenu.add(openMenuItem);
-                fileMenu.add(separator3);
-
-                //---- saveMenuItem ----
-                saveMenuItem.setText("Save");
-                fileMenu.add(saveMenuItem);
-
-                //---- saveAsMenuItem ----
-                saveAsMenuItem.setText("Save As...");
-                fileMenu.add(saveAsMenuItem);
-                fileMenu.add(separator4);
-
-                //---- exportMidiMenuItem ----
-                exportMidiMenuItem.setText("Export Midi File");
-                fileMenu.add(exportMidiMenuItem);
-                fileMenu.addSeparator();
-
-                //---- exitMenuItem ----
-                exitMenuItem.setText("Exit");
-                fileMenu.add(exitMenuItem);
-            }
-            menuBar1.add(fileMenu);
-
-            //======== playerMenu ========
-            {
-                playerMenu.setText("Midi Player");
-
-                //---- loadSoundFontMenuItem ----
-                loadSoundFontMenuItem.setText("Load SoundFont");
-                playerMenu.add(loadSoundFontMenuItem);
-                playerMenu.addSeparator();
-
-                //---- playDirectMenuItem ----
-                playDirectMenuItem.setText("Play");
-                playerMenu.add(playDirectMenuItem);
-
-                //---- stopDirectMenuItem ----
-                stopDirectMenuItem.setText("Stop");
-                playerMenu.add(stopDirectMenuItem);
-            }
-            menuBar1.add(playerMenu);
-
-            //======== toolMenu ========
-            {
-                toolMenu.setText("Tool");
-
-                //---- transposerMenuItem ----
-                transposerMenuItem.setText("Transposer");
-                toolMenu.add(transposerMenuItem);
-            }
-            menuBar1.add(toolMenu);
-
-            //======== helpMenu ========
-            {
-                helpMenu.setText("Help");
-
-                //---- instruMenuItem ----
-                instruMenuItem.setText("Instruments");
-                helpMenu.add(instruMenuItem);
-
-                //---- tipsMenuItem ----
-                tipsMenuItem.setText("Tips");
-                helpMenu.add(tipsMenuItem);
-
-                //---- aboutMenuItem ----
-                aboutMenuItem.setText("About");
-                helpMenu.add(aboutMenuItem);
-            }
-            menuBar1.add(helpMenu);
-
-            //======== titleMenu ========
-            {
-                titleMenu.setText("                                                                                                                     Euterpe II                                                                                                                                                     ");
-                titleMenu.setOpaque(false);
-                titleMenu.setBorderPainted(false);
-                titleMenu.setEnabled(false);
-                titleMenu.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        titleMenuMousePressed(e);
-                    }
-                });
-                titleMenu.addMouseMotionListener(new MouseMotionAdapter() {
-                    @Override
-                    public void mouseDragged(MouseEvent e) {
-                        titleMenuMouseDragged(e);
-                    }
-                });
-            }
-            menuBar1.add(titleMenu);
-
-            //---- minimizeButton ----
-            minimizeButton.setBorderPainted(false);
-            minimizeButton.setFont(new Font("Consolas", Font.PLAIN, 12));
-            minimizeButton.setIcon(new ImageIcon(getClass().getResource("/icons/minimize0.png")));
-            minimizeButton.setRolloverIcon(new ImageIcon(getClass().getResource("/icons/minimize1.png")));
-            minimizeButton.setBorder(null);
-            minimizeButton.setRolloverSelectedIcon(new ImageIcon(getClass().getResource("/icons/minimize1.png")));
-            minimizeButton.addActionListener(e -> minimizeButtonActionPerformed(e));
-            menuBar1.add(minimizeButton);
-
-            //---- closeButton ----
-            closeButton.setBorderPainted(false);
-            closeButton.setFont(new Font("Consolas", Font.PLAIN, 12));
-            closeButton.setIcon(new ImageIcon(getClass().getResource("/icons/close0.png")));
-            closeButton.setRolloverIcon(new ImageIcon(getClass().getResource("/icons/close1.png")));
-            closeButton.setBorder(null);
-            closeButton.setRolloverSelectedIcon(new ImageIcon(getClass().getResource("/icons/close1.png")));
-            closeButton.addActionListener(e -> closeButtonActionPerformed(e));
-            menuBar1.add(closeButton);
-        }
-        setJMenuBar(menuBar1);
-
-        //======== lineScrollPane ========
-        {
-
-            //---- lineTextArea ----
-            lineTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
-            lineTextArea.setEnabled(false);
-            lineTextArea.setEditable(false);
-            lineTextArea.setBorder(null);
-            lineTextArea.setBackground(Color.white);
-            lineTextArea.setForeground(new Color(153, 153, 153));
-            lineScrollPane.setViewportView(lineTextArea);
-        }
-        contentPane.add(lineScrollPane, "cell 0 0");
-
-        //======== inputScrollPane ========
-        {
-
-            //---- inputTextPane ----
-            inputTextPane.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
-            inputTextPane.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-            inputTextPane.setBorder(null);
-            inputTextPane.setDragEnabled(true);
-            inputScrollPane.setViewportView(inputTextPane);
-        }
-        contentPane.add(inputScrollPane, "cell 1 0");
-
-        //---- button1 ----
-        button1.setText("Play");
-        button1.setPreferredSize(new Dimension(40, 40));
-        button1.setMinimumSize(new Dimension(40, 40));
-        button1.setMaximumSize(new Dimension(40, 40));
-        contentPane.add(button1, "cell 0 1,grow");
-
-        //======== outputScrollPane ========
-        {
-
-            //---- outputTextArea ----
-            outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
-            outputTextArea.setEditable(false);
-            outputScrollPane.setViewportView(outputTextArea);
-        }
-        contentPane.add(outputScrollPane, "cell 1 1");
-
-        //======== pianoControllPanel ========
-        {
-            pianoControllPanel.setLayout(new MigLayout(
-                "hidemode 3",
+            leftPanel.setLayout(new MigLayout(
+                "insets 0,hidemode 3,gap 0 0",
                 // columns
-                "[400,fill]unrel" +
-                "[120,fill]rel" +
-                "[120,fill]rel" +
-                "[120,fill]0",
+                "[40,fill]" +
+                "[410,fill]",
                 // rows
-                "rel[30,fill]rel"));
-            pianoControllPanel.add(progressBar1, "cell 0 0,grow");
+                "0[30]0" +
+                "[740,fill]0"));
 
-            //======== panel1 ========
+            //======== menuBar2 ========
             {
-                panel1.setBackground(new Color(58, 60, 66));
-                panel1.setBorder(LineBorder.createBlackLineBorder());
-                panel1.setLayout(new MigLayout(
-                    "hidemode 3",
-                    // columns
-                    "[50,fill]" +
-                    "[50,fill]",
-                    // rows
-                    "0[45]0"));
 
-                //---- label1 ----
-                label1.setText("Key 1 =");
-                label1.setHorizontalAlignment(SwingConstants.CENTER);
-                label1.setForeground(new Color(184, 179, 178));
-                panel1.add(label1, "cell 0 0");
+                //======== fileMenu ========
+                {
+                    fileMenu.setText("File");
 
-                //---- keyLabel ----
-                keyLabel.setText("C(0)");
-                keyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                keyLabel.setBackground(new Color(229, 228, 233));
-                keyLabel.setForeground(new Color(116, 116, 116));
-                keyLabel.setOpaque(true);
-                keyLabel.setBorder(LineBorder.createBlackLineBorder());
-                keyLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        keyLabelMousePressed(e);
-                    }
-                });
-                panel1.add(keyLabel, "cell 1 0");
+                    //---- newEmptyMenuItem ----
+                    newEmptyMenuItem.setText("New - Empty");
+                    fileMenu.add(newEmptyMenuItem);
+
+                    //---- newTemplateMenuItem ----
+                    newTemplateMenuItem.setText("New - Template");
+                    fileMenu.add(newTemplateMenuItem);
+                    fileMenu.add(separator2);
+
+                    //---- openMenuItem ----
+                    openMenuItem.setText("Open");
+                    fileMenu.add(openMenuItem);
+                    fileMenu.add(separator3);
+
+                    //---- saveMenuItem ----
+                    saveMenuItem.setText("Save");
+                    fileMenu.add(saveMenuItem);
+
+                    //---- saveAsMenuItem ----
+                    saveAsMenuItem.setText("Save As...");
+                    fileMenu.add(saveAsMenuItem);
+                    fileMenu.add(separator4);
+
+                    //---- exportMidiMenuItem ----
+                    exportMidiMenuItem.setText("Export Midi File");
+                    fileMenu.add(exportMidiMenuItem);
+                    fileMenu.addSeparator();
+
+                    //---- exitMenuItem ----
+                    exitMenuItem.setText("Exit");
+                    fileMenu.add(exitMenuItem);
+                }
+                menuBar2.add(fileMenu);
+
+                //======== playerMenu ========
+                {
+                    playerMenu.setText("MIDIPlayer");
+
+                    //---- loadSoundFontMenuItem ----
+                    loadSoundFontMenuItem.setText("Load SoundFont");
+                    playerMenu.add(loadSoundFontMenuItem);
+                    playerMenu.addSeparator();
+
+                    //---- playDirectMenuItem ----
+                    playDirectMenuItem.setText("Play");
+                    playerMenu.add(playDirectMenuItem);
+
+                    //---- stopDirectMenuItem ----
+                    stopDirectMenuItem.setText("Stop");
+                    playerMenu.add(stopDirectMenuItem);
+                }
+                menuBar2.add(playerMenu);
+
+                //======== menu1 ========
+                {
+                    menu1.setText("Converter");
+
+                    //---- convertToMuiMenuItem ----
+                    convertToMuiMenuItem.setText("Convert Midi To Mui");
+                    menu1.add(convertToMuiMenuItem);
+                    menu1.addSeparator();
+
+                    //---- convertToStaveMenuItem ----
+                    convertToStaveMenuItem.setText("Convert To Stave");
+                    menu1.add(convertToStaveMenuItem);
+
+                    //---- convertToNmnMenuItem ----
+                    convertToNmnMenuItem.setText("Convert To Numbered Musical Notation");
+                    menu1.add(convertToNmnMenuItem);
+                }
+                menuBar2.add(menu1);
+
+                //======== toolMenu ========
+                {
+                    toolMenu.setText("Tool");
+
+                    //---- transposerMenuItem ----
+                    transposerMenuItem.setText("Transposer");
+                    toolMenu.add(transposerMenuItem);
+                }
+                menuBar2.add(toolMenu);
+
+                //======== helpMenu ========
+                {
+                    helpMenu.setText("Help");
+
+                    //---- instruMenuItem ----
+                    instruMenuItem.setText("Instruments");
+                    helpMenu.add(instruMenuItem);
+
+                    //---- tipsMenuItem ----
+                    tipsMenuItem.setText("Tips");
+                    helpMenu.add(tipsMenuItem);
+
+                    //---- aboutMenuItem ----
+                    aboutMenuItem.setText("About");
+                    helpMenu.add(aboutMenuItem);
+                }
+                menuBar2.add(helpMenu);
             }
-            pianoControllPanel.add(panel1, "cell 1 0,grow");
+            leftPanel.add(menuBar2, "cell 0 0 2 1");
 
-            //======== panel2 ========
+            //======== lineScrollPane ========
             {
-                panel2.setBackground(new Color(58, 60, 66));
-                panel2.setBorder(LineBorder.createBlackLineBorder());
-                panel2.setLayout(new MigLayout(
-                    "hidemode 3",
-                    // columns
-                    "[50,fill]" +
-                    "[50,fill]",
-                    // rows
-                    "0[45]0"));
 
-                //---- label2 ----
-                label2.setText("Sustain");
-                label2.setHorizontalAlignment(SwingConstants.CENTER);
-                label2.setForeground(new Color(184, 179, 178));
-                panel2.add(label2, "cell 0 0");
-
-                //---- sustainLabel ----
-                sustainLabel.setText("127");
-                sustainLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                sustainLabel.setBackground(new Color(229, 228, 233));
-                sustainLabel.setForeground(new Color(116, 116, 116));
-                sustainLabel.setOpaque(true);
-                sustainLabel.setBorder(LineBorder.createBlackLineBorder());
-                sustainLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        sustainLabelMousePressed(e);
-                    }
-                });
-                panel2.add(sustainLabel, "cell 1 0");
+                //---- lineTextArea ----
+                lineTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+                lineTextArea.setEnabled(false);
+                lineTextArea.setEditable(false);
+                lineTextArea.setBorder(null);
+                lineTextArea.setBackground(Color.white);
+                lineTextArea.setForeground(new Color(153, 153, 153));
+                lineScrollPane.setViewportView(lineTextArea);
             }
-            pianoControllPanel.add(panel2, "cell 2 0,grow");
+            leftPanel.add(lineScrollPane, "cell 0 1");
 
-            //======== panel3 ========
+            //======== inputScrollPane ========
             {
-                panel3.setBackground(new Color(58, 60, 66));
-                panel3.setBorder(LineBorder.createBlackLineBorder());
-                panel3.setLayout(new MigLayout(
-                    "hidemode 3",
-                    // columns
-                    "[50,fill]" +
-                    "[50,fill]",
-                    // rows
-                    "0[45]0"));
 
-                //---- label3 ----
-                label3.setText("Octave");
-                label3.setHorizontalAlignment(SwingConstants.CENTER);
-                label3.setForeground(new Color(184, 179, 178));
-                panel3.add(label3, "cell 0 0");
-
-                //---- OctaveLabel ----
-                OctaveLabel.setText("0");
-                OctaveLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                OctaveLabel.setBackground(new Color(229, 228, 233));
-                OctaveLabel.setForeground(new Color(116, 116, 116));
-                OctaveLabel.setOpaque(true);
-                OctaveLabel.setBorder(LineBorder.createBlackLineBorder());
-                OctaveLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        OctaveLabelMousePressed(e);
-                    }
-                });
-                panel3.add(OctaveLabel, "cell 1 0");
+                //---- inputTextPane ----
+                inputTextPane.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+                inputTextPane.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+                inputTextPane.setBorder(null);
+                inputTextPane.setDragEnabled(true);
+                inputScrollPane.setViewportView(inputTextPane);
             }
-            pianoControllPanel.add(panel3, "cell 3 0");
+            leftPanel.add(inputScrollPane, "cell 1 1");
         }
-        contentPane.add(pianoControllPanel, "cell 2 1,grow");
+        contentPane.add(leftPanel, "cell 0 0");
+
+        //======== layeredPane ========
+        {
+
+            //======== outputScrollPane ========
+            {
+
+                //---- outputTextArea ----
+                outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+                outputTextArea.setEditable(false);
+                outputTextArea.setBorder(null);
+                outputScrollPane.setViewportView(outputTextArea);
+            }
+            layeredPane.add(outputScrollPane, JLayeredPane.POPUP_LAYER);
+            outputScrollPane.setBounds(80, 185, 110, 185);
+        }
+        contentPane.add(layeredPane, "cell 1 0");
         setSize(1600, 800);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JMenuBar menuBar1;
+    private JPanel leftPanel;
+    private JMenuBar menuBar2;
     public JMenuItem newEmptyMenuItem;
     public JMenuItem newTemplateMenuItem;
     private JSeparator separator2;
@@ -492,27 +318,20 @@ public class MainWindow extends JFrame {
     public JMenuItem loadSoundFontMenuItem;
     public JMenuItem playDirectMenuItem;
     public JMenuItem stopDirectMenuItem;
+    private JMenu menu1;
+    public JMenuItem convertToMuiMenuItem;
+    public JMenuItem convertToStaveMenuItem;
+    public JMenuItem convertToNmnMenuItem;
     public JMenuItem transposerMenuItem;
     public JMenuItem instruMenuItem;
     public JMenuItem tipsMenuItem;
     public JMenuItem aboutMenuItem;
-    private JMenu titleMenu;
-    private JButton minimizeButton;
-    private JButton closeButton;
     private JScrollPane lineScrollPane;
     private JTextArea lineTextArea;
     private JScrollPane inputScrollPane;
     public JTextPane inputTextPane;
-    private JButton button1;
+    private JLayeredPane layeredPane;
     private JScrollPane outputScrollPane;
     public JTextArea outputTextArea;
-    private JPanel pianoControllPanel;
-    private JProgressBar progressBar1;
-    private JPanel panel1;
-    private JLabel keyLabel;
-    private JPanel panel2;
-    private JLabel sustainLabel;
-    private JPanel panel3;
-    private JLabel OctaveLabel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

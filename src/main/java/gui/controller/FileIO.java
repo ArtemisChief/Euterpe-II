@@ -19,6 +19,8 @@ public class FileIO {
     }
 
     private FileIO() {
+        tempMidiFile = null;
+        file = null;
     }
 
     private File tempMidiFile;
@@ -155,13 +157,36 @@ public class FileIO {
     public void loadSoundFont() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("SoundFont File", "sf2", "sf3");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("SoundFont File", "sf2","sf3");
         fileChooser.setFileFilter(filter);
         int value = fileChooser.showOpenDialog(MainWindow.GetInstance());
         if (value == JFileChooser.CANCEL_OPTION)
             return;
         File soundFontFile = fileChooser.getSelectedFile();
         MidiPlayer.GetInstance().loadSoundBank(soundFontFile);
+    }
+
+    public void convertMidiFile() {
+        if (Status.GetCurrentStatus().getIsEdited())
+            if (!Diaglogs.GetInstance().askSaving())
+                return;
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Midi File", "mid");
+        fileChooser.setFileFilter(filter);
+        int value = fileChooser.showOpenDialog(MainWindow.GetInstance());
+        if (value == JFileChooser.CANCEL_OPTION)
+            return;
+        File midiFile = fileChooser.getSelectedFile();
+
+        // todo what I don't know, rgnb(
+
+        String result = "rgnb!";
+        MainWindow.GetInstance().inputTextPane.setText(result);
+        MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
+
+        Status.SetCurrentStatus(Status.NEW_FILE);
     }
 
     public File getTempMidiFile() {

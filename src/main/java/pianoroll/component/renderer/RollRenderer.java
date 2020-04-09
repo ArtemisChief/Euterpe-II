@@ -27,17 +27,17 @@ public class RollRenderer {
 
     public void init(GL3 gl) {
         final float[] vertexDataRollWhite = {
-                -1.021f,  0.0f,           // Left-Top
-                -1.021f, -1.0f,           // Left-Bottom
-                 1.021f, -1.0f,           // Right-Bottom
-                 1.021f,  0.0f            // Right-Top
+                -1.02f,  0.0f,           // Left-Top
+                -1.02f, -1.0f,           // Left-Bottom
+                 1.02f, -1.0f,           // Right-Bottom
+                 1.02f,  0.0f            // Right-Top
         };
 
         final float[] vertexDataRollBlack = {
-                -0.651f,  0.0f,           // Left-Top
-                -0.651f, -1.0f,           // Left-Bottom
-                 0.651f, -1.0f,           // Right-Bottom
-                 0.651f,  0.0f            // Right-Top
+                -0.65f,  0.0f,           // Left-Top
+                -0.65f, -1.0f,           // Left-Bottom
+                 0.65f, -1.0f,           // Right-Bottom
+                 0.65f,  0.0f            // Right-Top
         };
 
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);

@@ -1,11 +1,9 @@
-package gui.controller;
+package pianoroll.component;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
-import pianoroll.component.GraphicEngine;
-import pianoroll.component.PianoRoll;
 
 import java.nio.FloatBuffer;
 
@@ -13,13 +11,13 @@ import static com.jogamp.opengl.GL2ES3.*;
 import static glm.GlmKt.glm;
 import static uno.buffer.UtilKt.destroyBuffers;
 
-public class Canvas implements GLEventListener {
+public class PianorollCanvas implements GLEventListener {
 
     // 单例
-    private static final Canvas instance = new Canvas();
+    private static final PianorollCanvas instance = new PianorollCanvas();
 
     // 获取单例
-    public static Canvas GetInstance() {
+    public static PianorollCanvas GetInstance() {
         return instance;
     }
 
@@ -34,7 +32,7 @@ public class Canvas implements GLEventListener {
     private PianoRoll pianoRoll;
     private GraphicEngine graphicEngine;
 
-    private Canvas() {
+    private PianorollCanvas() {
         clearColor = GLBuffers.newDirectFloatBuffer(4);
         clearDepth = GLBuffers.newDirectFloatBuffer(1);
         matBuffer = GLBuffers.newDirectFloatBuffer(16);
@@ -45,6 +43,7 @@ public class Canvas implements GLEventListener {
         GLCapabilities glCapabilities = new GLCapabilities(glProfile);
 
         glcanvas = new GLCanvas(glCapabilities);
+        glcanvas.setBounds(0,0,1150,800);
         glcanvas.addGLEventListener(instance);
 
         Animator animator = new Animator(glcanvas);
@@ -92,7 +91,7 @@ public class Canvas implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
 
         float ratio = (float) glcanvas.getSize().width / (float) glcanvas.getSize().height;
-        glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.027033f).to(matBuffer);
+        glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.02365f).to(matBuffer);
 
         graphicEngine.reshape(gl, matBuffer);
 

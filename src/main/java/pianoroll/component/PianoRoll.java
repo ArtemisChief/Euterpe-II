@@ -4,7 +4,6 @@ import pianoroll.component.controller.ParticleController;
 import pianoroll.component.controller.PianoController;
 import pianoroll.component.controller.RollController;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +19,10 @@ public class PianoRoll {
     private final InputProcessor inputProcessor;
 
     public PianoRoll() {
-        triggeredTrackList=new ArrayList<>();
+        triggeredTrackList = new ArrayList<>();
 
         pianoController = new PianoController(triggeredTrackList);
-        rollController = new RollController(triggeredTrackList,pianoController);
+        rollController = new RollController(triggeredTrackList, pianoController);
         particleController = new ParticleController(triggeredTrackList);
 
         graphicEngine = new GraphicEngine(this);

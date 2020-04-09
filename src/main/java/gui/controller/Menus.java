@@ -162,6 +162,24 @@ public class Menus {
             MidiPlayer.GetInstance().stop();
         });
 
+        // 转换Midi到Mui
+        MainWindow.GetInstance().convertToMuiMenuItem.addActionListener(e->{
+            FileIO.GetInstance().convertMidiFile();
+            MainWindow.GetInstance().outputTextArea.setText("");
+            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MidiPlayer.GetInstance().stop();
+        });
+
+        // 转换Mui到五线谱
+        MainWindow.GetInstance().convertToStaveMenuItem.addActionListener(e->{
+
+        });
+
+        // 转换Mui到简谱
+        MainWindow.GetInstance().convertToNmnMenuItem.addActionListener(e->{
+
+        });
+
         // 打开转调器窗口
         MainWindow.GetInstance().transposerMenuItem.addActionListener(e -> {
 
