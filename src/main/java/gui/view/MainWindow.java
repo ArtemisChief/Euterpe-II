@@ -187,7 +187,7 @@ public class MainWindow extends JFrame {
 
                 //======== playerMenu ========
                 {
-                    playerMenu.setText("MIDIPlayer");
+                    playerMenu.setText("MidiPlayer");
 
                     //---- loadSoundFontMenuItem ----
                     loadSoundFontMenuItem.setText("Load SoundFont");
