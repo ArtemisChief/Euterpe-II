@@ -122,7 +122,7 @@ new FormModel {
 						} )
 					} )
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-						name: "menu1"
+						name: "converterMenu"
 						"text": "Converter"
 						add( new FormComponent( "javax.swing.JMenuItem" ) {
 							name: "convertToMuiMenuItem"
@@ -150,13 +150,47 @@ new FormModel {
 						} )
 					} )
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
-						name: "toolMenu"
-						"text": "Tool"
-						auxiliary() {
-							"JavaCodeGenerator.variableLocal": true
-						}
-						add( new FormComponent( "javax.swing.JMenuItem" ) {
-							name: "transposerMenuItem"
+						name: "rightPanelMenu"
+						"text": "Select Right Panel As……"
+						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
+							name: "pianorollRadioMenuItem"
+							"text": "Pianoroll"
+							auxiliary() {
+								"JavaCodeGenerator.variableModifiers": 1
+							}
+						} )
+						add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
+							name: "separator7"
+						} )
+						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
+							name: "outputTextRadioMenuItem"
+							"text": "Output Text"
+							auxiliary() {
+								"JavaCodeGenerator.variableModifiers": 1
+							}
+						} )
+						add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
+							name: "separator8"
+						} )
+						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
+							name: "staveRadioMenuItem"
+							"text": "Stave"
+							auxiliary() {
+								"JavaCodeGenerator.variableModifiers": 1
+							}
+						} )
+						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
+							name: "nmnRadioMenuItem"
+							"text": "Numbered Musical Notaion"
+							auxiliary() {
+								"JavaCodeGenerator.variableModifiers": 1
+							}
+						} )
+						add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
+							name: "separator9"
+						} )
+						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
+							name: "transposerRadioMenuItem"
 							"text": "Transposer"
 							auxiliary() {
 								"JavaCodeGenerator.variableModifiers": 1

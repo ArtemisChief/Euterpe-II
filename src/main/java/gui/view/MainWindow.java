@@ -101,12 +101,16 @@ public class MainWindow extends JFrame {
         loadSoundFontMenuItem = new JMenuItem();
         playDirectMenuItem = new JMenuItem();
         stopDirectMenuItem = new JMenuItem();
-        menu1 = new JMenu();
+        converterMenu = new JMenu();
         convertToMuiMenuItem = new JMenuItem();
         convertToStaveMenuItem = new JMenuItem();
         convertToNmnMenuItem = new JMenuItem();
-        JMenu toolMenu = new JMenu();
-        transposerMenuItem = new JMenuItem();
+        rightPanelMenu = new JMenu();
+        pianorollRadioMenuItem = new JRadioButtonMenuItem();
+        outputTextRadioMenuItem = new JRadioButtonMenuItem();
+        staveRadioMenuItem = new JRadioButtonMenuItem();
+        nmnRadioMenuItem = new JRadioButtonMenuItem();
+        transposerRadioMenuItem = new JRadioButtonMenuItem();
         JMenu helpMenu = new JMenu();
         instruMenuItem = new JMenuItem();
         tipsMenuItem = new JMenuItem();
@@ -204,34 +208,53 @@ public class MainWindow extends JFrame {
                 }
                 menuBar2.add(playerMenu);
 
-                //======== menu1 ========
+                //======== converterMenu ========
                 {
-                    menu1.setText("Converter");
+                    converterMenu.setText("Converter");
 
                     //---- convertToMuiMenuItem ----
                     convertToMuiMenuItem.setText("Convert Midi To Mui");
-                    menu1.add(convertToMuiMenuItem);
-                    menu1.addSeparator();
+                    converterMenu.add(convertToMuiMenuItem);
+                    converterMenu.addSeparator();
 
                     //---- convertToStaveMenuItem ----
                     convertToStaveMenuItem.setText("Convert To Stave");
-                    menu1.add(convertToStaveMenuItem);
+                    converterMenu.add(convertToStaveMenuItem);
 
                     //---- convertToNmnMenuItem ----
                     convertToNmnMenuItem.setText("Convert To Numbered Musical Notation");
-                    menu1.add(convertToNmnMenuItem);
+                    converterMenu.add(convertToNmnMenuItem);
                 }
-                menuBar2.add(menu1);
+                menuBar2.add(converterMenu);
 
-                //======== toolMenu ========
+                //======== rightPanelMenu ========
                 {
-                    toolMenu.setText("Tool");
+                    rightPanelMenu.setText("Select Right Panel As\u2026\u2026");
 
-                    //---- transposerMenuItem ----
-                    transposerMenuItem.setText("Transposer");
-                    toolMenu.add(transposerMenuItem);
+                    //---- pianorollRadioMenuItem ----
+                    pianorollRadioMenuItem.setText("Pianoroll");
+                    rightPanelMenu.add(pianorollRadioMenuItem);
+                    rightPanelMenu.addSeparator();
+
+                    //---- outputTextRadioMenuItem ----
+                    outputTextRadioMenuItem.setText("Output Text");
+                    rightPanelMenu.add(outputTextRadioMenuItem);
+                    rightPanelMenu.addSeparator();
+
+                    //---- staveRadioMenuItem ----
+                    staveRadioMenuItem.setText("Stave");
+                    rightPanelMenu.add(staveRadioMenuItem);
+
+                    //---- nmnRadioMenuItem ----
+                    nmnRadioMenuItem.setText("Numbered Musical Notaion");
+                    rightPanelMenu.add(nmnRadioMenuItem);
+                    rightPanelMenu.addSeparator();
+
+                    //---- transposerRadioMenuItem ----
+                    transposerRadioMenuItem.setText("Transposer");
+                    rightPanelMenu.add(transposerRadioMenuItem);
                 }
-                menuBar2.add(toolMenu);
+                menuBar2.add(rightPanelMenu);
 
                 //======== helpMenu ========
                 {
@@ -318,11 +341,16 @@ public class MainWindow extends JFrame {
     public JMenuItem loadSoundFontMenuItem;
     public JMenuItem playDirectMenuItem;
     public JMenuItem stopDirectMenuItem;
-    private JMenu menu1;
+    private JMenu converterMenu;
     public JMenuItem convertToMuiMenuItem;
     public JMenuItem convertToStaveMenuItem;
     public JMenuItem convertToNmnMenuItem;
-    public JMenuItem transposerMenuItem;
+    private JMenu rightPanelMenu;
+    public JRadioButtonMenuItem pianorollRadioMenuItem;
+    public JRadioButtonMenuItem outputTextRadioMenuItem;
+    public JRadioButtonMenuItem staveRadioMenuItem;
+    public JRadioButtonMenuItem nmnRadioMenuItem;
+    public JRadioButtonMenuItem transposerRadioMenuItem;
     public JMenuItem instruMenuItem;
     public JMenuItem tipsMenuItem;
     public JMenuItem aboutMenuItem;

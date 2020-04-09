@@ -156,6 +156,8 @@ public class RollController {
                             triggeredTrackList.add(roll.getTrackID());
                             pianoController.trigger(roll.getTrackID());
                         }
+
+                        roll.setScaleY(roll.getScaleY() - speed * deltaTime);
                     }
 
                     if (roll.getOffsetY() < 0.0f) {
@@ -167,14 +169,12 @@ public class RollController {
                 }
             }
         } else {
-            float deltaY = deltaTime * speed;
-
             for (Roll roll : rollList) {
                 if (!roll.isUnused()) {
-                    roll.setOffsetY(roll.getOffsetY() + deltaY);
+                    roll.setOffsetY(roll.getOffsetY() + speed * deltaTime);
 
                     if (roll.isUpdatingScaleY())
-                        roll.setScaleY(roll.getScaleY() + deltaY);
+                        roll.setScaleY(roll.getScaleY() + speed * deltaTime);
 
                     if (roll.getOffsetY() - roll.getScaleY() > 80.0f)
                         roll.setUnused(true);

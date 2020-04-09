@@ -181,7 +181,7 @@ public class Menus {
         });
 
         // 打开转调器窗口
-        MainWindow.GetInstance().transposerMenuItem.addActionListener(e -> {
+        MainWindow.GetInstance().transposerRadioMenuItem.addActionListener(e -> {
 
         });
 
