@@ -66,7 +66,7 @@ vec4 getColor(int colorID){
         break;
 
         case GREY:
-        color = vec4(0.04f, 0.04f, 0.04f, 1.0f);
+        color = vec4(0.15f, 0.16f, 0.17f, 1.0f);
         break;
 
         default :

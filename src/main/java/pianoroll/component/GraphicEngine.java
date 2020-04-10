@@ -1,6 +1,7 @@
 package pianoroll.component;
 
 import com.jogamp.opengl.GL3;
+import pianoroll.component.renderer.BackgroundRenderer;
 import pianoroll.component.renderer.ParticleRenderer;
 import pianoroll.component.renderer.PianoRenderer;
 import pianoroll.component.renderer.RollRenderer;
@@ -16,28 +17,27 @@ public class GraphicEngine {
 
     private final PianoRoll pianoRoll;
 
-    private final PianoRenderer pianoRenderer;
-
     private final RollRenderer rollRenderer;
-
+    private final PianoRenderer pianoRenderer;
     private final ParticleRenderer particleRenderer;
+    private final BackgroundRenderer backgroundRenderer;
 
     private Program pianorollProgram;
     private Program particleProgram;
 
     public GraphicEngine(PianoRoll pianoRoll) {
-        this.pianoRoll=pianoRoll;
-
-        pianoRenderer = new PianoRenderer(pianoRoll.getPianoController().getKeyList());
+        this.pianoRoll = pianoRoll;
 
         rollRenderer = new RollRenderer(pianoRoll.getRollController().getAmount(), pianoRoll.getRollController().getRollList());
-
+        pianoRenderer = new PianoRenderer(pianoRoll.getPianoController().getKeyList());
+        backgroundRenderer = new BackgroundRenderer(pianoRoll.getBackgroundController().getColumnList(),pianoRoll.getBackgroundController().getrowList());
         particleRenderer = new ParticleRenderer(pianoRoll.getParticleController().getAmount(), pianoRoll.getParticleController().getParticleList());
     }
 
     public void init(GL3 gl) {
-        pianoRenderer.init(gl);
         rollRenderer.init(gl);
+        pianoRenderer.init(gl);
+        backgroundRenderer.init(gl);
         particleRenderer.init(gl);
 
         pianorollProgram = new Program(gl, getClass(),
@@ -50,14 +50,16 @@ public class GraphicEngine {
     }
 
     public void update(float deltaTime) {
-        pianoRoll.getParticleController().updateParticles(deltaTime);
         pianoRoll.getRollController().updateRolls(deltaTime);
         pianoRoll.getPianoController().updateKeys();
+        pianoRoll.getBackgroundController().updateBackground(deltaTime);
+        pianoRoll.getParticleController().updateParticles(deltaTime);
     }
 
     public void render(GL3 gl) {
-        pianoRenderer.drawKeys(gl, pianorollProgram);
         rollRenderer.drawRolls(gl, pianorollProgram);
+        pianoRenderer.drawKeys(gl, pianorollProgram);
+        backgroundRenderer.drawColumnRows(gl,pianorollProgram);
         particleRenderer.drawParticles(gl, particleProgram);
     }
 

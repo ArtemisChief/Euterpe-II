@@ -32,7 +32,7 @@ public class PianoController {
 //        }
     }
 
-    public void trigger(int trackID) {
+    public void pressKey(int trackID) {
         try {
             ShortMessage shortMessage = new ShortMessage(144, 0, keyList.get(trackID).getPitch(), 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
@@ -41,7 +41,7 @@ public class PianoController {
         }
     }
 
-    public void suspend(int trackID) {
+    public void releaseKey(int trackID) {
         try {
             ShortMessage shortMessage = new ShortMessage(128, 0, keyList.get(trackID).getPitch(), 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);

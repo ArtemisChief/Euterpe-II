@@ -6,8 +6,6 @@ public class Roll extends GraphicElement {
 
     private float scaleY;
 
-    boolean isUpdatingScaleY;
-
     boolean isUnused;
 
     public Roll() {
@@ -16,7 +14,6 @@ public class Roll extends GraphicElement {
         offsetY = 0.0f;
         scaleY = 1.0f;
 
-        isUpdatingScaleY = false;
         isUnused = true;
     }
 
@@ -36,14 +33,6 @@ public class Roll extends GraphicElement {
         this.offsetY = offsetY;
     }
 
-    public boolean isUpdatingScaleY() {
-        return isUpdatingScaleY;
-    }
-
-    public void setUpdatingScaleY(boolean updatingScaleY) {
-        isUpdatingScaleY = updatingScaleY;
-    }
-
     public boolean isUnused() {
         return isUnused;
     }
@@ -51,4 +40,5 @@ public class Roll extends GraphicElement {
     public void setUnused(boolean unused) {
         isUnused = unused;
     }
+
 }

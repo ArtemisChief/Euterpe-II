@@ -80,7 +80,7 @@ public class PianorollCanvas implements GLEventListener {
 
         graphicEngine.update(deltaTime);
 
-        gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .266f).put(1, .266f).put(2, .266f).put(3, 1f));
+        gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .09f).put(1, .11f).put(2, .13f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
         graphicEngine.render(gl);

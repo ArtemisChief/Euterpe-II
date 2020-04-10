@@ -39,7 +39,7 @@ public class ParticleRenderer {
 
         gl.glGenBuffers(1, buffer);
 
-        gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.PARTICLE));
+        gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_PARTICLE));
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferParticle.capacity() * Float.BYTES, vertexBufferParticle, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -48,7 +48,7 @@ public class ParticleRenderer {
         for (int i = 0; i < amount; ++i) {
             Particle particle = new Particle();
 
-            particle.setVbo(buffer.get(Semantic.Buffer.PARTICLE));
+            particle.setVbo(buffer.get(Semantic.Buffer.VERTEX_PARTICLE));
             particleList.add(particle);
         }
 

@@ -20,7 +20,8 @@ public class InputProcessor implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        pianoRoll.getRollController().loadMidiFile(new File("1.mid"));
+        pianoRoll.loadMidiFile(new File("1.mid"));
+        pianoRoll.setPlaying(true);
     }
 
     @Override
@@ -30,8 +31,8 @@ public class InputProcessor implements KeyListener {
         if (trackID != -1) {
             if (!keyDownList.contains(e.getKeyCode())) {
                 pianoRoll.trigger(trackID);
-                pianoRoll.getPianoController().trigger(trackID);
-                pianoRoll.getRollController().trigger(trackID);
+
+                pianoRoll.getPianoController().pressKey(trackID);
 
                 keyDownList.add(e.getKeyCode());
             }
@@ -45,8 +46,8 @@ public class InputProcessor implements KeyListener {
         if (trackID != -1) {
             if (keyDownList.contains(e.getKeyCode())) {
                 pianoRoll.suspend(trackID);
-                pianoRoll.getPianoController().suspend(trackID);
-                pianoRoll.getRollController().suspend(trackID);
+
+                pianoRoll.getPianoController().releaseKey(trackID);
 
                 keyDownList.remove((Integer) e.getKeyCode());
             }
