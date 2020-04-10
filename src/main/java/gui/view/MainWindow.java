@@ -129,24 +129,11 @@ public class MainWindow extends JFrame {
         setTitle("Euterpe II");
         setResizable(false);
         Container contentPane = getContentPane();
-        contentPane.setLayout(new MigLayout(
-            "insets 0,hidemode 3,gap 0 0",
-            // columns
-            "[450,fill]" +
-            "[1150,fill]",
-            // rows
-            "[770,fill]0"));
+        contentPane.setLayout(null);
 
         //======== leftPanel ========
         {
-            leftPanel.setLayout(new MigLayout(
-                "insets 0,hidemode 3,gap 0 0",
-                // columns
-                "[40,fill]" +
-                "[410,fill]",
-                // rows
-                "0[30]0" +
-                "[740,fill]0"));
+            leftPanel.setLayout(null);
 
             //======== menuBar2 ========
             {
@@ -274,7 +261,8 @@ public class MainWindow extends JFrame {
                 }
                 menuBar2.add(helpMenu);
             }
-            leftPanel.add(menuBar2, "cell 0 0 2 1");
+            leftPanel.add(menuBar2);
+            menuBar2.setBounds(0, 0, 450, 30);
 
             //======== lineScrollPane ========
             {
@@ -288,7 +276,8 @@ public class MainWindow extends JFrame {
                 lineTextArea.setForeground(new Color(153, 153, 153));
                 lineScrollPane.setViewportView(lineTextArea);
             }
-            leftPanel.add(lineScrollPane, "cell 0 1");
+            leftPanel.add(lineScrollPane);
+            lineScrollPane.setBounds(0, 31, 40, 742);
 
             //======== inputScrollPane ========
             {
@@ -300,9 +289,26 @@ public class MainWindow extends JFrame {
                 inputTextPane.setDragEnabled(true);
                 inputScrollPane.setViewportView(inputTextPane);
             }
-            leftPanel.add(inputScrollPane, "cell 1 1");
+            leftPanel.add(inputScrollPane);
+            inputScrollPane.setBounds(39, 31, 411, 742);
+
+            {
+                // compute preferred size
+                Dimension preferredSize = new Dimension();
+                for(int i = 0; i < leftPanel.getComponentCount(); i++) {
+                    Rectangle bounds = leftPanel.getComponent(i).getBounds();
+                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+                }
+                Insets insets = leftPanel.getInsets();
+                preferredSize.width += insets.right;
+                preferredSize.height += insets.bottom;
+                leftPanel.setMinimumSize(preferredSize);
+                leftPanel.setPreferredSize(preferredSize);
+            }
         }
-        contentPane.add(leftPanel, "cell 0 0");
+        contentPane.add(leftPanel);
+        leftPanel.setBounds(0, 0, 449, 768);
 
         //======== layeredPane ========
         {
@@ -319,7 +325,23 @@ public class MainWindow extends JFrame {
             layeredPane.add(outputScrollPane, JLayeredPane.POPUP_LAYER);
             outputScrollPane.setBounds(80, 185, 110, 185);
         }
-        contentPane.add(layeredPane, "cell 1 0");
+        contentPane.add(layeredPane);
+        layeredPane.setBounds(450, 0, 1150, 770);
+
+        {
+            // compute preferred size
+            Dimension preferredSize = new Dimension();
+            for(int i = 0; i < contentPane.getComponentCount(); i++) {
+                Rectangle bounds = contentPane.getComponent(i).getBounds();
+                preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+            }
+            Insets insets = contentPane.getInsets();
+            preferredSize.width += insets.right;
+            preferredSize.height += insets.bottom;
+            contentPane.setMinimumSize(preferredSize);
+            contentPane.setPreferredSize(preferredSize);
+        }
         setSize(1600, 800);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

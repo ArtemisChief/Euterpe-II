@@ -3,22 +3,14 @@ JFDML JFormDesigner: "7.0.0.6.255" Java: "11.0.4" encoding: "UTF-8"
 new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
-		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
-			"$layoutConstraints": "insets 0,hidemode 3,gap 0 0"
-			"$columnConstraints": "[450,fill][1150,fill]"
-			"$rowConstraints": "[770,fill]0"
-		} ) {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
 			name: "this"
 			"defaultCloseOperation": 3
 			"componentOrientation": sfield java.awt.ComponentOrientation LEFT_TO_RIGHT
 			"title": "Euterpe II"
 			"resizable": false
 			"$sizePolicy": 1
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
-				"$columnConstraints": "[40,fill][410,fill]"
-				"$rowConstraints": "0[30]0[740,fill]0"
-				"$layoutConstraints": "insets 0,hidemode 3,gap 0 0"
-			} ) {
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
 				name: "leftPanel"
 				add( new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
 					name: "menuBar2"
@@ -225,8 +217,11 @@ new FormModel {
 							}
 						} )
 					} )
-				}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-					"value": "cell 0 0 2 1"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"y": 0
+					"width": 450
+					"x": 0
+					"height": 30
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "lineScrollPane"
@@ -239,8 +234,11 @@ new FormModel {
 						"background": new java.awt.Color( 255, 255, 255, 255 )
 						"foreground": new java.awt.Color( 153, 153, 153, 255 )
 					} )
-				}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-					"value": "cell 0 1"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"y": 31
+					"width": 40
+					"height": 742
+					"x": 0
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "inputScrollPane"
@@ -254,11 +252,15 @@ new FormModel {
 							"JavaCodeGenerator.variableModifiers": 1
 						}
 					} )
-				}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-					"value": "cell 1 1"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 39
+					"y": 31
+					"width": 411
+					"height": 742
 				} )
-			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 0 0"
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"width": 449
+				"height": 768
 			} )
 			add( new FormContainer( "javax.swing.JLayeredPane", new FormLayoutManager( class javax.swing.JLayeredPane ) ) {
 				name: "layeredPane"
@@ -282,8 +284,11 @@ new FormModel {
 					"height": 185
 					"layer": 300
 				} )
-			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 1 0"
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 450
+				"width": 1150
+				"height": 770
+				"y": 0
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 5, 0 )
