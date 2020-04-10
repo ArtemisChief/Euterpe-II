@@ -119,7 +119,7 @@ public class PianorollCanvas implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
 
         long timeCurrentFrame = System.currentTimeMillis();
-        float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
+        float deltaTime = (timeCurrentFrame - timeLastFrame) / 1_000f;
         timeLastFrame = timeCurrentFrame;
 
         update(deltaTime);

@@ -4,6 +4,7 @@ import midiplayer.component.MidiPlayer;
 import pianoroll.component.Pianoroll;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Key;
+import pianoroll.util.Semantic;
 
 import javax.sound.midi.ShortMessage;
 import java.util.ArrayList;
@@ -50,14 +51,14 @@ public class PianoController {
     public void updateKeys() {
         for (Key key : keyList) {
             if (GraphicElement.IsWhite(key.getTrackID()))
-                key.setColorID(200);
+                key.setColorID(Semantic.Color.WHITE);
             else
-                key.setColorID(201);
+                key.setColorID(Semantic.Color.BLACK);
         }
 
         for (int trackID : Pianoroll.GetInstance().getTriggeredTrackList()) {
             Key key = keyList.get(trackID);
-            key.setColorID(key.getTrackID() + 100);
+            key.setColorID(key.getTrackID());
         }
     }
 

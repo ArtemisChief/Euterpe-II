@@ -141,11 +141,9 @@ public class Pianoroll {
     public void addTimeSum(float deltaTime) {
         timeSum += deltaTime;
 
-        if (lengthPerSecondQueue.peek() != null) {
-            if (timeSum > lengthPerSecondQueue.peek().getKey()) {
+        if (lengthPerSecondQueue.peek() != null)
+            if (timeSum > lengthPerSecondQueue.peek().getKey())
                 setLengthPerSecond(lengthPerSecondQueue.poll().getValue());
-            }
-        }
     }
 
     public void setLengthPerSecond(float bpm) {

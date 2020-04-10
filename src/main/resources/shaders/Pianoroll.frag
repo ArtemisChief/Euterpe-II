@@ -58,7 +58,7 @@ vec4 getColor(int colorID){
 
     switch (colorID){
         case WHITE:
-        color = vec4(0.98f, 0.98f, 0.98f, 1.0f);
+        color = vec4(0.95f, 0.96f, 0.98f, 1.0f);
         break;
 
         case BLACK:
@@ -66,16 +66,16 @@ vec4 getColor(int colorID){
         break;
 
         case GREY:
-        color = vec4(0.15f, 0.16f, 0.17f, 1.0f);
+        color = vec4(0.20f, 0.23f, 0.26f, 1.0f);
         break;
 
         default :
         float s = 0.5f;
         float v = 1.0f;
 
-        if(colorID > 100){
+        if (colorID > 100){
             colorID -= 100;
-            s = 0.3f;
+            s = 0.2f;
         }
 
         int h = (colorID * 5) % 360;

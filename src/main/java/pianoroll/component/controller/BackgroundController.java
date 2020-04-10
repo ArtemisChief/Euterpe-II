@@ -18,19 +18,13 @@ public class BackgroundController {
     }
 
     public void updateBackground(float deltaTime) {
-        if (Pianoroll.GetInstance().isPlaying()) {
-            for (ColumnRow row : rowList) {
+        if (Pianoroll.GetInstance().isPlaying())
+            for (ColumnRow row : rowList)
                 row.setOffsetY(row.getOffsetY() - Pianoroll.GetInstance().getLengthPerSecond() * deltaTime);
-
-                if (row.getOffsetY() <= 0.0f) {
-                    row.setOffsetY(2 * 4 * Semantic.Pianoroll.LENGTH_PER_CROTCHET - Pianoroll.GetInstance().getLengthPerSecond() * deltaTime);
-                }
-            }
-        }
     }
 
     public void reset() {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < Semantic.Pianoroll.ROW_AMOUNT; i++)
             rowList.get(i).setOffsetY(i * 4 * Semantic.Pianoroll.LENGTH_PER_CROTCHET);
     }
 

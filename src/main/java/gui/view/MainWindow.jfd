@@ -112,6 +112,20 @@ new FormModel {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
 						} )
+						add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
+							name: "separator10"
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "playExternalMenuItem"
+							"text": "Play From External "
+							auxiliary() {
+								"JavaCodeGenerator.variableModifiers": 1
+							}
+						} )
+					} )
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "arduinoMenu"
+						"text": "Arduino"
 					} )
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 						name: "converterMenu"
@@ -143,7 +157,7 @@ new FormModel {
 					} )
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 						name: "rightPanelMenu"
-						"text": "Select Right Panel As……"
+						"text": "Switch Right Panel"
 						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
 							name: "pianorollRadioMenuItem"
 							"text": "Pianoroll Panel"

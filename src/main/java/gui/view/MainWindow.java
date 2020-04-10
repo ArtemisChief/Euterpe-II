@@ -111,6 +111,8 @@ public class MainWindow extends JFrame {
         loadSoundFontMenuItem = new JMenuItem();
         playDirectMenuItem = new JMenuItem();
         stopDirectMenuItem = new JMenuItem();
+        playExternalMenuItem = new JMenuItem();
+        arduinoMenu = new JMenu();
         converterMenu = new JMenu();
         convertToMuiMenuItem = new JMenuItem();
         convertToStaveMenuItem = new JMenuItem();
@@ -202,8 +204,19 @@ public class MainWindow extends JFrame {
                     //---- stopDirectMenuItem ----
                     stopDirectMenuItem.setText("Stop");
                     playerMenu.add(stopDirectMenuItem);
+                    playerMenu.addSeparator();
+
+                    //---- playExternalMenuItem ----
+                    playExternalMenuItem.setText("Play From External ");
+                    playerMenu.add(playExternalMenuItem);
                 }
                 menuBar2.add(playerMenu);
+
+                //======== arduinoMenu ========
+                {
+                    arduinoMenu.setText("Arduino");
+                }
+                menuBar2.add(arduinoMenu);
 
                 //======== converterMenu ========
                 {
@@ -226,7 +239,7 @@ public class MainWindow extends JFrame {
 
                 //======== rightPanelMenu ========
                 {
-                    rightPanelMenu.setText("Select Right Panel As\u2026\u2026");
+                    rightPanelMenu.setText("Switch Right Panel");
 
                     //---- pianorollRadioMenuItem ----
                     pianorollRadioMenuItem.setText("Pianoroll Panel");
@@ -374,6 +387,8 @@ public class MainWindow extends JFrame {
     public JMenuItem loadSoundFontMenuItem;
     public JMenuItem playDirectMenuItem;
     public JMenuItem stopDirectMenuItem;
+    public JMenuItem playExternalMenuItem;
+    private JMenu arduinoMenu;
     private JMenu converterMenu;
     public JMenuItem convertToMuiMenuItem;
     public JMenuItem convertToStaveMenuItem;

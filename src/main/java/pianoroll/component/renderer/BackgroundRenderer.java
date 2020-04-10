@@ -53,22 +53,22 @@ public class BackgroundRenderer {
 
         destroyBuffers(vertexBufferColumn, vertexBufferRow);
 
-        for (int trackID = 2; trackID < 88; trackID += 12) {
+        for (int trackID = 2; trackID < Semantic.Piano.KEY_MAX; trackID += 12) {
             ColumnRow column = new ColumnRow(trackID);
 
             column.setVbo(buffer.get(Semantic.Buffer.VERTEX_COLUMN));
             columnList.add(column);
         }
 
-        for (int trackID = 7; trackID < 88; trackID += 12) {
+        for (int trackID = 7; trackID < Semantic.Piano.KEY_MAX; trackID += 12) {
             ColumnRow column = new ColumnRow(trackID);
 
             column.setVbo(buffer.get(Semantic.Buffer.VERTEX_COLUMN));
             columnList.add(column);
         }
 
-        for (int i = 0; i < 2; i++) {
-            ColumnRow row = new ColumnRow(44);
+        for (int i = 0; i < Semantic.Pianoroll.ROW_AMOUNT; i++) {
+            ColumnRow row = new ColumnRow(Semantic.Piano.KEY_MAX / 2);
 
             row.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROW));
             row.setOffsetY(i * 4 * Semantic.Pianoroll.LENGTH_PER_CROTCHET);
@@ -114,7 +114,7 @@ public class BackgroundRenderer {
 
         gl.glUniform1f(program.get("scaleY"), 1f);
         gl.glUniform1f(program.get("offsetY"), 0);
-        gl.glUniform1i(program.get("colorID"), 202);
+        gl.glUniform1i(program.get("colorID"), Semantic.Color.GREY);
 
         for (ColumnRow column : columnList) {
             gl.glBindVertexArray(column.getVao().get(0));

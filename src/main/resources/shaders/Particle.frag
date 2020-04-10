@@ -53,7 +53,7 @@ vec3 hsvToRgb(vec3 hsv){
 vec4 getColor(int colorID, float life){
     vec4 color;
 
-    float s = 0.8f;
+    float s = 0.7f;
     float v = 1.0f;
 
     int h = (colorID * 5) % 360;

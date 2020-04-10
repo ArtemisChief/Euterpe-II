@@ -191,6 +191,7 @@ public class FileIO {
         MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
 
         Status.SetCurrentStatus(Status.NEW_FILE);
+        Status.GetCurrentStatus().setIsEdited(true);
     }
 
     public File getTempMidiFile() {

@@ -35,7 +35,7 @@ public class ParticleController {
             particle.setTrackID(trackID);
             particle.setColorID(randomColor);
             particle.setOffset(randomX, 0.0f);
-            particle.setVelocity(randomX, randomY * 16.0f);
+            particle.setVelocity(randomX * 2.0f, randomY * 20.0f);
             particle.setScale(randomScale);
             particle.setScaleConst(randomScale);
             particle.setDegrees(randomDegrees);

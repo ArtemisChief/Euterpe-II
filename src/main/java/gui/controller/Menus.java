@@ -7,6 +7,8 @@ import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
 import pianoroll.util.Semantic;
 
+import java.io.IOException;
+
 public class Menus {
 
     private static final Menus instance = new Menus();
@@ -119,6 +121,7 @@ public class Menus {
                     return;
 
                 MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+                Pianoroll.GetInstance().reset();
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             }
         });
@@ -162,6 +165,15 @@ public class Menus {
 
         // 播放
         MainWindow.GetInstance().playDirectMenuItem.addActionListener(e -> {
+            if (!MidiPlayer.GetInstance().getIsLoadedMidiFile()) {
+                if (!FileIO.GetInstance().generateTempMidiFile())
+                    return;
+
+                MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+                Pianoroll.GetInstance().reset();
+                Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            }
+
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
                 MidiPlayer.GetInstance().pause();
                 MainWindow.GetInstance().playDirectMenuItem.setText("Resume");
@@ -179,6 +191,18 @@ public class Menus {
             MidiPlayer.GetInstance().stop();
             Pianoroll.GetInstance().reset();
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+        });
+
+        // 从外部播放Midi文件
+        MainWindow.GetInstance().playExternalMenuItem.addActionListener(e-> {
+            if (!FileIO.GetInstance().generateTempMidiFile())
+                return;
+
+            try {
+                Runtime.getRuntime().exec("rundll32 url.dll FileProtocolHandler file://" + FileIO.GetInstance().getTempMidiFile().getAbsolutePath().replace("\\", "\\\\"));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         });
 
         // 转换Midi到Mui

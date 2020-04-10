@@ -34,8 +34,9 @@ public class RollController {
 
                     if (roll.getOffsetY() - roll.getScaleY() <= 0.0f) {
                         if (!Pianoroll.GetInstance().getTriggeredTrackList().contains(roll.getTrackID())) {
-                            roll.setColorID(roll.getTrackID() + 100);
+                            roll.setColorID(roll.getTrackID() + Semantic.Color.HIGH_LIGHT);
                             Pianoroll.GetInstance().getTriggeredTrackList().add(roll.getTrackID());
+                            Pianoroll.GetInstance().getPianoController().pressKey(roll.getTrackID());
                         }
 
                         roll.setScaleY(roll.getScaleY() - distance);
@@ -43,6 +44,7 @@ public class RollController {
 
                     if (roll.getOffsetY() <= 0.0f) {
                         Pianoroll.GetInstance().getTriggeredTrackList().remove((Integer) roll.getTrackID());
+                        Pianoroll.GetInstance().getPianoController().releaseKey(roll.getTrackID());
                         roll.setUnused(true);
                     }
 
