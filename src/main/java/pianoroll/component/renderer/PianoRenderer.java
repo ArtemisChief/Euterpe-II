@@ -3,6 +3,7 @@ package pianoroll.component.renderer;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
+import pianoroll.component.Pianoroll;
 import pianoroll.entity.Key;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
@@ -18,8 +19,8 @@ public class PianoRenderer {
 
     private final List<Key> keyList;
 
-    public PianoRenderer(List<Key> keyList) {
-        this.keyList = keyList;
+    public PianoRenderer() {
+        this.keyList = Pianoroll.GetInstance().getPianoController().getKeyList();
     }
 
     public void init(GL3 gl) {

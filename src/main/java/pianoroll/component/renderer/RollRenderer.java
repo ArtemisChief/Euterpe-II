@@ -3,6 +3,7 @@ package pianoroll.component.renderer;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
+import pianoroll.component.Pianoroll;
 import pianoroll.entity.Roll;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
@@ -16,13 +17,10 @@ import static uno.buffer.UtilKt.destroyBuffers;
 
 public class RollRenderer {
 
-    private final int amount;
-
     private final List<Roll> rollList;
 
-    public RollRenderer(int amount,List<Roll> rollList) {
-        this.amount = amount;
-        this.rollList = rollList;
+    public RollRenderer() {
+        this.rollList = Pianoroll.GetInstance().getRollController().getRollList();
     }
 
     public void init(GL3 gl) {
@@ -57,14 +55,14 @@ public class RollRenderer {
 
         destroyBuffers(vertexBufferRollWhite, vertexBufferRollBlack);
 
-        for (int i = 0; i < amount / 2; ++i) {
+        for (int i = 0; i < Semantic.Pianoroll.ROLL_AMOUNT / 2; ++i) {
             Roll roll = new Roll();
 
             roll.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROLLWHITE));
             rollList.add(roll);
         }
 
-        for (int i = amount / 2; i < amount; ++i) {
+        for (int i = Semantic.Pianoroll.ROLL_AMOUNT / 2; i < Semantic.Pianoroll.ROLL_AMOUNT; ++i) {
             Roll roll = new Roll();
 
             roll.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROLLBLACK));

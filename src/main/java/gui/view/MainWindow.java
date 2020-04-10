@@ -42,7 +42,7 @@ public class MainWindow extends JFrame {
         PianorollCanvas.Setup();
 
         // 钢琴卷帘组件加入到窗口
-        layeredPane.add(PianorollCanvas.GetGlcanvas(),new Integer(100));
+        layeredPane.add(PianorollCanvas.GetGlcanvas(), new Integer(100));
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
@@ -56,6 +56,16 @@ public class MainWindow extends JFrame {
         lineScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         inputScrollPane.getVerticalScrollBar().addAdjustmentListener(
                 e -> lineScrollPane.getVerticalScrollBar().setValue(inputScrollPane.getVerticalScrollBar().getValue()));
+
+        // 单选按钮添加到组
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(pianorollRadioMenuItem);
+        buttonGroup.add(outputTextRadioMenuItem);
+        buttonGroup.add(staveRadioMenuItem);
+        buttonGroup.add(nmnRadioMenuItem);
+        buttonGroup.add(transposerRadioMenuItem);
+
+        layeredPane.setLayer(outputScrollPane, 100);
 
         // 关闭窗口
         addWindowListener(new WindowAdapter() {
@@ -219,26 +229,27 @@ public class MainWindow extends JFrame {
                     rightPanelMenu.setText("Select Right Panel As\u2026\u2026");
 
                     //---- pianorollRadioMenuItem ----
-                    pianorollRadioMenuItem.setText("Pianoroll");
+                    pianorollRadioMenuItem.setText("Pianoroll Panel");
+                    pianorollRadioMenuItem.setSelected(true);
                     rightPanelMenu.add(pianorollRadioMenuItem);
                     rightPanelMenu.addSeparator();
 
                     //---- outputTextRadioMenuItem ----
-                    outputTextRadioMenuItem.setText("Output Text");
+                    outputTextRadioMenuItem.setText("Output Text Panel");
                     rightPanelMenu.add(outputTextRadioMenuItem);
                     rightPanelMenu.addSeparator();
 
                     //---- staveRadioMenuItem ----
-                    staveRadioMenuItem.setText("Stave");
+                    staveRadioMenuItem.setText("Stave Panel");
                     rightPanelMenu.add(staveRadioMenuItem);
 
                     //---- nmnRadioMenuItem ----
-                    nmnRadioMenuItem.setText("Numbered Musical Notaion");
+                    nmnRadioMenuItem.setText("Numbered Musical Notaion Panel");
                     rightPanelMenu.add(nmnRadioMenuItem);
                     rightPanelMenu.addSeparator();
 
                     //---- transposerRadioMenuItem ----
-                    transposerRadioMenuItem.setText("Transposer");
+                    transposerRadioMenuItem.setText("Transposer Panel");
                     rightPanelMenu.add(transposerRadioMenuItem);
                 }
                 menuBar2.add(rightPanelMenu);
@@ -317,13 +328,13 @@ public class MainWindow extends JFrame {
             {
 
                 //---- outputTextArea ----
-                outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+                outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
                 outputTextArea.setEditable(false);
                 outputTextArea.setBorder(null);
                 outputScrollPane.setViewportView(outputTextArea);
             }
             layeredPane.add(outputScrollPane, JLayeredPane.POPUP_LAYER);
-            outputScrollPane.setBounds(80, 185, 110, 185);
+            outputScrollPane.setBounds(0, 0, 1145, 773);
         }
         contentPane.add(layeredPane);
         layeredPane.setBounds(450, 0, 1150, 770);
@@ -380,8 +391,8 @@ public class MainWindow extends JFrame {
     private JTextArea lineTextArea;
     private JScrollPane inputScrollPane;
     public JTextPane inputTextPane;
-    private JLayeredPane layeredPane;
-    private JScrollPane outputScrollPane;
+    public JLayeredPane layeredPane;
+    public JScrollPane outputScrollPane;
     public JTextArea outputTextArea;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

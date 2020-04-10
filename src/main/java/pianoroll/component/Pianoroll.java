@@ -20,7 +20,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class PianoRoll {
+public class Pianoroll {
+
+    // 单例
+    private static final Pianoroll instance = new Pianoroll();
+
+    // 获取单例
+    public static Pianoroll GetInstance() {
+        return instance;
+    }
 
     private final List<Integer> triggeredTrackList;
 
@@ -28,9 +36,6 @@ public class PianoRoll {
     private final PianoController pianoController;
     private final BackgroundController backgroundController;
     private final ParticleController particleController;
-
-    private final GraphicEngine graphicEngine;
-    private final InputProcessor inputProcessor;
 
     private float timeSum;
 
@@ -40,16 +45,13 @@ public class PianoRoll {
 
     private boolean isPlaying = false;
 
-    public PianoRoll() {
+    public Pianoroll() {
         triggeredTrackList = new ArrayList<>();
 
-        rollController = new RollController(this, triggeredTrackList);
-        pianoController = new PianoController(triggeredTrackList);
-        backgroundController = new BackgroundController(this);
-        particleController = new ParticleController(triggeredTrackList);
-
-        graphicEngine = new GraphicEngine(this);
-        inputProcessor = new InputProcessor(this);
+        rollController = new RollController();
+        pianoController = new PianoController();
+        backgroundController = new BackgroundController();
+        particleController = new ParticleController();
 
         timeSum = 0.0f;
         lengthPerSecondQueue = new LinkedList<>();
@@ -106,14 +108,18 @@ public class PianoRoll {
             setLengthPerSecond(120);
     }
 
-    public void unloadMidiFile() {
-        for (Roll roll : rollController.getRollList()) {
-            roll.setUnused(true);
-        }
+    public void reset() {
+        rollController.reset();
+        backgroundController.reset();
 
+        triggeredTrackList.clear();
         lengthPerSecondQueue.clear();
         timeSum = 0.0f;
         isPlaying = false;
+    }
+
+    public List<Integer> getTriggeredTrackList() {
+        return triggeredTrackList;
     }
 
     public PianoController getPianoController() {
@@ -130,14 +136,6 @@ public class PianoRoll {
 
     public BackgroundController getBackgroundController() {
         return backgroundController;
-    }
-
-    public GraphicEngine getGraphicEngine() {
-        return graphicEngine;
-    }
-
-    public InputProcessor getInputProcessor() {
-        return inputProcessor;
     }
 
     public void addTimeSum(float deltaTime) {

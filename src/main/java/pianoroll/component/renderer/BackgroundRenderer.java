@@ -3,14 +3,13 @@ package pianoroll.component.renderer;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
-import pianoroll.component.PianoRoll;
+import pianoroll.component.Pianoroll;
 import pianoroll.entity.ColumnRow;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
@@ -21,9 +20,9 @@ public class BackgroundRenderer {
     private final List<ColumnRow> columnList;
     private final List<ColumnRow> rowList;
 
-    public BackgroundRenderer(List<ColumnRow> columnList, List<ColumnRow> rowList) {
-        this.columnList = columnList;
-        this.rowList = rowList;
+    public BackgroundRenderer() {
+        this.columnList = Pianoroll.GetInstance().getBackgroundController().getColumnList();
+        this.rowList = Pianoroll.GetInstance().getBackgroundController().getRowList();
     }
 
     public void init(GL3 gl) {
@@ -57,7 +56,6 @@ public class BackgroundRenderer {
         for (int trackID = 2; trackID < 88; trackID += 12) {
             ColumnRow column = new ColumnRow(trackID);
 
-            column.setColorID(202);
             column.setVbo(buffer.get(Semantic.Buffer.VERTEX_COLUMN));
             columnList.add(column);
         }
@@ -65,7 +63,6 @@ public class BackgroundRenderer {
         for (int trackID = 7; trackID < 88; trackID += 12) {
             ColumnRow column = new ColumnRow(trackID);
 
-            column.setColorID(202);
             column.setVbo(buffer.get(Semantic.Buffer.VERTEX_COLUMN));
             columnList.add(column);
         }
@@ -73,7 +70,6 @@ public class BackgroundRenderer {
         for (int i = 0; i < 2; i++) {
             ColumnRow row = new ColumnRow(44);
 
-            row.setColorID(202);
             row.setVbo(buffer.get(Semantic.Buffer.VERTEX_ROW));
             row.setOffsetY(i * 4 * Semantic.Pianoroll.LENGTH_PER_CROTCHET);
             rowList.add(row);

@@ -105,17 +105,26 @@ public class Interpreter {
         if (tokens == null)
             return false;
 
+        for (Token token : tokens)
+            stringBuilder.append(token);
+
+        stringBuilder.append("\n\n=======================================词法分析结束=============开始语法分析=======================================\n\n");
+
         Node AbstractSyntaxTree = runSyn(tokens, stringBuilder);
 
         if (AbstractSyntaxTree == null)
             return false;
+
+        stringBuilder.append(AbstractSyntaxTree.print(0)+ "\n\n=======================================语法分析结束=============开始语义分析=======================================\n\n");
 
         String code = runMidiSem(AbstractSyntaxTree, stringBuilder);
 
         if (code == null)
             return false;
 
-        MainWindow.GetInstance().outputTextArea.setText("==============================================\nMidi Successfully Generated");
+        stringBuilder.append(code + "\n\n==================================================================================================\nMidi Successfully Generated");
+
+        MainWindow.GetInstance().outputTextArea.setText(stringBuilder.toString());
 
         return true;
     }

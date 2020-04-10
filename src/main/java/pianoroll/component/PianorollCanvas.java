@@ -4,6 +4,15 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
+import pianoroll.component.renderer.BackgroundRenderer;
+import pianoroll.component.renderer.ParticleRenderer;
+import pianoroll.component.renderer.PianoRenderer;
+import pianoroll.component.renderer.RollRenderer;
+import pianoroll.entity.ColumnRow;
+import pianoroll.entity.Key;
+import pianoroll.entity.Particle;
+import pianoroll.entity.Roll;
+import uno.glsl.Program;
 
 import java.nio.FloatBuffer;
 
@@ -29,13 +38,25 @@ public class PianorollCanvas implements GLEventListener {
 
     private long timeLastFrame;
 
-    private PianoRoll pianoRoll;
-    private GraphicEngine graphicEngine;
+    private final RollRenderer rollRenderer;
+    private final PianoRenderer pianoRenderer;
+    private final ParticleRenderer particleRenderer;
+    private final BackgroundRenderer backgroundRenderer;
+
+    private Program pianorollProgram;
+    private Program particleProgram;
 
     private PianorollCanvas() {
         clearColor = GLBuffers.newDirectFloatBuffer(4);
         clearDepth = GLBuffers.newDirectFloatBuffer(1);
         matBuffer = GLBuffers.newDirectFloatBuffer(16);
+
+        timeLastFrame = 0;
+
+        rollRenderer = new RollRenderer();
+        pianoRenderer = new PianoRenderer();
+        backgroundRenderer = new BackgroundRenderer();
+        particleRenderer = new ParticleRenderer();
     }
 
     public static void Setup() {
@@ -50,17 +71,40 @@ public class PianorollCanvas implements GLEventListener {
         animator.start();
     }
 
+    public void update(float deltaTime) {
+        Pianoroll.GetInstance().getRollController().updateRolls(deltaTime);
+        Pianoroll.GetInstance().getPianoController().updateKeys();
+        Pianoroll.GetInstance().getBackgroundController().updateBackground(deltaTime);
+        Pianoroll.GetInstance().getParticleController().updateParticles(deltaTime);
+    }
+
+    public void render(GL3 gl) {
+        rollRenderer.drawRolls(gl, pianorollProgram);
+        pianoRenderer.drawKeys(gl, pianorollProgram);
+        backgroundRenderer.drawColumnRows(gl,pianorollProgram);
+        particleRenderer.drawParticles(gl, particleProgram);
+    }
+
     @Override
     public void init(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
         timeLastFrame = System.currentTimeMillis();
 
-        pianoRoll = new PianoRoll();
-        graphicEngine = pianoRoll.getGraphicEngine();
-        graphicEngine.init(gl);
+        rollRenderer.init(gl);
+        pianoRenderer.init(gl);
+        backgroundRenderer.init(gl);
+        particleRenderer.init(gl);
 
-        glcanvas.addKeyListener(pianoRoll.getInputProcessor());
+        pianorollProgram = new Program(gl, getClass(),
+                "shaders", "Pianoroll.vert", "Pianoroll.frag",
+                "trackID", "scaleY", "offsetY", "proj", "colorID");
+
+        particleProgram = new Program(gl, getClass(),
+                "shaders", "Particle.vert", "Particle.frag",
+                "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
+
+        glcanvas.addKeyListener(new InputProcessor());
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);
@@ -78,12 +122,12 @@ public class PianorollCanvas implements GLEventListener {
         float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000f;
         timeLastFrame = timeCurrentFrame;
 
-        graphicEngine.update(deltaTime);
+        update(deltaTime);
 
         gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .09f).put(1, .11f).put(2, .13f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
-        graphicEngine.render(gl);
+        render(gl);
     }
 
     @Override
@@ -93,7 +137,10 @@ public class PianorollCanvas implements GLEventListener {
         float ratio = (float) glcanvas.getSize().width / (float) glcanvas.getSize().height;
         glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.02365f).to(matBuffer);
 
-        graphicEngine.reshape(gl, matBuffer);
+        gl.glUseProgram(pianorollProgram.name);
+        gl.glUniformMatrix4fv(pianorollProgram.get("proj"), 1, false, matBuffer);
+        gl.glUseProgram(particleProgram.name);
+        gl.glUniformMatrix4fv(particleProgram.get("proj"), 1, false, matBuffer);
 
         gl.glViewport(x, y, width, height);
     }
@@ -102,7 +149,25 @@ public class PianorollCanvas implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        graphicEngine.dispose(gl, pianoRoll.getPianoController().getKeyList(), pianoRoll.getRollController().getRollList(), pianoRoll.getParticleController().getParticleList());
+        Pianoroll pianoroll= Pianoroll.GetInstance();
+
+        gl.glDeleteProgram(pianorollProgram.name);
+        gl.glDeleteProgram(particleProgram.name);
+
+        for (Key key : pianoroll.getPianoController().getKeyList())
+            gl.glDeleteVertexArrays(1, key.getVao());
+
+        for (Roll roll : pianoroll.getRollController().getRollList())
+            gl.glDeleteVertexArrays(1, roll.getVao());
+
+        for (Particle particle : pianoroll.getParticleController().getParticleList())
+            gl.glDeleteVertexArrays(1, particle.getVao());
+
+        for(ColumnRow column:pianoroll.getBackgroundController().getColumnList())
+            gl.glDeleteVertexArrays(1, column.getVao());
+
+        for(ColumnRow row:pianoroll.getBackgroundController().getRowList())
+            gl.glDeleteVertexArrays(1, row.getVao());
 
         destroyBuffers(matBuffer, clearColor, clearDepth);
     }

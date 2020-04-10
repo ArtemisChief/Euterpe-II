@@ -113,7 +113,7 @@ public class Token {
         }
         if (line == -1)
             return String.format("%-9s\t%-13s\t类型码:%s\n", content, type, this.type);
-        return String.format("Line%-7s\t%-18s\t%-13s\t类型码:%s\n", line, content, type, this.type);
+        return String.format("Line%-7s\t%-26s\t%-21s\t类型码:%s\n", line, content, type, this.type);
     }
 
     public int getType() {

@@ -8,21 +8,14 @@ import java.util.List;
 
 public class InputProcessor implements KeyListener {
 
-    private final PianoRoll pianoRoll;
-
     private final List<Integer> keyDownList;
 
-    public InputProcessor(PianoRoll pianoRoll) {
-        this.pianoRoll = pianoRoll;
-
+    public InputProcessor() {
         keyDownList = new ArrayList<>();
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        pianoRoll.loadMidiFile(new File("1.mid"));
-        pianoRoll.setPlaying(true);
-    }
+    public void keyTyped(KeyEvent e) { }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -30,9 +23,9 @@ public class InputProcessor implements KeyListener {
 
         if (trackID != -1) {
             if (!keyDownList.contains(e.getKeyCode())) {
-                pianoRoll.trigger(trackID);
+                Pianoroll.GetInstance().trigger(trackID);
 
-                pianoRoll.getPianoController().pressKey(trackID);
+                Pianoroll.GetInstance().getPianoController().pressKey(trackID);
 
                 keyDownList.add(e.getKeyCode());
             }
@@ -45,9 +38,9 @@ public class InputProcessor implements KeyListener {
 
         if (trackID != -1) {
             if (keyDownList.contains(e.getKeyCode())) {
-                pianoRoll.suspend(trackID);
+                Pianoroll.GetInstance().suspend(trackID);
 
-                pianoRoll.getPianoController().releaseKey(trackID);
+                Pianoroll.GetInstance().getPianoController().releaseKey(trackID);
 
                 keyDownList.remove((Integer) e.getKeyCode());
             }
@@ -55,7 +48,7 @@ public class InputProcessor implements KeyListener {
     }
 
     private int parseKey(KeyEvent keyEvent) {
-        int pitchOffset = pianoRoll.getPianoController().getPitchOffset();
+        int pitchOffset = Pianoroll.GetInstance().getPianoController().getPitchOffset();
 
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_LEFT:

@@ -67,4 +67,22 @@ public class Node {
         return String.format("%s\n", type);
     }
 
+    public String toString(boolean isTerminal) {
+        if (isTerminal)
+            return String.format("%s\n", content);
+        return String.format("%s\n", type);
+    }
+
+    public String print(int height) {
+        String str = "";
+        for (int i = 0; i < height; i++) {
+            str += "           ";
+        }
+        str += this.toString(content != null);
+        for (Node child : childNodes) {
+            str += child.print(height + 1);
+        }
+        return str;
+    }
+
 }

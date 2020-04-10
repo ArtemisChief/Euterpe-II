@@ -1,7 +1,8 @@
 package pianoroll.component.controller;
 
+import pianoroll.component.Pianoroll;
 import pianoroll.entity.Particle;
-import pianoroll.entity.Roll;
+import pianoroll.util.Semantic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,27 +10,21 @@ import java.util.Random;
 
 public class ParticleController {
 
-    private final int amount;
-
     private final List<Particle> particleList;
-
-    private final List<Integer> triggeredTrackList;
 
     private final Random random;
 
     private int lastUnusedParticle;
 
-    public ParticleController(List<Integer> triggeredTrackList) {
-        amount = 500;
+    public ParticleController() {
         particleList = new ArrayList<>();
-        this.triggeredTrackList = triggeredTrackList;
         random = new Random(System.currentTimeMillis());
         lastUnusedParticle = 0;
     }
 
     public void updateParticles(float deltaTime) {
         // spawn a new particle if needed
-        for (int trackID : triggeredTrackList) {
+        for (int trackID : Pianoroll.GetInstance().getTriggeredTrackList()) {
             Particle particle = particleList.get(firstUnusedParticle());
             int randomColor = random.nextInt(6) - 3 + trackID;
             float randomScale = (random.nextFloat() + 0.6f) * 1.2f;
@@ -62,7 +57,7 @@ public class ParticleController {
     }
 
     private int firstUnusedParticle() {
-        for (int i = lastUnusedParticle; i < amount; ++i) {
+        for (int i = lastUnusedParticle; i < Semantic.Pianoroll.PARTICLE_AMOUNT; ++i) {
             if (particleList.get(i).getLife() <= 0.0f) {
                 lastUnusedParticle = i;
                 return i;
@@ -78,10 +73,6 @@ public class ParticleController {
 
         lastUnusedParticle = 0;
         return 0;
-    }
-
-    public int getAmount() {
-        return amount;
     }
 
     public List<Particle> getParticleList() {

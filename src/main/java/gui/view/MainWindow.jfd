@@ -146,7 +146,8 @@ new FormModel {
 						"text": "Select Right Panel As……"
 						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
 							name: "pianorollRadioMenuItem"
-							"text": "Pianoroll"
+							"text": "Pianoroll Panel"
+							"selected": true
 							auxiliary() {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
@@ -156,7 +157,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
 							name: "outputTextRadioMenuItem"
-							"text": "Output Text"
+							"text": "Output Text Panel"
 							auxiliary() {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
@@ -166,14 +167,14 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
 							name: "staveRadioMenuItem"
-							"text": "Stave"
+							"text": "Stave Panel"
 							auxiliary() {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
 						} )
 						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
 							name: "nmnRadioMenuItem"
-							"text": "Numbered Musical Notaion"
+							"text": "Numbered Musical Notaion Panel"
 							auxiliary() {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
@@ -183,7 +184,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
 							name: "transposerRadioMenuItem"
-							"text": "Transposer"
+							"text": "Transposer Panel"
 							auxiliary() {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
@@ -264,11 +265,17 @@ new FormModel {
 			} )
 			add( new FormContainer( "javax.swing.JLayeredPane", new FormLayoutManager( class javax.swing.JLayeredPane ) ) {
 				name: "layeredPane"
+				auxiliary() {
+					"JavaCodeGenerator.variableModifiers": 1
+				}
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "outputScrollPane"
+					auxiliary() {
+						"JavaCodeGenerator.variableModifiers": 1
+					}
 					add( new FormComponent( "javax.swing.JTextArea" ) {
 						name: "outputTextArea"
-						"font": new java.awt.Font( "Microsoft YaHei", 0, 12 )
+						"font": new java.awt.Font( "Microsoft YaHei", 0, 14 )
 						"editable": false
 						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 						auxiliary() {
@@ -278,10 +285,8 @@ new FormModel {
 				}, new FormLayoutConstraints( null ) {
 					"location": new java.awt.Point( 545, 835 )
 					"size": new java.awt.Dimension( 125, 305 )
-					"x": 80
-					"y": 185
-					"width": 110
-					"height": 185
+					"width": 1145
+					"height": 773
 					"layer": 300
 				} )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {

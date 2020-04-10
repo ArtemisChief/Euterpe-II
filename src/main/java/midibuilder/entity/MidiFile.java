@@ -29,8 +29,10 @@ public class MidiFile {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder(MidiBuilderUtil.bytesToHex(midiFileData));
 
-        for (int i = 48; i < stringBuilder.length(); i += 49)
+        for (int i = 138; i < stringBuilder.length(); i += 139)
             stringBuilder.replace(i, i, "\n");
+
+
 
         return stringBuilder.toString();
     }

@@ -1,6 +1,7 @@
 package pianoroll.component.controller;
 
 import midiplayer.component.MidiPlayer;
+import pianoroll.component.Pianoroll;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Key;
 
@@ -12,14 +13,10 @@ public class PianoController {
 
     private final List<Key> keyList;
 
-    private final List<Integer> triggeredTrackList;
-
     private int pitchOffset;
 
-    public PianoController(List<Integer> triggeredTrackList) {
+    public PianoController() {
         keyList = new ArrayList<>();
-
-        this.triggeredTrackList = triggeredTrackList;
 
         pitchOffset = 0;
 
@@ -58,7 +55,7 @@ public class PianoController {
                 key.setColorID(201);
         }
 
-        for (int trackID : triggeredTrackList) {
+        for (int trackID : Pianoroll.GetInstance().getTriggeredTrackList()) {
             Key key = keyList.get(trackID);
             key.setColorID(key.getTrackID() + 100);
         }

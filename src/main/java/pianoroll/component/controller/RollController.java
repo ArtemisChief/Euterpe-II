@@ -1,64 +1,59 @@
 package pianoroll.component.controller;
 
-import pianoroll.component.PianoRoll;
+import pianoroll.component.Pianoroll;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Roll;
+import pianoroll.util.Semantic;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RollController {
-    private final PianoRoll pianoRoll;
-
-    private final int amount;
 
     private final List<Roll> rollList;
-
-    private final List<Integer> triggeredTrackList;
 
     private int lastUnusedRollWhite;
     private int lastUnusedRollBlack;
 
-    public RollController(PianoRoll pianoRoll, List<Integer> triggeredTrackList) {
-        this.pianoRoll = pianoRoll;
-
-        amount = 100000;
-
+    public RollController() {
         rollList = new ArrayList<>();
 
-        this.triggeredTrackList = triggeredTrackList;
-
         lastUnusedRollWhite = 0;
-        lastUnusedRollBlack = amount / 2;
+        lastUnusedRollBlack = Semantic.Pianoroll.ROLL_AMOUNT / 2;
     }
 
     public void updateRolls(float deltaTime) {
-        if(pianoRoll.isPlaying()) {
-            pianoRoll.addTimeSum(deltaTime);
+        if (Pianoroll.GetInstance().isPlaying()) {
+            Pianoroll.GetInstance().addTimeSum(deltaTime);
+
+            float distance = Pianoroll.GetInstance().getLengthPerSecond() * deltaTime;
 
             for (Roll roll : rollList) {
                 if (!roll.isUnused()) {
-                    roll.setOffsetY(roll.getOffsetY() - pianoRoll.getLengthPerSecond() * deltaTime);
+                    roll.setOffsetY(roll.getOffsetY() - distance);
 
                     if (roll.getOffsetY() - roll.getScaleY() <= 0.0f) {
-                        if (!triggeredTrackList.contains(roll.getTrackID())) {
+                        if (!Pianoroll.GetInstance().getTriggeredTrackList().contains(roll.getTrackID())) {
                             roll.setColorID(roll.getTrackID() + 100);
-                            triggeredTrackList.add(roll.getTrackID());
-                            pianoRoll.getPianoController().pressKey(roll.getTrackID());
+                            Pianoroll.GetInstance().getTriggeredTrackList().add(roll.getTrackID());
                         }
 
-                        roll.setScaleY(roll.getScaleY() - pianoRoll.getLengthPerSecond() * deltaTime);
+                        roll.setScaleY(roll.getScaleY() - distance);
                     }
 
                     if (roll.getOffsetY() <= 0.0f) {
-                        triggeredTrackList.remove((Integer) roll.getTrackID());
-                        pianoRoll.getPianoController().releaseKey(roll.getTrackID());
+                        Pianoroll.GetInstance().getTriggeredTrackList().remove((Integer) roll.getTrackID());
                         roll.setUnused(true);
                     }
 
                 }
             }
         }
+    }
+
+    public void reset() {
+        for (Roll roll : rollList)
+            roll.setUnused(true);
     }
 
     public int firstUnusedRoll(int trackID) {
@@ -73,7 +68,7 @@ public class RollController {
     }
 
     private int firstUnusedRollWhite() {
-        for (int i = lastUnusedRollWhite; i < amount / 2; ++i) {
+        for (int i = lastUnusedRollWhite; i < Semantic.Pianoroll.ROLL_AMOUNT / 2; ++i) {
             if (rollList.get(i).isUnused()) {
                 lastUnusedRollWhite = i;
                 return i;
@@ -92,26 +87,22 @@ public class RollController {
     }
 
     private int firstUnusedRollBlack() {
-        for (int i = lastUnusedRollBlack; i < amount; ++i) {
+        for (int i = lastUnusedRollBlack; i < Semantic.Pianoroll.ROLL_AMOUNT; ++i) {
             if (rollList.get(i).isUnused()) {
                 lastUnusedRollBlack = i;
                 return i;
             }
         }
 
-        for (int i = amount / 2; i < lastUnusedRollBlack; ++i) {
+        for (int i = Semantic.Pianoroll.ROLL_AMOUNT / 2; i < lastUnusedRollBlack; ++i) {
             if (rollList.get(i).isUnused()) {
                 lastUnusedRollBlack = i;
                 return i;
             }
         }
 
-        lastUnusedRollBlack = amount / 2;
-        return amount / 2;
-    }
-
-    public int getAmount() {
-        return amount;
+        lastUnusedRollBlack = Semantic.Pianoroll.ROLL_AMOUNT / 2;
+        return Semantic.Pianoroll.ROLL_AMOUNT / 2;
     }
 
     public List<Roll> getRollList() {
