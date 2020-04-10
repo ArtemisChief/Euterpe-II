@@ -5,6 +5,7 @@ import midiplayer.component.MidiPlayer;
 import gui.entity.Status;
 import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
+import pianoroll.util.Semantic;
 
 public class Menus {
 
@@ -34,6 +35,8 @@ public class Menus {
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
 
+            Pianoroll.GetInstance().reset();
+
             MainWindow.GetInstance().inputTextPane.setText("");
             MainWindow.GetInstance().tipsMenuItem.doClick();
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
@@ -46,6 +49,8 @@ public class Menus {
             if (Status.GetCurrentStatus().getIsEdited())
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
+
+            Pianoroll.GetInstance().reset();
 
             String str = "/*\n" +
                     " 数字乐谱模板\n" +
@@ -100,7 +105,11 @@ public class Menus {
 
         // 打开文件
         MainWindow.GetInstance().openMenuItem.addActionListener(e -> {
-            FileIO.GetInstance().openMuiFile();
+            if(!FileIO.GetInstance().openMuiFile())
+                return;
+
+            Pianoroll.GetInstance().reset();
+
             MainWindow.GetInstance().outputTextArea.setText("");
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();

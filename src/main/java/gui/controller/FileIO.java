@@ -27,10 +27,10 @@ public class FileIO {
 
     private File file;
 
-    public void openMuiFile() {
+    public boolean openMuiFile() {
         if (Status.GetCurrentStatus().getIsEdited())
             if (!Diaglogs.GetInstance().askSaving())
-                return;
+                return false;
 
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -58,10 +58,14 @@ public class FileIO {
 
                 Status.SetCurrentStatus(Status.SAVED_FILE);
 
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
         }
+
+        return false;
     }
 
     public void saveMuiFile() {
