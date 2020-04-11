@@ -16,9 +16,12 @@ public class Symbol {
 
     private final int position;
 
-    public Symbol(int symbol, int position) {
+    private final int line;
+
+    public Symbol(int symbol, int position, int line) {
         this.symbol = symbol;
         this.position = position;
+        this.line = line;
     }
 
     public int getSymbol() {
@@ -27,6 +30,10 @@ public class Symbol {
 
     public int getPosition() {
         return position;
+    }
+
+    public int getLine() {
+        return line;
     }
 
 }

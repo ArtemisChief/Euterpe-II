@@ -145,6 +145,7 @@ public class Semantic {
 
                 case "melody":
                     noteList = paragraph.getNoteList();
+                    Integer melodyLine = child.getChild(0).getLine();
                     for (Node tone : child.getChildren()) {
                         switch (tone.getContent()) {
                             case "(":
@@ -160,7 +161,7 @@ public class Semantic {
                                 toneOffset -= 12;
                                 break;
                             case "|":
-                                paragraph.getSymbolQueue().offer(new Symbol(1, noteList.size()));
+                                paragraph.getSymbolQueue().offer(new Symbol(1, noteList.size(), melodyLine));
                                 break;
                             case "#":
                                 haftToneOffset = 1;
@@ -213,14 +214,14 @@ public class Semantic {
 
                 case "rhythm":
                     durationList = paragraph.getDurationList();
-                    Integer line = child.getChild(0).getLine();
+                    Integer rhythmLine = child.getChild(0).getLine();
                     for (Node rhythm : child.getChildren()) {
                         switch (rhythm.getContent()) {
                             case "{":
-                                paragraph.getSymbolQueue().offer(new Symbol(0, durationList.size()));
+                                paragraph.getSymbolQueue().offer(new Symbol(0, durationList.size(), rhythmLine));
                                 break;
                             case "}":
-                                paragraph.getSymbolQueue().offer(new Symbol(2, durationList.size()));
+                                paragraph.getSymbolQueue().offer(new Symbol(2, durationList.size(), rhythmLine));
                                 break;
                             case "1":
                                 lineRhythmCount++;
@@ -268,15 +269,15 @@ public class Semantic {
                                 break;
                             case "w*":
                                 lineRhythmCount++;
-                                errorInfo.append("Line: ").append(line).append("\t不支持32分附点音符，即w*\n");
-                                errorLines.add(line);
+                                errorInfo.append("Line: ").append(rhythmLine).append("\t不支持32分附点音符，即w*\n");
+                                errorLines.add(rhythmLine);
                                 break;
                         }
                     }
 
                     if (lineNoteCount != lineRhythmCount) {
-                        errorInfo.append("Line: ").append(line).append("\t该句音符与时值数量不相同\n");
-                        errorLines.add(line);
+                        errorInfo.append("Line: ").append(rhythmLine).append("\t该句音符与时值数量不相同\n");
+                        errorLines.add(rhythmLine);
                     }
 
                     break;
@@ -383,8 +384,9 @@ public class Semantic {
                         //同时音
                         if (!symbolQueue.isEmpty()) {
                             if (symbolQueue.peek().getSymbol() != 1) {
-                                errorInfo.append("Line: 未知\t同时音间存在连音无意义\n");
-                                errorLines.add(0);
+                                int line = symbolQueue.peek().getLine();
+                                errorInfo.append("Line: ").append(line).append("\t同时音间存在连音无意义\n");
+                                errorLines.add(line);
                                 break;
                             }
 
@@ -411,8 +413,9 @@ public class Semantic {
                         //连音
                         if (!symbolQueue.isEmpty()) {
                             if (symbolQueue.peek().getSymbol() != 2) {
-                                errorInfo.append("Line: 未知\t连音间存在同时音无意义\n");
-                                errorLines.add(0);
+                                int line = symbolQueue.peek().getLine();
+                                errorInfo.append("Line: ").append(line).append("\t连音间存在同时音无意义\n");
+                                errorLines.add(line);
                                 break;
                             }
 
