@@ -1,9 +1,11 @@
 package gui.controller;
 
+import converter.component.MidiConverter;
 import gui.view.MainWindow;
 import midibuilder.component.MidiFileBuilder;
 import midiplayer.component.MidiPlayer;
 import gui.entity.Status;
+import pianoroll.component.Pianoroll;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -184,14 +186,12 @@ public class FileIO {
             return;
         File midiFile = fileChooser.getSelectedFile();
 
-        // todo what I don't know, rgnb(
+        String result = MidiConverter.GetInstance().converterToMui(midiFile);
 
-        String result = "rgnb!";
         MainWindow.GetInstance().inputTextPane.setText(result);
         MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
 
         Status.SetCurrentStatus(Status.NEW_FILE);
-        Status.GetCurrentStatus().setIsEdited(true);
     }
 
     public File getTempMidiFile() {

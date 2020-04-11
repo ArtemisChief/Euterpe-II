@@ -214,6 +214,15 @@ public class Menus {
             MainWindow.GetInstance().outputTextArea.setText("");
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
+
+            if (!MidiPlayer.GetInstance().getIsLoadedMidiFile()) {
+                if (!FileIO.GetInstance().generateTempMidiFile())
+                    return;
+
+                MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+                Pianoroll.GetInstance().reset();
+                Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            }
         });
 
         // 转换Mui到五线谱

@@ -311,7 +311,26 @@ new FormModel {
 					"size": new java.awt.Dimension( 125, 305 )
 					"width": 1145
 					"height": 773
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
+					"autoSize": false
+				} ) {
+					name: "panel1"
+					add( new FormComponent( "javax.swing.JSlider" ) {
+						name: "slider1"
+						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"focusable": false
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+						"x": 15
+						"y": 5
+						"width": 930
+						"height": 20
+					} )
+				}, new FormLayoutConstraints( null ) {
+					"x": 0
 					"layer": 300
+					"width": 1145
+					"height": 30
 				} )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 				"x": 450

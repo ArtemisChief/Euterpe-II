@@ -135,6 +135,8 @@ public class MainWindow extends JFrame {
         layeredPane = new JLayeredPane();
         outputScrollPane = new JScrollPane();
         outputTextArea = new JTextArea();
+        panel1 = new JPanel();
+        slider1 = new JSlider();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -352,8 +354,21 @@ public class MainWindow extends JFrame {
                 outputTextArea.setBorder(null);
                 outputScrollPane.setViewportView(outputTextArea);
             }
-            layeredPane.add(outputScrollPane, JLayeredPane.POPUP_LAYER);
+            layeredPane.add(outputScrollPane, JLayeredPane.DEFAULT_LAYER);
             outputScrollPane.setBounds(0, 0, 1145, 773);
+
+            //======== panel1 ========
+            {
+                panel1.setLayout(null);
+
+                //---- slider1 ----
+                slider1.setBorder(null);
+                slider1.setFocusable(false);
+                panel1.add(slider1);
+                slider1.setBounds(15, 5, 930, 20);
+            }
+            layeredPane.add(panel1, JLayeredPane.POPUP_LAYER);
+            panel1.setBounds(0, 0, 1145, 30);
         }
         contentPane.add(layeredPane);
         layeredPane.setBounds(450, 0, 1150, 770);
@@ -416,5 +431,7 @@ public class MainWindow extends JFrame {
     public JLayeredPane layeredPane;
     public JScrollPane outputScrollPane;
     public JTextArea outputTextArea;
+    private JPanel panel1;
+    private JSlider slider1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
