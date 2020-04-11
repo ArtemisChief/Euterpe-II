@@ -67,10 +67,14 @@ public class Pianoroll {
 
     public void loadMidiFile(File midiFile) {
         MidiContent midiContent = MidiParser.GetInstance().parse(midiFile);
-        BpmEvent firstBpmEvent = null;
+
+        long lastTick = 0;
+        float lastBpm = 0.0f;
+        float lastTime = 0.0f;
 
         for (MidiTrack midiTrack : midiContent.getMidiTrackList()) {
             for (MidiEvent midiEvent : midiTrack.getMidiEventList()) {
+                // 音符
                 if (midiEvent instanceof NoteEvent) {
                     NoteEvent noteEvent = (NoteEvent) midiEvent;
 
@@ -87,14 +91,23 @@ public class Pianoroll {
                     roll.setUnused(false);
                 }
 
+                // 变速
                 if (midiEvent instanceof BpmEvent) {
                     BpmEvent bpmEvent = (BpmEvent) midiEvent;
                     Pair<Float, Float> lengthPerSecondPair;
 
-                    if (bpmEvent.getTriggerTick() == 0)
-                        firstBpmEvent = bpmEvent;
+                    float time;
 
-                    lengthPerSecondPair = new Pair<>(bpmEvent.getTriggerTick() / midiContent.getResolution() / firstBpmEvent.getBpm() * 60.0f, bpmEvent.getBpm());
+                    if (bpmEvent.getTriggerTick() == 0)
+                        time = 0;
+                    else
+                        time = (bpmEvent.getTriggerTick() - lastTick) / (float) midiContent.getResolution() / lastBpm * 60.0f + lastTime;
+
+                    lengthPerSecondPair = new Pair<>(time, bpmEvent.getBpm());
+
+                    lastTime = time;
+                    lastTick = bpmEvent.getTriggerTick();
+                    lastBpm = bpmEvent.getBpm();
 
                     if (!lengthPerSecondQueue.contains(lengthPerSecondPair))
                         lengthPerSecondQueue.add(lengthPerSecondPair);
