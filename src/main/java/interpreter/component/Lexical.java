@@ -8,8 +8,8 @@ import java.util.List;
  *     <错误,-1> 错误token
  *     <score,1> 乐谱
  *     <paragraph,2> 段落
- *     <speed=?,3> 速度
- *     <1=?,4> 调性
+ *     <speed=,3> 速度
+ *     <1=,4> 调性
  *     <end,5>
  *     <play,6> 播放操作
  *     <(,7>
@@ -23,8 +23,16 @@ import java.util.List;
  *     <*,15>
  *     <,,16>
  *     <&,17>
+ *     <#,18>升号
+ *     <b,19>降号
+ *     <instrument,20>乐器
+ *     <volume=,21>音量
+ *     <|,22>同时音
+ *     <休止符,94>
+ *     <调性,95>
+ *     <常数,96>速度/乐器/音量中使用，速度常数可能为小数，乐器常数存在一个负数-1
  *     <\n,97>换行
- *     <音符，98>
+ *     <音符,98>
  *     <时值,99>
  *     <标识符100 ，标识符指针>
  */
@@ -228,12 +236,14 @@ public class Lexical {
                         tokens.add(new Token(-1, "\"instrument=\"后缺少对应乐器编号", count));
                         return;
                     }
-                    //扫描instrument=后的字符，出现非数字则报错
+                    //扫描instrument=后的字符，出现非合法数字则报错
                     for (int i = 11; i < inputWord.length(); ++i) {
+                        if(i==11&&inputWord.charAt(i)=='-')
+                            continue;
                         if (!isNumber(inputWord.charAt(i))) {
                             skipLine = count;
                             errorLine.add(skipLine);
-                            tokens.add(new Token(-1, "乐器编号中出现非法字符：" + inputWord.charAt(i), count));
+                            tokens.add(new Token(-1, "乐器编号不是合法的乐器编号：" + inputWord.substring(11), count));
                             return;
                         }
                     }
@@ -247,7 +257,7 @@ public class Lexical {
 
             //判断是否是音量标识
             if (inputWord.length() >= 7) {
-                //当输入字符串以instrument=开头时
+                //当输入字符串以volume=开头时
                 if (inputWord.substring(0, 7).equals("volume=")) {
                     //若volume=后未加常数，报错
                     if (inputWord.length() == 7) {
@@ -261,7 +271,7 @@ public class Lexical {
                         if (!isNumber(inputWord.charAt(i))) {
                             skipLine = count;
                             errorLine.add(skipLine);
-                            tokens.add(new Token(-1, "音量中出现非法字符：" + inputWord.charAt(i), count));
+                            tokens.add(new Token(-1, "音量不是合法的音量数字：" + inputWord.substring(7), count));
                             return;
                         }
                     }
@@ -292,13 +302,13 @@ public class Lexical {
                             if(i==6) {
                                 skipLine = count;
                                 errorLine.add(skipLine);
-                                tokens.add(new Token(-1, "速度不能以小数点开头：" + inputWord.charAt(i), count));
+                                tokens.add(new Token(-1, "速度不能以小数点开头：" + inputWord.substring(6), count));
                                 return;
                             }
                             else if(point){
                                 skipLine = count;
                                 errorLine.add(skipLine);
-                                tokens.add(new Token(-1, "速度中不能出现多个小数点：" + inputWord.charAt(i), count));
+                                tokens.add(new Token(-1, "速度中不能出现多个小数点：" + inputWord.substring(6), count));
                                 return;
                             }
                             else {
@@ -308,7 +318,7 @@ public class Lexical {
                         else if (!isNumber(inputWord.charAt(i))) {
                             skipLine = count;
                             errorLine.add(skipLine);
-                            tokens.add(new Token(-1, "速度中出现非法字符：" + inputWord.charAt(i), count));
+                            tokens.add(new Token(-1, "速度不是合法的速度常数：" + inputWord.substring(6), count));
                             return;
                         }
                     }
