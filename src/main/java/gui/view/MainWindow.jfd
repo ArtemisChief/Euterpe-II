@@ -321,10 +321,55 @@ new FormModel {
 						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 						"focusable": false
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 15
+						"x": 0
 						"y": 5
-						"width": 930
+						"width": 850
 						"height": 20
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "keyComboBox"
+						"model": new javax.swing.DefaultComboBoxModel {
+							selectedItem: "1 = Ab (-4)"
+							addElement( "1 = Ab (-4)" )
+							addElement( "1 = A (-3)" )
+							addElement( "1 = Bb (-2)" )
+							addElement( "1 = B (-1)" )
+							addElement( "1 = C (0)" )
+							addElement( "1 = Db (+1)" )
+							addElement( "1 = D (+2)" )
+							addElement( "1 = Eb (+3)" )
+							addElement( "1 = E (+4)" )
+							addElement( "1 = F (+5)" )
+							addElement( "1 = F# (+6)" )
+							addElement( "1 = G (+7)" )
+						}
+						"maximumRowCount": 12
+						"focusable": false
+						"selectedIndex": 4
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+						"x": 865
+						"y": 5
+						"height": 20
+						"width": 120
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "octaveComboBox"
+						"maximumRowCount": 5
+						"model": new javax.swing.DefaultComboBoxModel {
+							selectedItem: "Octave -2"
+							addElement( "Octave -2" )
+							addElement( "Octave -1" )
+							addElement( "Octave  0" )
+							addElement( "Octave  1" )
+							addElement( "Octave  2" )
+						}
+						"focusable": false
+						"selectedIndex": 2
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+						"x": 1010
+						"y": 5
+						"height": 20
+						"width": 120
 					} )
 				}, new FormLayoutConstraints( null ) {
 					"x": 0

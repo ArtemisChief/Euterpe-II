@@ -1,6 +1,7 @@
 package pianoroll.component.controller;
 
 import midiplayer.component.MidiPlayer;
+import pianoroll.component.InputProcessor;
 import pianoroll.component.Pianoroll;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Key;
@@ -32,7 +33,7 @@ public class PianoController {
 
     public void pressKey(int trackID) {
         try {
-            ShortMessage shortMessage = new ShortMessage(144, 0, keyList.get(trackID).getPitch(), 100);
+            ShortMessage shortMessage = new ShortMessage(144, 15, trackID + 21, 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +42,7 @@ public class PianoController {
 
     public void releaseKey(int trackID) {
         try {
-            ShortMessage shortMessage = new ShortMessage(128, 0, keyList.get(trackID).getPitch(), 100);
+            ShortMessage shortMessage = new ShortMessage(128, 15, trackID + 21, 100);
             MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,16 +63,13 @@ public class PianoController {
         }
     }
 
-    public void addHalfTone() {
-        pitchOffset++;
-    }
-
-    public void reduceHalfTone() {
-        pitchOffset--;
-    }
-
     public List<Key> getKeyList() {
         return keyList;
+    }
+
+    public void setPitchOffset(int pitchOffset) {
+        this.pitchOffset = pitchOffset;
+
     }
 
     public int getPitchOffset() {

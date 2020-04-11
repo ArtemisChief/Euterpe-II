@@ -8,12 +8,14 @@ import java.awt.event.*;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.*;
 
 import gui.controller.Diaglogs;
 import gui.controller.FileIO;
 import gui.controller.InputTexts;
 import gui.controller.Menus;
 import gui.entity.Status;
+import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
 import midiplayer.component.MidiPlayer;
 import net.miginfocom.swing.*;
@@ -43,6 +45,18 @@ public class MainWindow extends JFrame {
 
         // 钢琴卷帘组件加入到窗口
         layeredPane.add(PianorollCanvas.GetGlcanvas(), new Integer(100));
+
+        // 设置调性下拉框
+        keyComboBox.setSelectedIndex(4);
+        keyComboBox.addActionListener(e -> {
+            Pianoroll.GetInstance().getPianoController().setPitchOffset(keyComboBox.getSelectedIndex() - 4);
+        });
+
+        // 设置音高下拉框
+        octaveComboBox.setSelectedIndex(2);
+        octaveComboBox.addActionListener(e -> {
+            octaveComboBox.getSelectedIndex();
+        });
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
@@ -137,6 +151,8 @@ public class MainWindow extends JFrame {
         outputTextArea = new JTextArea();
         panel1 = new JPanel();
         slider1 = new JSlider();
+        keyComboBox = new JComboBox<>();
+        octaveComboBox = new JComboBox<>();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -365,7 +381,42 @@ public class MainWindow extends JFrame {
                 slider1.setBorder(null);
                 slider1.setFocusable(false);
                 panel1.add(slider1);
-                slider1.setBounds(15, 5, 930, 20);
+                slider1.setBounds(0, 5, 850, 20);
+
+                //---- keyComboBox ----
+                keyComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "1 = Ab (-4)",
+                    "1 = A (-3)",
+                    "1 = Bb (-2)",
+                    "1 = B (-1)",
+                    "1 = C (0)",
+                    "1 = Db (+1)",
+                    "1 = D (+2)",
+                    "1 = Eb (+3)",
+                    "1 = E (+4)",
+                    "1 = F (+5)",
+                    "1 = F# (+6)",
+                    "1 = G (+7)"
+                }));
+                keyComboBox.setMaximumRowCount(12);
+                keyComboBox.setFocusable(false);
+                keyComboBox.setSelectedIndex(4);
+                panel1.add(keyComboBox);
+                keyComboBox.setBounds(865, 5, 120, 20);
+
+                //---- octaveComboBox ----
+                octaveComboBox.setMaximumRowCount(5);
+                octaveComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Octave -2",
+                    "Octave -1",
+                    "Octave  0",
+                    "Octave  1",
+                    "Octave  2"
+                }));
+                octaveComboBox.setFocusable(false);
+                octaveComboBox.setSelectedIndex(2);
+                panel1.add(octaveComboBox);
+                octaveComboBox.setBounds(1010, 5, 120, 20);
             }
             layeredPane.add(panel1, JLayeredPane.POPUP_LAYER);
             panel1.setBounds(0, 0, 1145, 30);
@@ -433,5 +484,7 @@ public class MainWindow extends JFrame {
     public JTextArea outputTextArea;
     private JPanel panel1;
     private JSlider slider1;
+    private JComboBox<String> keyComboBox;
+    private JComboBox<String> octaveComboBox;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

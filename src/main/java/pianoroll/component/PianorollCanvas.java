@@ -22,13 +22,7 @@ import static uno.buffer.UtilKt.destroyBuffers;
 
 public class PianorollCanvas implements GLEventListener {
 
-    // 单例
     private static final PianorollCanvas instance = new PianorollCanvas();
-
-    // 获取单例
-    public static PianorollCanvas GetInstance() {
-        return instance;
-    }
 
     private static GLCanvas glcanvas;
 

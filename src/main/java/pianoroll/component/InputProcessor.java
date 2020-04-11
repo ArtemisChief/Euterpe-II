@@ -3,14 +3,15 @@ package pianoroll.component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class InputProcessor implements KeyListener {
 
-    private final List<Integer> keyDownList;
+    private final List<Integer> keyboardKeyDownList;
 
     public InputProcessor() {
-        keyDownList = new ArrayList<>();
+        keyboardKeyDownList = new ArrayList<>();
     }
 
     @Override
@@ -21,12 +22,11 @@ public class InputProcessor implements KeyListener {
         int trackID = parseKey(e);
 
         if (trackID != -1) {
-            if (!keyDownList.contains(e.getKeyCode())) {
+            if (!keyboardKeyDownList.contains(e.getKeyCode())) {
                 Pianoroll.GetInstance().trigger(trackID);
-
                 Pianoroll.GetInstance().getPianoController().pressKey(trackID);
 
-                keyDownList.add(e.getKeyCode());
+                keyboardKeyDownList.add(e.getKeyCode());
             }
         }
     }
@@ -36,12 +36,11 @@ public class InputProcessor implements KeyListener {
         int trackID = parseKey(e);
 
         if (trackID != -1) {
-            if (keyDownList.contains(e.getKeyCode())) {
+            if (keyboardKeyDownList.contains(e.getKeyCode())) {
                 Pianoroll.GetInstance().suspend(trackID);
-
                 Pianoroll.GetInstance().getPianoController().releaseKey(trackID);
 
-                keyDownList.remove((Integer) e.getKeyCode());
+                keyboardKeyDownList.remove((Integer) e.getKeyCode());
             }
         }
     }

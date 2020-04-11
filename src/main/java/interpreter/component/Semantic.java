@@ -357,6 +357,7 @@ public class Semantic {
         Queue<Symbol> symbolQueue = paragraph.getSymbolQueue();
 
         Note tempNote;
+        byte tempChannel=channel;
 
         int count = noteList.size();
         for (int index = 0; index < count; ++index) {
@@ -372,6 +373,11 @@ public class Semantic {
                         midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
                         break;
                     case 2:
+                        if (Byte.parseByte(event.getData()) == -1)
+                            channel = (byte) 9;
+                        else
+                            channel = tempChannel;
+
                         midiTrackBuilder.setInstrument(channel, Byte.parseByte(event.getData()));
                         break;
                 }
