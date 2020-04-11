@@ -190,6 +190,27 @@ public class Syntactic {
 
             sentenceError = false;
 
+            if(tokens.get(index).getType()==3){
+                Node speed = parseSpeed();
+                paragraph.addChild(speed);
+                continue;
+            }
+            if(tokens.get(index).getType()==4){
+                Node tone = parseTone();
+                paragraph.addChild(tone);
+                continue;
+            }
+            if(tokens.get(index).getType()==20){
+                Node instrument = parseInstrument();
+                paragraph.addChild(instrument);
+                continue;
+            }
+            if(tokens.get(index).getType()==21){
+                Node volume = parseVolume();
+                paragraph.addChild(volume);
+                continue;
+            }
+
             Node sentence = parseSentence();
             paragraph.addChild(sentence);
         }
