@@ -17,8 +17,8 @@ public class Symbol {
     private final int position;
 
     public Symbol(int symbol, int position) {
-        this.position = position;
         this.symbol = symbol;
+        this.position = position;
     }
 
     public int getSymbol() {

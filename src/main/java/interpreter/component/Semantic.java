@@ -1,9 +1,6 @@
 package interpreter.component;
 
-import interpreter.entity.Node;
-import interpreter.entity.Note;
-import interpreter.entity.Paragraph;
-import interpreter.entity.Symbol;
+import interpreter.entity.*;
 import midibuilder.component.MidiFileBuilder;
 import midibuilder.component.MidiTrackBuilder;
 import midibuilder.entity.MidiFile;
@@ -22,9 +19,9 @@ public class Semantic {
 
     private Map<String, Paragraph> paragraphMap;
 
-    private MidiTrackBuilder midiTrackBuilder= new MidiTrackBuilder();
+    private MidiTrackBuilder midiTrackBuilder = new MidiTrackBuilder();
 
-    private MidiFileBuilder midiFileBuilder= new MidiFileBuilder();
+    private MidiFileBuilder midiFileBuilder = new MidiFileBuilder();
 
     private MidiFile midiFile;
 
@@ -80,7 +77,7 @@ public class Semantic {
 
                 case "instrument":
                     if (child.getChild(0).getContent().length() < 4 && Integer.parseInt(child.getChild(0).getContent()) >= -1 && Integer.parseInt(child.getChild(0).getContent()) < 128) {
-                        paragraph.setInstrument(Integer.parseInt(child.getChild(0).getContent()));
+                        paragraph.getEventQueue().offer(new Event(2, child.getChild(0).getContent(), paragraph.getNoteList().size()));
                     } else {
                         errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t乐器声明超出范围（-1~127）\n");
                         errorLines.add(child.getChild(0).getLine());
@@ -89,7 +86,7 @@ public class Semantic {
 
                 case "volume":
                     if (child.getChild(0).getContent().length() < 4 && Integer.parseInt(child.getChild(0).getContent()) >= 0 && Integer.parseInt(child.getChild(0).getContent()) < 128) {
-                        paragraph.setVolume(Byte.parseByte(child.getChild(0).getContent()));
+                        paragraph.getEventQueue().offer(new Event(1, child.getChild(0).getContent(), paragraph.getNoteList().size()));
                     } else {
                         errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t音量声明超出范围（0~127）\n");
                         errorLines.add(child.getChild(0).getLine());
@@ -98,7 +95,7 @@ public class Semantic {
 
                 case "speed":
                     if (Float.parseFloat(child.getChild(0).getContent()) >= 0 && Float.parseFloat(child.getChild(0).getContent()) < 1000) {
-                        paragraph.setSpeed(Float.parseFloat(child.getChild(0).getContent()));
+                        paragraph.getEventQueue().offer(new Event(0, child.getChild(0).getContent(), paragraph.getNoteList().size()));
                     } else {
                         errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t速度声明超出范围（0~999）\n");
                         errorLines.add(child.getChild(0).getLine());
@@ -319,13 +316,6 @@ public class Semantic {
                                     break;
                                 }
 
-                                int tempIndex = index;
-
-                                if (paragraphMap.get(paraName).getInstrument() == -1) {
-                                    paragraphMap.get(paraName).setInstrument(0);
-                                    index = 9;
-                                }
-
                                 MidiTrack midiTrack;
 
                                 if (index > midiTracks.size() - 1) {
@@ -337,8 +327,6 @@ public class Semantic {
                                     if (midiTrack != null)
                                         midiTrackBuilder.merge(midiTracks.get(index), midiTrack);
                                 }
-
-                                index = tempIndex;
 
                                 break;
                         }
@@ -355,11 +343,7 @@ public class Semantic {
         if (getIsError())
             return null;
 
-        midiTrackBuilder.createMidiTrack()
-                .setStart()
-                .setBpm(paragraph.getSpeed())
-                .setInstrument(channel, (byte) paragraph.getInstrument())
-                .addController(channel, (byte) 0x07, paragraph.getVolume());
+        midiTrackBuilder.createMidiTrack().setStart();
 
         if (duration != 0)
             midiTrackBuilder.setDuration(duration);
@@ -375,6 +359,23 @@ public class Semantic {
 
         int count = noteList.size();
         for (int index = 0; index < count; ++index) {
+            // 处理速度、音量和乐器
+            while (paragraph.getEventQueue().peek() != null && paragraph.getEventQueue().peek().getPosition() == index) {
+                Event event = paragraph.getEventQueue().poll();
+
+                switch (event.getType()) {
+                    case 0:
+                        midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
+                        break;
+                    case 1:
+                        midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                        break;
+                    case 2:
+                        midiTrackBuilder.setInstrument(channel, Byte.parseByte(event.getData()));
+                        break;
+                }
+            }
+
             while (!symbolQueue.isEmpty() && symbolQueue.peek().getPosition() == index) {
                 //处理特殊符号，i为符号后一个音符
                 switch (symbolQueue.poll().getSymbol()) {

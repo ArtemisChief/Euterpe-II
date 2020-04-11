@@ -62,7 +62,11 @@ public class MidiPlayer {
         }
     }
 
-    public boolean getIsLoadedMidiFile() {
+    public void setLoadedMidiFile(boolean loadedMidiFile) {
+        isLoadedMidiFile = loadedMidiFile;
+    }
+
+    public boolean isLoadedMidiFile() {
         return isLoadedMidiFile;
     }
 
@@ -79,7 +83,6 @@ public class MidiPlayer {
     public void stop() {
         microsecondPosition = 0;
         sequencer.stop();
-        isLoadedMidiFile = false;
     }
 
     public Synthesizer getSynthesizer() {

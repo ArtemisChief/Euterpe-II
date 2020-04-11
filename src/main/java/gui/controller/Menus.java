@@ -43,6 +43,7 @@ public class Menus {
             MainWindow.GetInstance().tipsMenuItem.doClick();
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
+            MidiPlayer.GetInstance().setLoadedMidiFile(false);
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
@@ -102,12 +103,13 @@ public class Menus {
             MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
+            MidiPlayer.GetInstance().setLoadedMidiFile(false);
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
         // 打开文件
         MainWindow.GetInstance().openMenuItem.addActionListener(e -> {
-            if(!FileIO.GetInstance().openMuiFile())
+            if (!FileIO.GetInstance().openMuiFile())
                 return;
 
             Pianoroll.GetInstance().reset();
@@ -116,14 +118,13 @@ public class Menus {
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
 
-            if (!MidiPlayer.GetInstance().getIsLoadedMidiFile()) {
-                if (!FileIO.GetInstance().generateTempMidiFile())
-                    return;
+            if (!FileIO.GetInstance().generateTempMidiFile())
+                return;
 
-                MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-                Pianoroll.GetInstance().reset();
-                Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            }
+            MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            Pianoroll.GetInstance().reset();
+            Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+
         });
 
         // 保存文件
@@ -165,7 +166,20 @@ public class Menus {
 
         // 重新编译Midi文件
         MainWindow.GetInstance().rebuildMenuItem.addActionListener(e -> {
-            if (!MidiPlayer.GetInstance().getIsLoadedMidiFile()) {
+            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MidiPlayer.GetInstance().stop();
+
+            if (!FileIO.GetInstance().generateTempMidiFile())
+                return;
+
+            MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            Pianoroll.GetInstance().reset();
+            Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+        });
+
+        // 播放
+        MainWindow.GetInstance().playDirectMenuItem.addActionListener(e -> {
+            if(!MidiPlayer.GetInstance().isLoadedMidiFile()){
                 if (!FileIO.GetInstance().generateTempMidiFile())
                     return;
 
@@ -173,10 +187,7 @@ public class Menus {
                 Pianoroll.GetInstance().reset();
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             }
-        });
 
-        // 播放
-        MainWindow.GetInstance().playDirectMenuItem.addActionListener(e -> {
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
                 MidiPlayer.GetInstance().pause();
                 MainWindow.GetInstance().playDirectMenuItem.setText("Resume");
@@ -215,14 +226,12 @@ public class Menus {
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
 
-            if (!MidiPlayer.GetInstance().getIsLoadedMidiFile()) {
-                if (!FileIO.GetInstance().generateTempMidiFile())
-                    return;
+            if (!FileIO.GetInstance().generateTempMidiFile())
+                return;
 
-                MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-                Pianoroll.GetInstance().reset();
-                Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            }
+            MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            Pianoroll.GetInstance().reset();
+            Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
         });
 
         // 转换Mui到五线谱
