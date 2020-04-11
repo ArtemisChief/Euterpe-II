@@ -79,10 +79,10 @@ public class Semantic {
                     break;
 
                 case "instrument":
-                    if (child.getChild(0).getContent().length() < 4 && Integer.parseInt(child.getChild(0).getContent()) >= 0 && Integer.parseInt(child.getChild(0).getContent()) < 128) {
-                        paragraph.setInstrument(Byte.parseByte(child.getChild(0).getContent()));
+                    if (child.getChild(0).getContent().length() < 4 && Integer.parseInt(child.getChild(0).getContent()) >= -1 && Integer.parseInt(child.getChild(0).getContent()) < 128) {
+                        paragraph.setInstrument(Integer.parseInt(child.getChild(0).getContent()));
                     } else {
-                        errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t乐器声明超出范围（0-127）\n");
+                        errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t乐器声明超出范围（-1~127）\n");
                         errorLines.add(child.getChild(0).getLine());
                     }
                     break;
@@ -91,16 +91,16 @@ public class Semantic {
                     if (child.getChild(0).getContent().length() < 4 && Integer.parseInt(child.getChild(0).getContent()) >= 0 && Integer.parseInt(child.getChild(0).getContent()) < 128) {
                         paragraph.setVolume(Byte.parseByte(child.getChild(0).getContent()));
                     } else {
-                        errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t音量声明超出范围（0-127）\n");
+                        errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t音量声明超出范围（0~127）\n");
                         errorLines.add(child.getChild(0).getLine());
                     }
                     break;
 
                 case "speed":
-                    if (child.getChild(0).getContent().length() < 4) {
+                    if (Float.parseFloat(child.getChild(0).getContent()) >= 0 && Float.parseFloat(child.getChild(0).getContent()) < 1000) {
                         paragraph.setSpeed(Float.parseFloat(child.getChild(0).getContent()));
                     } else {
-                        errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t速度声明超出范围（0-999）\n");
+                        errorInfo.append("Line: ").append(child.getChild(0).getLine()).append("\t速度声明超出范围（0~999）\n");
                         errorLines.add(child.getChild(0).getLine());
                     }
                     break;
@@ -293,6 +293,8 @@ public class Semantic {
                         switch (playList.getContent()) {
                             case "&":
                                 index++;
+                                if (index > 15 || index == 9)
+                                    index = ++index % 16;
                                 break;
 
                             case ",":
@@ -319,8 +321,10 @@ public class Semantic {
 
                                 int tempIndex = index;
 
-                                if (paraName.equals("Drums"))
+                                if (paragraphMap.get(paraName).getInstrument() == -1) {
+                                    paragraphMap.get(paraName).setInstrument(0);
                                     index = 9;
+                                }
 
                                 MidiTrack midiTrack;
 
@@ -334,8 +338,7 @@ public class Semantic {
                                         midiTrackBuilder.merge(midiTracks.get(index), midiTrack);
                                 }
 
-                                if (paraName.equals("Drums"))
-                                    index = tempIndex;
+                                index = tempIndex;
 
                                 break;
                         }
@@ -355,7 +358,7 @@ public class Semantic {
         midiTrackBuilder.createMidiTrack()
                 .setStart()
                 .setBpm(paragraph.getSpeed())
-                .setInstrument(channel, paragraph.getInstrument())
+                .setInstrument(channel, (byte) paragraph.getInstrument())
                 .addController(channel, (byte) 0x07, paragraph.getVolume());
 
         if (duration != 0)

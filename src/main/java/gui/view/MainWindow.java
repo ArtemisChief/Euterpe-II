@@ -109,6 +109,7 @@ public class MainWindow extends JFrame {
         exitMenuItem = new JMenuItem();
         JMenu playerMenu = new JMenu();
         loadSoundFontMenuItem = new JMenuItem();
+        rebuildMenuItem = new JMenuItem();
         playDirectMenuItem = new JMenuItem();
         stopDirectMenuItem = new JMenuItem();
         playExternalMenuItem = new JMenuItem();
@@ -195,6 +196,11 @@ public class MainWindow extends JFrame {
                     //---- loadSoundFontMenuItem ----
                     loadSoundFontMenuItem.setText("Load SoundFont");
                     playerMenu.add(loadSoundFontMenuItem);
+                    playerMenu.addSeparator();
+
+                    //---- rebuildMenuItem ----
+                    rebuildMenuItem.setText("Rebuild Midi");
+                    playerMenu.add(rebuildMenuItem);
                     playerMenu.addSeparator();
 
                     //---- playDirectMenuItem ----
@@ -385,6 +391,7 @@ public class MainWindow extends JFrame {
     public JMenuItem exportMidiMenuItem;
     public JMenuItem exitMenuItem;
     public JMenuItem loadSoundFontMenuItem;
+    public JMenuItem rebuildMenuItem;
     public JMenuItem playDirectMenuItem;
     public JMenuItem stopDirectMenuItem;
     public JMenuItem playExternalMenuItem;

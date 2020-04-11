@@ -99,6 +99,16 @@ new FormModel {
 							name: "separator5"
 						} )
 						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "rebuildMenuItem"
+							"text": "Rebuild Midi"
+							auxiliary() {
+								"JavaCodeGenerator.variableModifiers": 1
+							}
+						} )
+						add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
+							name: "separator11"
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
 							name: "playDirectMenuItem"
 							"text": "Play"
 							auxiliary() {

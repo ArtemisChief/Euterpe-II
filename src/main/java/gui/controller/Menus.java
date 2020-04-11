@@ -163,8 +163,8 @@ public class Menus {
             FileIO.GetInstance().loadSoundFont();
         });
 
-        // 播放
-        MainWindow.GetInstance().playDirectMenuItem.addActionListener(e -> {
+        // 重新编译Midi文件
+        MainWindow.GetInstance().rebuildMenuItem.addActionListener(e -> {
             if (!MidiPlayer.GetInstance().getIsLoadedMidiFile()) {
                 if (!FileIO.GetInstance().generateTempMidiFile())
                     return;
@@ -173,7 +173,10 @@ public class Menus {
                 Pianoroll.GetInstance().reset();
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             }
+        });
 
+        // 播放
+        MainWindow.GetInstance().playDirectMenuItem.addActionListener(e -> {
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
                 MidiPlayer.GetInstance().pause();
                 MainWindow.GetInstance().playDirectMenuItem.setText("Resume");

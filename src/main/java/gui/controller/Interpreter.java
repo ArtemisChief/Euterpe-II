@@ -36,6 +36,7 @@ public class Interpreter {
             output.append(lexical.getErrorInfo(tokens));
             output.append("检测到错误");
             MainWindow.GetInstance().outputTextArea.setText(output.toString());
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
             for (int line : lexical.getErrorLine()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),
@@ -57,6 +58,7 @@ public class Interpreter {
             output.append(syntactic.getErrors(AbstractSyntaxTree));
             output.append("检测到错误");
             MainWindow.GetInstance().outputTextArea.setText(output.toString());
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
             for (int line : syntactic.getErrorList()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),
@@ -78,6 +80,7 @@ public class Interpreter {
             output.append(semantic.getErrors());
             output.append("检测到错误");
             MainWindow.GetInstance().outputTextArea.setText(output.toString());
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
             for (int line : semantic.getErrorLines()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),

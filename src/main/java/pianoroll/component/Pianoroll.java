@@ -82,6 +82,9 @@ public class Pianoroll {
                     float offsetY = (float) noteEvent.getTriggerTick() / midiContent.getResolution() * Semantic.Pianoroll.LENGTH_PER_CROTCHET + scaleY + 0.15f;
                     int trackID = noteEvent.getPitch() - 21;
 
+                    if (trackID < 0 || trackID > 88)
+                        continue;
+
                     Roll roll = rollController.getRollList().get(rollController.firstUnusedRoll(trackID));
 
                     roll.setTrackID(trackID);

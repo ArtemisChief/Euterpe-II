@@ -14,7 +14,7 @@ public class Paragraph {
 
     private byte volume;
 
-    private byte instrument;
+    private int instrument;
 
     private final List<Integer> noteList;
 
@@ -42,11 +42,11 @@ public class Paragraph {
         this.volume = volume;
     }
 
-    public byte getInstrument() {
+    public int getInstrument() {
         return instrument;
     }
 
-    public void setInstrument(byte instrument) {
+    public void setInstrument(int instrument) {
         this.instrument = instrument;
     }
 
