@@ -243,10 +243,8 @@ public class MidiConverter {
                 remainTick -= minDurationTicks;
             } else {
                 //时值少于32分音符的按32分音符处理
-                ++noteNumbers;
-                timeString.insert(0, "w");
-                minDurationTicks = resolution * 0.125;
-                remainTick = 0;
+                double roundingDuration=resolution * 0.125-remainTick;
+                return getMuiNote(pitch,durationTicks+roundingDuration);
             }
         }
         return new MuiNote(pitch, timeString.toString(), noteNumbers, minDurationTicks);
