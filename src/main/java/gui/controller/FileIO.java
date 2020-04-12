@@ -20,14 +20,17 @@ public class FileIO {
         return instance;
     }
 
-    private FileIO() {
-        tempMidiFile = null;
-        file = null;
-    }
-
     private File tempMidiFile;
 
     private File file;
+
+    private boolean isOpeningFile;
+
+    private FileIO() {
+        tempMidiFile = null;
+        file = null;
+        isOpeningFile=false;
+    }
 
     public boolean openMuiFile() {
         if (Status.GetCurrentStatus().getIsEdited())
@@ -55,8 +58,12 @@ public class FileIO {
 
                 bufferedReader.close();
 
+                isOpeningFile=true;
                 MainWindow.GetInstance().inputTextPane.setText(stringBuilder.toString());
                 MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
+                isOpeningFile=false;
+
+                InputTexts.GetInstance().refreshColor();
 
                 Status.SetCurrentStatus(Status.SAVED_FILE);
 
@@ -196,6 +203,10 @@ public class FileIO {
 
     public File getTempMidiFile() {
         return tempMidiFile;
+    }
+
+    public boolean isOpeningFile() {
+        return isOpeningFile;
     }
 
 }

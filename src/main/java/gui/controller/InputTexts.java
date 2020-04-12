@@ -37,56 +37,61 @@ public class InputTexts {
     public class MyDocument extends DefaultStyledDocument {
         @Override
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-            boolean isComment = false;
-            boolean isAutoComplete = false;
+            if(FileIO.GetInstance().isOpeningFile()) {
+                super.insertString(offs, str, a);
+            }
+            else{
+                boolean isComment = false;
+                boolean isAutoComplete = false;
 
-            //处理自动补全
-            String text = inputTextPane.getText().replace("\r", "");
-            char b;
-            if (offs == text.length() || (b = text.charAt(offs)) == '\n' || b == ' ' || b == ')' || b == ']' || b == '|' || (offs > 0 && text.charAt(offs - 1) == '/')) {
-                switch (str) {
-                    case "(":
-                        isAutoComplete = true;
-                        str += ")";
-                        break;
-                    case "[":
-                        isAutoComplete = true;
-                        str += "]";
-                        break;
-                    case "{":
-                        isAutoComplete = true;
-                        str += "}";
-                        break;
-                    case "<":
-                        isAutoComplete = true;
-                        str += ">";
-                        break;
-                    case "|":
-                        isAutoComplete = true;
-                        str += "|";
-                        break;
-                    case "*":
-                        str += "\n\n*/";
-                        isComment = true;
-                        break;
+                //处理自动补全
+                String text = inputTextPane.getText().replace("\r", "");
+                char b;
+                if (offs == text.length() || (b = text.charAt(offs)) == '\n' || b == ' ' || b == ')' || b == ']' || b == '|' || (offs > 0 && text.charAt(offs - 1) == '/')) {
+                    switch (str) {
+                        case "(":
+                            isAutoComplete = true;
+                            str += ")";
+                            break;
+                        case "[":
+                            isAutoComplete = true;
+                            str += "]";
+                            break;
+                        case "{":
+                            isAutoComplete = true;
+                            str += "}";
+                            break;
+                        case "<":
+                            isAutoComplete = true;
+                            str += ">";
+                            break;
+                        case "|":
+                            isAutoComplete = true;
+                            str += "|";
+                            break;
+                        case "*":
+                            str += "\n\n*/";
+                            isComment = true;
+                            break;
+                    }
                 }
+
+                if (offs < text.length() && ((b = text.charAt(offs)) == ')' && str.equals(")") || str.equals("]") && b == ']' || str.equals("}") && b == '}' || str.equals(">") && b == '>' || str.equals("|") && b == '|')) {
+                    str = "";
+                    isAutoComplete = true;
+                }
+
+
+                super.insertString(offs, str, a);
+
+                if (isAutoComplete)
+                    inputTextPane.setCaretPosition(offs + 1);
+                if (isComment)
+                    inputTextPane.setCaretPosition(offs + 2);
+
+                refreshColor();
+                Status.GetCurrentStatus().setIsEdited(true);
             }
-
-            if (offs < text.length() && ((b = text.charAt(offs)) == ')' && str.equals(")") || str.equals("]") && b == ']' || str.equals("}") && b == '}' || str.equals(">") && b == '>' || str.equals("|") && b == '|')) {
-                str = "";
-                isAutoComplete = true;
-            }
-
-
-            super.insertString(offs, str, a);
-
-            if (isAutoComplete)
-                inputTextPane.setCaretPosition(offs + 1);
-            if (isComment)
-                inputTextPane.setCaretPosition(offs + 2);
-
-            refreshColor();
-            Status.GetCurrentStatus().setIsEdited(true);
         }
 
         @Override
@@ -142,7 +147,7 @@ public class InputTexts {
     }
 
     //代码着色
-    private void refreshColor() {
+    public void refreshColor() {
         String input = inputTextPane.getText().replace("\r", "");
 
         inputStyledDocument.setCharacterAttributes(
