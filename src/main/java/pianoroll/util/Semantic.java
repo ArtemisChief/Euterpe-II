@@ -21,9 +21,7 @@ public abstract class Semantic {
     }
 
     public interface Pianoroll {
-        int ROLL_AMOUNT = 50000;
-        int PARTICLE_AMOUNT = 500;
-        int ROW_AMOUNT = 500;
+        int PARTICLE_AMOUNT = 5000;
         float DEFAULT_LENGTH_PER_SECOND = 30.0f;
         float LENGTH_PER_CROTCHET = 10.0f;
     }

@@ -22,7 +22,13 @@ import static uno.buffer.UtilKt.destroyBuffers;
 
 public class PianorollCanvas implements GLEventListener {
 
+    // 单例
     private static final PianorollCanvas instance = new PianorollCanvas();
+
+    // 获取单例
+    public static PianorollCanvas GetInstance() {
+        return instance;
+    }
 
     private static GLCanvas glcanvas;
 
@@ -58,25 +64,11 @@ public class PianorollCanvas implements GLEventListener {
         GLCapabilities glCapabilities = new GLCapabilities(glProfile);
 
         glcanvas = new GLCanvas(glCapabilities);
-        glcanvas.setBounds(0,0,1150,800);
+        glcanvas.setBounds(0, 0, 1150, 800);
         glcanvas.addGLEventListener(instance);
 
         Animator animator = new Animator(glcanvas);
         animator.start();
-    }
-
-    public void update(float deltaTime) {
-        Pianoroll.GetInstance().getRollController().updateRolls(deltaTime);
-        Pianoroll.GetInstance().getPianoController().updateKeys();
-        Pianoroll.GetInstance().getBackgroundController().updateBackground(deltaTime);
-        Pianoroll.GetInstance().getParticleController().updateParticles(deltaTime);
-    }
-
-    public void render(GL3 gl) {
-        rollRenderer.drawRolls(gl, pianorollProgram);
-        pianoRenderer.drawKeys(gl, pianorollProgram);
-        backgroundRenderer.drawColumnRows(gl,pianorollProgram);
-        particleRenderer.drawParticles(gl, particleProgram);
     }
 
     @Override
@@ -92,7 +84,7 @@ public class PianorollCanvas implements GLEventListener {
 
         pianorollProgram = new Program(gl, getClass(),
                 "shaders", "Pianoroll.vert", "Pianoroll.frag",
-                "trackID", "scaleY", "offsetY", "proj", "colorID");
+                "trackID", "scaleY", "offsetY", "proj", "posZ", "colorID");
 
         particleProgram = new Program(gl, getClass(),
                 "shaders", "Particle.vert", "Particle.frag",
@@ -116,12 +108,18 @@ public class PianorollCanvas implements GLEventListener {
         float deltaTime = (timeCurrentFrame - timeLastFrame) / 1_000f;
         timeLastFrame = timeCurrentFrame;
 
-        update(deltaTime);
+        Pianoroll.GetInstance().update(deltaTime);
+
+        rollRenderer.bindBuffer(gl);
+        backgroundRenderer.bindBuffer(gl);
 
         gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .09f).put(1, .11f).put(2, .13f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
-        render(gl);
+        rollRenderer.drawRolls(gl, pianorollProgram);
+        pianoRenderer.drawKeys(gl, pianorollProgram);
+        backgroundRenderer.drawColumnRows(gl, pianorollProgram);
+        particleRenderer.drawParticles(gl, particleProgram);
     }
 
     @Override
@@ -143,25 +141,15 @@ public class PianorollCanvas implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        Pianoroll pianoroll= Pianoroll.GetInstance();
+        Pianoroll pianoroll = Pianoroll.GetInstance();
 
         gl.glDeleteProgram(pianorollProgram.name);
         gl.glDeleteProgram(particleProgram.name);
 
-        for (Key key : pianoroll.getPianoController().getKeyList())
-            gl.glDeleteVertexArrays(1, key.getVao());
-
-        for (Roll roll : pianoroll.getRollController().getRollList())
-            gl.glDeleteVertexArrays(1, roll.getVao());
-
-        for (Particle particle : pianoroll.getParticleController().getParticleList())
-            gl.glDeleteVertexArrays(1, particle.getVao());
-
-        for(ColumnRow column:pianoroll.getBackgroundController().getColumnList())
-            gl.glDeleteVertexArrays(1, column.getVao());
-
-        for(ColumnRow row:pianoroll.getBackgroundController().getRowList())
-            gl.glDeleteVertexArrays(1, row.getVao());
+        backgroundRenderer.dispose(gl);
+        particleRenderer.dispose(gl);
+        pianoRenderer.dispose(gl);
+        rollRenderer.dispose(gl);
 
         destroyBuffers(matBuffer, clearColor, clearDepth);
     }
@@ -170,4 +158,19 @@ public class PianorollCanvas implements GLEventListener {
         return glcanvas;
     }
 
+    public RollRenderer getRollRenderer() {
+        return rollRenderer;
+    }
+
+    public PianoRenderer getPianoRenderer() {
+        return pianoRenderer;
+    }
+
+    public ParticleRenderer getParticleRenderer() {
+        return particleRenderer;
+    }
+
+    public BackgroundRenderer getBackgroundRenderer() {
+        return backgroundRenderer;
+    }
 }

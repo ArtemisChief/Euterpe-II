@@ -8,8 +8,6 @@ public abstract class GraphicElement {
 
     private final IntBuffer vao;
 
-    private int vbo;
-
     private int trackID;
 
     private int colorID;
@@ -23,28 +21,20 @@ public abstract class GraphicElement {
         return vao;
     }
 
-    public void setVbo(int vbo) {
-        this.vbo = vbo;
-    }
-
-    public int getVbo() {
-        return vbo;
+    public void setTrackID(int trackID) {
+        this.trackID = trackID;
     }
 
     public int getTrackID() {
         return trackID;
     }
 
-    public int getColorID() {
-        return colorID;
-    }
-
-    public void setTrackID(int trackID) {
-        this.trackID = trackID;
-    }
-
     public void setColorID(int colorID) {
         this.colorID = colorID;
+    }
+
+    public int getColorID() {
+        return colorID;
     }
 
     public static boolean IsWhite(int trackID) {

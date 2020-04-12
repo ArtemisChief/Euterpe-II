@@ -20,7 +20,7 @@ public class ParticleRenderer {
     private final List<Particle> particleList;
 
     public ParticleRenderer() {
-        this.particleList = Pianoroll.GetInstance().getParticleController().getParticleList();
+        particleList = Pianoroll.GetInstance().getParticleController().getParticleList();
     }
 
     public void init(GL3 gl) {
@@ -46,16 +46,11 @@ public class ParticleRenderer {
         for (int i = 0; i < Semantic.Pianoroll.PARTICLE_AMOUNT; ++i) {
             Particle particle = new Particle();
 
-            particle.setVbo(buffer.get(Semantic.Buffer.VERTEX_PARTICLE));
-            particleList.add(particle);
-        }
-
-        for (Particle particle : particleList) {
             gl.glGenVertexArrays(1, particle.getVao());
 
             gl.glBindVertexArray(particle.getVao().get(0));
             {
-                gl.glBindBuffer(GL_ARRAY_BUFFER, particle.getVbo());
+                gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_PARTICLE));
                 {
                     gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
                     gl.glVertexAttribPointer(Semantic.Attr.POSITION, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
@@ -63,6 +58,8 @@ public class ParticleRenderer {
                 gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
             }
             gl.glBindVertexArray(0);
+
+            particleList.add(particle);
         }
 
         gl.glDeleteBuffers(1, buffer);
@@ -86,6 +83,11 @@ public class ParticleRenderer {
         }
 
         gl.glBindVertexArray(0);
+    }
+
+    public void dispose(GL3 gl){
+        for (Particle particle : particleList)
+            gl.glDeleteVertexArrays(1, particle.getVao());
     }
 
 }

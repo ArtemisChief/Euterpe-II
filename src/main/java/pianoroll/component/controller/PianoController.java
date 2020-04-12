@@ -21,14 +21,24 @@ public class PianoController {
         keyList = new ArrayList<>();
 
         pitchOffset = 0;
+    }
 
-//        try {
-//            //todo sustain
-//            ShortMessage shortMessage = new ShortMessage(176, 0, 64, 127);
-//            MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public void setSustainEnable(boolean isEnable) {
+        if (isEnable) {
+            try {
+                ShortMessage shortMessage = new ShortMessage(176, 15, 64, 127);
+                MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                ShortMessage shortMessage = new ShortMessage(176, 15, 64, 0);
+                MidiPlayer.GetInstance().getSynthesizer().getReceiver().send(shortMessage, 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void pressKey(int trackID) {

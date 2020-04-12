@@ -6,23 +6,23 @@ public class Roll extends GraphicElement {
 
     private float scaleY;
 
-    boolean isUnused;
+    private boolean isValid;
+    private boolean isTriggered;
 
-    public Roll() {
-        super(-1);
+    public Roll(int trackID, float offsetY, float scaleY) {
+        super(trackID);
 
-        offsetY = 0.0f;
-        scaleY = 1.0f;
+        setColorID(trackID);
 
-        isUnused = true;
+        this.offsetY = offsetY;
+        this.scaleY = scaleY;
+
+        isValid =true;
+        isTriggered=false;
     }
 
     public float getScaleY() {
         return scaleY;
-    }
-
-    public void setScaleY(float scaleY) {
-        this.scaleY = scaleY;
     }
 
     public float getOffsetY() {
@@ -33,12 +33,20 @@ public class Roll extends GraphicElement {
         this.offsetY = offsetY;
     }
 
-    public boolean isUnused() {
-        return isUnused;
+    public boolean isValid() {
+        return isValid;
     }
 
-    public void setUnused(boolean unused) {
-        isUnused = unused;
+    public void setValid(boolean valid) {
+        isValid = valid;
+    }
+
+    public boolean isTriggered() {
+        return isTriggered;
+    }
+
+    public void setTriggered(boolean triggered) {
+        isTriggered = triggered;
     }
 
 }

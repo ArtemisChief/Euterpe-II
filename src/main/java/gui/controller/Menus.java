@@ -27,7 +27,7 @@ public class Menus {
                 MainWindow.GetInstance().playDirectMenuItem.setText("Play");
                 MidiPlayer.GetInstance().stop();
                 Pianoroll.GetInstance().reset();
-                Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+                MainWindow.GetInstance().playSlider.setValue(0);
             }
         });
 
@@ -44,6 +44,8 @@ public class Menus {
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
             MidiPlayer.GetInstance().setLoadedMidiFile(false);
+            MainWindow.GetInstance().playSlider.setValue(0);
+            MainWindow.GetInstance().playSlider.setEnabled(false);
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
@@ -104,6 +106,8 @@ public class Menus {
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
             MidiPlayer.GetInstance().setLoadedMidiFile(false);
+            MainWindow.GetInstance().playSlider.setValue(0);
+            MainWindow.GetInstance().playSlider.setEnabled(false);
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
@@ -122,9 +126,9 @@ public class Menus {
                 return;
 
             MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            Pianoroll.GetInstance().reset();
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-
+            MainWindow.GetInstance().playSlider.setValue(0);
+            MainWindow.GetInstance().playSlider.setEnabled(true);
         });
 
         // 保存文件
@@ -173,8 +177,9 @@ public class Menus {
                 return;
 
             MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            Pianoroll.GetInstance().reset();
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            MainWindow.GetInstance().playSlider.setValue(0);
+            MainWindow.GetInstance().playSlider.setEnabled(true);
         });
 
         // 播放
@@ -186,6 +191,8 @@ public class Menus {
                 MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
                 Pianoroll.GetInstance().reset();
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+                MainWindow.GetInstance().playSlider.setValue(0);
+                MainWindow.GetInstance().playSlider.setEnabled(true);
             }
 
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
@@ -204,7 +211,6 @@ public class Menus {
             MainWindow.GetInstance().playDirectMenuItem.setText("Play");
             MidiPlayer.GetInstance().stop();
             Pianoroll.GetInstance().reset();
-            Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
         });
 
         // 从外部播放Midi文件
@@ -232,6 +238,8 @@ public class Menus {
             MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             Pianoroll.GetInstance().reset();
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            MainWindow.GetInstance().playSlider.setValue(0);
+            MainWindow.GetInstance().playSlider.setEnabled(true);
         });
 
         // 转换Mui到五线谱
@@ -261,11 +269,6 @@ public class Menus {
 
         // 打开简谱面板
         MainWindow.GetInstance().nmnRadioMenuItem.addActionListener(e -> {
-
-        });
-
-        // 打开转调器面板
-        MainWindow.GetInstance().transposerRadioMenuItem.addActionListener(e -> {
 
         });
 

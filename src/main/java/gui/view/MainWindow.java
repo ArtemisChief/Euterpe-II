@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.plaf.metal.MetalSliderUI;
 
 import gui.controller.Diaglogs;
 import gui.controller.FileIO;
@@ -33,9 +34,11 @@ public class MainWindow extends JFrame {
         return instance;
     }
 
-    Point pressedPoint;
+    boolean playSliderPressed;
 
     private MainWindow() {
+
+        playSliderPressed=false;
 
         // 初始化组件
         initComponents();
@@ -49,19 +52,58 @@ public class MainWindow extends JFrame {
         // 设置调性下拉框
         keyComboBox.setSelectedIndex(4);
         keyComboBox.addActionListener(e -> {
-            Pianoroll.GetInstance().getPianoController().setPitchOffset(keyComboBox.getSelectedIndex() - 4);
+            Pianoroll.GetInstance().getPianoController().setPitchOffset(keyComboBox.getSelectedIndex() - 4 + (octaveComboBox.getSelectedIndex() - 2) * 12);
         });
 
         // 设置音高下拉框
         octaveComboBox.setSelectedIndex(2);
         octaveComboBox.addActionListener(e -> {
-            octaveComboBox.getSelectedIndex();
+            Pianoroll.GetInstance().getPianoController().setPitchOffset(keyComboBox.getSelectedIndex() - 4 + (octaveComboBox.getSelectedIndex() - 2) * 12);
+        });
+
+        // 开关延音
+        sustainToggleBtn.addActionListener(e-> {
+            if(sustainToggleBtn.isSelected())
+                sustainToggleBtn.setText("Sustain On");
+            else
+                sustainToggleBtn.setText("Sustain Off");
+            Pianoroll.GetInstance().getPianoController().setSustainEnable(sustainToggleBtn.isSelected());
+        });
+
+        // 进度条以及时间改变
+        Timer timer=new Timer(50,e -> {
+            if (playSlider.isEnabled() && !playSliderPressed) {
+                playSlider.setValue((int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / (float)MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() * 1000000));
+            }
+        });
+        timer.start();
+
+        // 播放进度条
+        playSlider.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (playSlider.isEnabled()) {
+                    playSliderPressed = true;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (playSlider.isEnabled()) {
+                    playSliderPressed = false;
+                    long currentMicrosecond = (long) (playSlider.getValue() / 1000000.0f * MidiPlayer.GetInstance().getSequencer().getMicrosecondLength());
+                    MidiPlayer.GetInstance().setMicrosecondPosition(currentMicrosecond);
+                    Pianoroll.GetInstance().setCurrentTime(currentMicrosecond / 1_000_000f
+                            , MidiPlayer.GetInstance().getSequencer().getTickPosition()
+                            , MidiPlayer.GetInstance().getSequencer().getSequence().getResolution());
+                }
+            }
         });
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
 
-        for (int i = 1; i < 1000; ++i)
+        for (int i = 1; i < 10000; ++i)
             lineStr.append(i).append("\n");
 
         lineTextArea.setText(lineStr.toString());
@@ -77,7 +119,6 @@ public class MainWindow extends JFrame {
         buttonGroup.add(outputTextRadioMenuItem);
         buttonGroup.add(staveRadioMenuItem);
         buttonGroup.add(nmnRadioMenuItem);
-        buttonGroup.add(transposerRadioMenuItem);
 
         layeredPane.setLayer(outputScrollPane, 100);
 
@@ -137,7 +178,6 @@ public class MainWindow extends JFrame {
         outputTextRadioMenuItem = new JRadioButtonMenuItem();
         staveRadioMenuItem = new JRadioButtonMenuItem();
         nmnRadioMenuItem = new JRadioButtonMenuItem();
-        transposerRadioMenuItem = new JRadioButtonMenuItem();
         JMenu helpMenu = new JMenu();
         instruMenuItem = new JMenuItem();
         tipsMenuItem = new JMenuItem();
@@ -150,9 +190,12 @@ public class MainWindow extends JFrame {
         outputScrollPane = new JScrollPane();
         outputTextArea = new JTextArea();
         panel1 = new JPanel();
-        slider1 = new JSlider();
+        playSlider = new JSlider();
         keyComboBox = new JComboBox<>();
         octaveComboBox = new JComboBox<>();
+        sustainToggleBtn = new JToggleButton();
+        timeLength = new JLabel();
+        currTime = new JLabel();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -283,11 +326,6 @@ public class MainWindow extends JFrame {
                     //---- nmnRadioMenuItem ----
                     nmnRadioMenuItem.setText("Numbered Musical Notaion Panel");
                     rightPanelMenu.add(nmnRadioMenuItem);
-                    rightPanelMenu.addSeparator();
-
-                    //---- transposerRadioMenuItem ----
-                    transposerRadioMenuItem.setText("Transposer Panel");
-                    rightPanelMenu.add(transposerRadioMenuItem);
                 }
                 menuBar2.add(rightPanelMenu);
 
@@ -363,6 +401,8 @@ public class MainWindow extends JFrame {
 
             //======== outputScrollPane ========
             {
+                outputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+                outputScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
                 //---- outputTextArea ----
                 outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
@@ -377,11 +417,14 @@ public class MainWindow extends JFrame {
             {
                 panel1.setLayout(null);
 
-                //---- slider1 ----
-                slider1.setBorder(null);
-                slider1.setFocusable(false);
-                panel1.add(slider1);
-                slider1.setBounds(0, 5, 850, 20);
+                //---- playSlider ----
+                playSlider.setBorder(null);
+                playSlider.setFocusable(false);
+                playSlider.setValue(0);
+                playSlider.setMaximum(1000000);
+                playSlider.setEnabled(false);
+                panel1.add(playSlider);
+                playSlider.setBounds(45, 5, 670, 20);
 
                 //---- keyComboBox ----
                 keyComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -402,7 +445,7 @@ public class MainWindow extends JFrame {
                 keyComboBox.setFocusable(false);
                 keyComboBox.setSelectedIndex(4);
                 panel1.add(keyComboBox);
-                keyComboBox.setBounds(865, 5, 120, 20);
+                keyComboBox.setBounds(880, 5, 120, 20);
 
                 //---- octaveComboBox ----
                 octaveComboBox.setMaximumRowCount(5);
@@ -417,6 +460,22 @@ public class MainWindow extends JFrame {
                 octaveComboBox.setSelectedIndex(2);
                 panel1.add(octaveComboBox);
                 octaveComboBox.setBounds(1010, 5, 120, 20);
+
+                //---- sustainToggleBtn ----
+                sustainToggleBtn.setText("Sustain Off");
+                sustainToggleBtn.setFocusable(false);
+                panel1.add(sustainToggleBtn);
+                sustainToggleBtn.setBounds(760, 5, 105, 20);
+
+                //---- timeLength ----
+                timeLength.setText("1:21");
+                panel1.add(timeLength);
+                timeLength.setBounds(715, 0, 40, 30);
+
+                //---- currTime ----
+                currTime.setText("00:00");
+                panel1.add(currTime);
+                currTime.setBounds(5, 0, 40, 30);
             }
             layeredPane.add(panel1, JLayeredPane.POPUP_LAYER);
             panel1.setBounds(0, 0, 1145, 30);
@@ -471,7 +530,6 @@ public class MainWindow extends JFrame {
     public JRadioButtonMenuItem outputTextRadioMenuItem;
     public JRadioButtonMenuItem staveRadioMenuItem;
     public JRadioButtonMenuItem nmnRadioMenuItem;
-    public JRadioButtonMenuItem transposerRadioMenuItem;
     public JMenuItem instruMenuItem;
     public JMenuItem tipsMenuItem;
     public JMenuItem aboutMenuItem;
@@ -483,8 +541,11 @@ public class MainWindow extends JFrame {
     public JScrollPane outputScrollPane;
     public JTextArea outputTextArea;
     private JPanel panel1;
-    private JSlider slider1;
+    public JSlider playSlider;
     private JComboBox<String> keyComboBox;
     private JComboBox<String> octaveComboBox;
+    private JToggleButton sustainToggleBtn;
+    private JLabel timeLength;
+    private JLabel currTime;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

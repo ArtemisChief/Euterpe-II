@@ -1,7 +1,9 @@
 package pianoroll.component.controller;
 
 import pianoroll.component.Pianoroll;
+import pianoroll.component.PianorollCanvas;
 import pianoroll.entity.ColumnRow;
+import pianoroll.entity.Roll;
 import pianoroll.util.Semantic;
 
 import java.util.ArrayList;
@@ -17,15 +19,15 @@ public class BackgroundController {
         rowList = new ArrayList<>();
     }
 
-    public void updateBackground(float deltaTime) {
-        if (Pianoroll.GetInstance().isPlaying())
-            for (ColumnRow row : rowList)
-                row.setOffsetY(row.getOffsetY() - Pianoroll.GetInstance().getLengthPerSecond() * deltaTime);
+    public void createRow(float offsetY) {
+        ColumnRow row = new ColumnRow(Semantic.Piano.KEY_MAX / 2, offsetY);
+        PianorollCanvas.GetInstance().getBackgroundRenderer().addToUnbindRowList(row);
+        rowList.add(row);
     }
 
-    public void reset() {
-        for (int i = 0; i < Semantic.Pianoroll.ROW_AMOUNT; i++)
-            rowList.get(i).setOffsetY(i * 4 * Semantic.Pianoroll.LENGTH_PER_CROTCHET);
+    public void updateBackground(float distance) {
+        for (ColumnRow row : rowList)
+            row.setOffsetY(row.getOffsetY() - distance);
     }
 
     public List<ColumnRow> getColumnList() {

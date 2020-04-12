@@ -85,6 +85,11 @@ public class MidiPlayer {
         sequencer.stop();
     }
 
+    public void setMicrosecondPosition(long microsecondPosition) {
+        this.microsecondPosition = microsecondPosition;
+        sequencer.setMicrosecondPosition(microsecondPosition);
+    }
+
     public Synthesizer getSynthesizer() {
         return synthesizer;
     }

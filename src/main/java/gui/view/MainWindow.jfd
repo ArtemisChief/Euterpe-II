@@ -203,16 +203,6 @@ new FormModel {
 								"JavaCodeGenerator.variableModifiers": 1
 							}
 						} )
-						add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
-							name: "separator9"
-						} )
-						add( new FormComponent( "javax.swing.JRadioButtonMenuItem" ) {
-							name: "transposerRadioMenuItem"
-							"text": "Transposer Panel"
-							auxiliary() {
-								"JavaCodeGenerator.variableModifiers": 1
-							}
-						} )
 					} )
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 						name: "helpMenu"
@@ -294,6 +284,8 @@ new FormModel {
 				}
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "outputScrollPane"
+					"verticalScrollBarPolicy": 22
+					"horizontalScrollBarPolicy": 32
 					auxiliary() {
 						"JavaCodeGenerator.variableModifiers": 1
 					}
@@ -317,13 +309,19 @@ new FormModel {
 				} ) {
 					name: "panel1"
 					add( new FormComponent( "javax.swing.JSlider" ) {
-						name: "slider1"
+						name: "playSlider"
 						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 						"focusable": false
+						"value": 0
+						"maximum": 1000000
+						"enabled": false
+						auxiliary() {
+							"JavaCodeGenerator.variableModifiers": 1
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 0
+						"x": 45
 						"y": 5
-						"width": 850
+						"width": 670
 						"height": 20
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -347,7 +345,7 @@ new FormModel {
 						"focusable": false
 						"selectedIndex": 4
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 865
+						"x": 880
 						"y": 5
 						"height": 20
 						"width": 120
@@ -371,11 +369,40 @@ new FormModel {
 						"height": 20
 						"width": 120
 					} )
+					add( new FormComponent( "javax.swing.JToggleButton" ) {
+						name: "sustainToggleBtn"
+						"text": "Sustain Off"
+						"focusable": false
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+						"x": 760
+						"y": 5
+						"height": 20
+						"width": 105
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "timeLength"
+						"text": "1:21"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+						"x": 715
+						"height": 30
+						"width": 40
+						"y": 0
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "currTime"
+						"text": "00:00"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+						"x": 5
+						"y": 0
+						"height": 30
+						"width": 40
+					} )
 				}, new FormLayoutConstraints( null ) {
 					"x": 0
 					"layer": 300
 					"width": 1145
 					"height": 30
+					"y": 0
 				} )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 				"x": 450

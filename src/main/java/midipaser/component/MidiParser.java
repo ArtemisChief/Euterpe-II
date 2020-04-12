@@ -26,7 +26,7 @@ public class MidiParser {
         try {
             Sequence sequence = MidiSystem.getSequence(midiFile);
 
-            MidiContent midiContent = new MidiContent(sequence.getResolution());
+            MidiContent midiContent = new MidiContent(sequence.getResolution(),sequence.getTickLength());
             System.out.println("Midi Info - Ticks per quarter note: " + sequence.getResolution());
 
             int trackCount = 0;

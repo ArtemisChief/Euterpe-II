@@ -4,9 +4,10 @@ public class ColumnRow extends GraphicElement {
 
     private float offsetY;
 
-    public ColumnRow(int trackID) {
+    public ColumnRow(int trackID, float offsetY) {
         super(trackID);
-        offsetY = 0.0f;
+
+        this.offsetY = offsetY;
     }
 
     public float getOffsetY() {

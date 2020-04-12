@@ -5,6 +5,7 @@ layout (location = 0) in vec2 position;
 uniform int trackID;
 uniform float scaleY;
 uniform float offsetY;
+uniform float posZ;
 
 uniform mat4 proj;
 
@@ -57,28 +58,9 @@ float getOffsetX(const int trackID) {
     return offsetX;
 }
 
-float getPosZ(int trackID){
-    float posZ;
-
-    switch (trackID % 12) {
-        case 1:
-        case 4:
-        case 6:
-        case 9:
-        case 11:
-        posZ = 0.5f;
-        break;
-        default:
-        posZ = 0.0f;
-        break;
-    }
-
-    return posZ;
-}
-
 void main() {
 
-    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 26.9f, getPosZ(trackID), 1);
+    gl_Position = proj * vec4(position.x + getOffsetX(trackID), position.y * scaleY + offsetY - 26.9f, posZ, 1);
 
 }
 

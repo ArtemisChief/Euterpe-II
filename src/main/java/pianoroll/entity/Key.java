@@ -6,6 +6,7 @@ public class Key extends GraphicElement {
 
     public Key(int trackID) {
         super(trackID);
+
         this.pitch = trackID + 21;
     }
 
