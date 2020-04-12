@@ -26,17 +26,17 @@ public class PianoRenderer {
 
     public void init(GL3 gl) {
         final float[] vertexDataKeyWhite = {
-                -1.113f, 0.0f,            // Left-Top
-                -1.113f, -12.1f,           // Left-Bottom
-                1.113f, -12.1f,           // Right-Bottom
-                1.113f, 0.0f             // Right-Top
+                -1.113f,  0.0f,          // Left-Top
+                -1.113f, -12.1f,         // Left-Bottom
+                 1.113f, -12.1f,         // Right-Bottom
+                 1.113f,  0.0f           // Right-Top
         };
 
         final float[] vertexDataKeyBlack = {
-                -0.68f, 0.0f,           // Left-Top
+                -0.68f,  0.0f,           // Left-Top
                 -0.68f, -8.3f,           // Left-Bottom
-                0.68f, -8.3f,           // Right-Bottom
-                0.68f, 0.0f            // Right-Top
+                 0.68f, -8.3f,           // Right-Bottom
+                 0.68f,  0.0f            // Right-Top
         };
 
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(2);
@@ -57,12 +57,12 @@ public class PianoRenderer {
         destroyBuffers(vertexBufferKeyWhite, vertexBufferKeyBlack);
 
         for (int trackID = 0; trackID < Semantic.Piano.KEY_MAX; ++trackID) {
-            Key key= new Key(trackID);
+            Key key = new Key(trackID);
             int vbo;
 
             if (Key.IsWhite(trackID))
                 vbo = buffer.get(Semantic.Buffer.VERTEX_KEYWHITE);
-             else
+            else
                 vbo = buffer.get(Semantic.Buffer.VERTEX_KEYBLACK);
 
             gl.glGenVertexArrays(1, key.getVao());

@@ -11,7 +11,7 @@ import pianoroll.component.controller.BackgroundController;
 import pianoroll.component.controller.ParticleController;
 import pianoroll.component.controller.PianoController;
 import pianoroll.component.controller.RollController;
-import pianoroll.entity.ColumnRow;
+import pianoroll.entity.Background;
 import pianoroll.entity.Roll;
 import pianoroll.util.Semantic;
 
@@ -146,7 +146,7 @@ public class Pianoroll {
             roll.setTriggered(false);
         }
 
-        for(ColumnRow row:backgroundController.getRowList())
+        for(Background row:backgroundController.getRowList())
             row.setOffsetY(row.getOffsetY() + distanceSum);
 
         triggeredTrackList.clear();
@@ -171,7 +171,7 @@ public class Pianoroll {
             roll.setTriggered(false);
         }
 
-        for (ColumnRow row : backgroundController.getRowList())
+        for (Background row : backgroundController.getRowList())
             row.setOffsetY(row.getOffsetY() + this.distanceSum);
 
         distanceSum = distance;

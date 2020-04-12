@@ -14,6 +14,7 @@ public abstract class Semantic {
         int VERTEX_PARTICLE = 0;
         int VERTEX_COLUMN = 0;
         int VERTEX_ROW = 1;
+        int VERTEX_PIANO = 2;
     }
 
     public interface Piano {

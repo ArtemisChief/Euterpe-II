@@ -4,8 +4,7 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 import glm.vec._2.Vec2;
 import pianoroll.component.Pianoroll;
-import pianoroll.entity.ColumnRow;
-import pianoroll.entity.Roll;
+import pianoroll.entity.Background;
 import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
@@ -20,35 +19,49 @@ import static uno.buffer.UtilKt.destroyBuffers;
 
 public class BackgroundRenderer {
 
-    private final List<ColumnRow> columnList;
-    private final List<ColumnRow> rowList;
-    private final List<ColumnRow> unbindrowList;
+    private final Background piano;
+
+    private final List<Background> columnList;
+    private final List<Background> rowList;
+
+    private final List<Background> unbindRowList;
 
     private IntBuffer buffer;
 
     public BackgroundRenderer() {
+        piano=new Background(Semantic.Piano.KEY_MAX/2,0.0f);
+
         columnList = Pianoroll.GetInstance().getBackgroundController().getColumnList();
         rowList = Pianoroll.GetInstance().getBackgroundController().getRowList();
-        unbindrowList=new ArrayList<>();
+
+        unbindRowList =new ArrayList<>();
     }
 
     public void init(GL3 gl) {
         final float[] vertexDataColumn = {
                 1.178f, 100.0f,          // Right-Top
-                1.178f, 0.0f           // Right-Bottom
+                1.178f,   0.0f           // Right-Bottom
         };
 
         final float[] vertexDataRow = {
                 -70.0f, 0.0f,            // Left-Bottom
-                70.0f, 0.0f             // Right-Bottom
+                 70.0f, 0.0f             // Right-Bottom
         };
 
-        buffer = GLBuffers.newDirectIntBuffer(2);
+        final float[] vertexDataPiano = {
+                -70.0f,   0.0f,          // Left-Top
+                -70.0f, -13.0f,          // Left-Bottom
+                 70.0f, -13.0f,          // Right-Bottom
+                 70.0f,   0.0f           // Right-Top
+        };
+
+        buffer = GLBuffers.newDirectIntBuffer(3);
 
         FloatBuffer vertexBufferColumn = GLBuffers.newDirectFloatBuffer(vertexDataColumn);
         FloatBuffer vertexBufferRow = GLBuffers.newDirectFloatBuffer(vertexDataRow);
+        FloatBuffer vertexBufferPiano = GLBuffers.newDirectFloatBuffer(vertexDataPiano);
 
-        gl.glGenBuffers(2, buffer);
+        gl.glGenBuffers(3, buffer);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_COLUMN));
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferColumn.capacity() * Float.BYTES, vertexBufferColumn, GL_STATIC_DRAW);
@@ -58,10 +71,14 @@ public class BackgroundRenderer {
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferRow.capacity() * Float.BYTES, vertexBufferRow, GL_STATIC_DRAW);
         gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        destroyBuffers(vertexBufferColumn, vertexBufferRow);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_PIANO));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferPiano.capacity() * Float.BYTES, vertexBufferPiano, GL_STATIC_DRAW);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        destroyBuffers(vertexBufferColumn, vertexBufferRow, vertexBufferPiano);
 
         for (int trackID = 2; trackID < Semantic.Piano.KEY_MAX; trackID += 12) {
-            ColumnRow column = new ColumnRow(trackID, 0.0f);
+            Background column = new Background(trackID, 0.0f);
 
             gl.glGenVertexArrays(1, column.getVao());
 
@@ -80,7 +97,7 @@ public class BackgroundRenderer {
         }
 
         for (int trackID = 7; trackID < Semantic.Piano.KEY_MAX; trackID += 12) {
-            ColumnRow column = new ColumnRow(trackID, 0.0f);
+            Background column = new Background(trackID, 0.0f);
 
             gl.glGenVertexArrays(1, column.getVao());
 
@@ -97,17 +114,30 @@ public class BackgroundRenderer {
 
             columnList.add(column);
         }
+
+        gl.glGenVertexArrays(1, piano.getVao());
+
+        gl.glBindVertexArray(piano.getVao().get(0));
+        {
+            gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_PIANO));
+            {
+                gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
+                gl.glVertexAttribPointer(Semantic.Attr.POSITION, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
+            }
+            gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+        gl.glBindVertexArray(0);
     }
 
-    public void addToUnbindRowList(ColumnRow row) {
-        unbindrowList.add(row);
+    public void addToUnbindRowList(Background row) {
+        unbindRowList.add(row);
     }
 
     public void bindBuffer(GL3 gl) {
-        if(!unbindrowList.isEmpty()) {
-            Iterator<ColumnRow> iterator = unbindrowList.iterator();
+        if(!unbindRowList.isEmpty()) {
+            Iterator<Background> iterator = unbindRowList.iterator();
             while (iterator.hasNext()) {
-                ColumnRow row=iterator.next();
+                Background row=iterator.next();
 
                 // bind vao
                 gl.glGenVertexArrays(1, row.getVao());
@@ -136,7 +166,7 @@ public class BackgroundRenderer {
         gl.glUniform1f(program.get("posZ"), 0.1f);
         gl.glUniform1i(program.get("colorID"), Semantic.Color.GREY);
 
-        for (ColumnRow column : columnList) {
+        for (Background column : columnList) {
             gl.glBindVertexArray(column.getVao().get(0));
             gl.glUniform1i(program.get("trackID"), column.getTrackID());
 
@@ -144,7 +174,7 @@ public class BackgroundRenderer {
             gl.glDrawArrays(GL_LINE_STRIP, 0, 2);
         }
 
-        for (ColumnRow row : rowList) {
+        for (Background row : rowList) {
             gl.glBindVertexArray(row.getVao().get(0));
             gl.glUniform1i(program.get("trackID"), row.getTrackID());
             gl.glUniform1f(program.get("offsetY"), row.getOffsetY());
@@ -153,17 +183,24 @@ public class BackgroundRenderer {
             gl.glDrawArrays(GL_LINE_STRIP, 0, 2);
         }
 
+        gl.glBindVertexArray(piano.getVao().get(0));
+        gl.glUniform1i(program.get("trackID"), piano.getTrackID());
+        gl.glUniform1f(program.get("offsetY"), piano.getOffsetY());
+        gl.glUniform1f(program.get("posZ"), 0.4f);
+        gl.glUniform1i(program.get("colorID"), Semantic.Color.GREY);
+        gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
         gl.glBindVertexArray(0);
     }
 
     public void dispose(GL3 gl) {
-        for (ColumnRow column : columnList)
+        for (Background column : columnList)
             gl.glDeleteVertexArrays(1, column.getVao());
 
-        for (ColumnRow row : rowList)
+        for (Background row : rowList)
             gl.glDeleteVertexArrays(1, row.getVao());
 
-        gl.glDeleteBuffers(2, buffer);
+        gl.glDeleteBuffers(3, buffer);
         destroyBuffers(buffer);
     }
 

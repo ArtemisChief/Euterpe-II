@@ -1,10 +1,10 @@
 package pianoroll.entity;
 
-public class ColumnRow extends GraphicElement {
+public class Background extends GraphicElement {
 
     private float offsetY;
 
-    public ColumnRow(int trackID, float offsetY) {
+    public Background(int trackID, float offsetY) {
         super(trackID);
 
         this.offsetY = offsetY;

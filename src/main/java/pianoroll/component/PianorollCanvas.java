@@ -8,10 +8,6 @@ import pianoroll.component.renderer.BackgroundRenderer;
 import pianoroll.component.renderer.ParticleRenderer;
 import pianoroll.component.renderer.PianoRenderer;
 import pianoroll.component.renderer.RollRenderer;
-import pianoroll.entity.ColumnRow;
-import pianoroll.entity.Key;
-import pianoroll.entity.Particle;
-import pianoroll.entity.Roll;
 import uno.glsl.Program;
 
 import java.nio.FloatBuffer;

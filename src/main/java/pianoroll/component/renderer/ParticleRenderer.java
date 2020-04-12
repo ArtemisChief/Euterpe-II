@@ -25,10 +25,10 @@ public class ParticleRenderer {
 
     public void init(GL3 gl) {
         final float[] vertexDataParticle = {
-                -0.3f, 0.3f,          // Left-Top
-                -0.3f, -0.3f,          // Left-Bottom
-                0.3f, 0.3f,          // Right-Top
-                0.3f, -0.3f           // Right-Bottom
+                -0.3f,  0.3f,             // Left-Top
+                -0.3f, -0.3f,             // Left-Bottom
+                 0.3f,  0.3f,             // Right-Top
+                 0.3f, -0.3f              // Right-Bottom
         };
 
         IntBuffer buffer = GLBuffers.newDirectIntBuffer(1);

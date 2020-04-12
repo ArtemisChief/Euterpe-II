@@ -27,22 +27,22 @@ public class RollRenderer {
 
     public RollRenderer() {
         rollList = Pianoroll.GetInstance().getRollController().getRollList();
-        unbindRollList=new ArrayList<>();
+        unbindRollList = new ArrayList<>();
     }
 
     public void init(GL3 gl) {
         final float[] vertexDataRollWhite = {
-                -1.02f, 0.0f,           // Left-Top
+                -1.02f,  0.0f,           // Left-Top
                 -1.02f, -1.0f,           // Left-Bottom
-                1.02f, -1.0f,           // Right-Bottom
-                1.02f, 0.0f            // Right-Top
+                 1.02f, -1.0f,           // Right-Bottom
+                 1.02f,  0.0f            // Right-Top
         };
 
         final float[] vertexDataRollBlack = {
-                -0.65f, 0.0f,           // Left-Top
+                -0.65f,  0.0f,           // Left-Top
                 -0.65f, -1.0f,           // Left-Bottom
-                0.65f, -1.0f,           // Right-Bottom
-                0.65f, 0.0f            // Right-Top
+                 0.65f, -1.0f,           // Right-Bottom
+                 0.65f,  0.0f            // Right-Top
         };
 
         buffer = GLBuffers.newDirectIntBuffer(2);
@@ -68,7 +68,7 @@ public class RollRenderer {
     }
 
     public void bindBuffer(GL3 gl) {
-        if(!unbindRollList.isEmpty()) {
+        if (!unbindRollList.isEmpty()) {
             Iterator<Roll> iterator = unbindRollList.iterator();
             while (iterator.hasNext()) {
                 Roll roll = iterator.next();
