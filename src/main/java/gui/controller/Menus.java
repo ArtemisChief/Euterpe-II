@@ -27,7 +27,7 @@ public class Menus {
 
         MidiPlayer.GetInstance().getSequencer().addMetaEventListener(meta -> {
             if (meta.getType() == 47) {
-                MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+                MainWindow.GetInstance().playBtn.setText("▶");
                 MidiPlayer.GetInstance().stop();
                 Pianoroll.GetInstance().reset();
                 MidiPlayer.GetInstance().setMicrosecondPosition(0);
@@ -44,7 +44,7 @@ public class Menus {
 
             MainWindow.GetInstance().inputTextPane.setText("");
             MainWindow.GetInstance().tipsMenuItem.doClick();
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MainWindow.GetInstance().playBtn.setText("▶");
             MidiPlayer.GetInstance().stop();
             MidiPlayer.GetInstance().setLoadedMidiFile(false);
             MainWindow.GetInstance().playSlider.setValue(0);
@@ -108,7 +108,7 @@ public class Menus {
             MainWindow.GetInstance().inputTextPane.setText(str);
             MainWindow.GetInstance().tipsMenuItem.doClick();
             MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MainWindow.GetInstance().playBtn.setText("▶");
             MidiPlayer.GetInstance().stop();
             MidiPlayer.GetInstance().setLoadedMidiFile(false);
             MainWindow.GetInstance().playSlider.setValue(0);
@@ -126,7 +126,7 @@ public class Menus {
             Pianoroll.GetInstance().reset();
 
             MainWindow.GetInstance().outputTextArea.setText("");
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MainWindow.GetInstance().playBtn.setText("▶");
             MidiPlayer.GetInstance().stop();
 
             if (!FileIO.GetInstance().generateTempMidiFile())
@@ -144,15 +144,11 @@ public class Menus {
         // 保存文件
         MainWindow.GetInstance().saveMenuItem.addActionListener(e -> {
             FileIO.GetInstance().saveMuiFile();
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
-            MidiPlayer.GetInstance().stop();
         });
 
         // 另存为文件
         MainWindow.GetInstance().saveAsMenuItem.addActionListener(e -> {
             FileIO.GetInstance().saveAsMuiFile();
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
-            MidiPlayer.GetInstance().stop();
         });
 
         // 导出Midi文件
@@ -180,7 +176,7 @@ public class Menus {
 
         // 重新编译Midi文件
         MainWindow.GetInstance().rebuildMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MainWindow.GetInstance().playBtn.setText("▶");
             MidiPlayer.GetInstance().stop();
 
             if (!FileIO.GetInstance().generateTempMidiFile())
@@ -196,13 +192,12 @@ public class Menus {
         });
 
         // 播放
-        MainWindow.GetInstance().playDirectMenuItem.addActionListener(e -> {
+        MainWindow.GetInstance().playBtn.addActionListener(e -> {
             if(!MidiPlayer.GetInstance().isLoadedMidiFile()){
                 if (!FileIO.GetInstance().generateTempMidiFile())
                     return;
 
                 MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-                Pianoroll.GetInstance().reset();
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
                 MainWindow.GetInstance().playSlider.setValue(0);
                 MainWindow.GetInstance().playSlider.setEnabled(true);
@@ -213,20 +208,13 @@ public class Menus {
 
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
                 MidiPlayer.GetInstance().pause();
-                MainWindow.GetInstance().playDirectMenuItem.setText("Resume");
+                MainWindow.GetInstance().playBtn.setText("▶");
                 Pianoroll.GetInstance().setPlaying(false);
             } else {
                 MidiPlayer.GetInstance().play();
-                MainWindow.GetInstance().playDirectMenuItem.setText("Pause");
+                MainWindow.GetInstance().playBtn.setText("||");
                 Pianoroll.GetInstance().setPlaying(true);
             }
-        });
-
-        // 停止播放
-        MainWindow.GetInstance().stopDirectMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
-            MidiPlayer.GetInstance().stop();
-            Pianoroll.GetInstance().reset();
         });
 
         // 从外部播放Midi文件
@@ -264,14 +252,13 @@ public class Menus {
         MainWindow.GetInstance().convertToMuiMenuItem.addActionListener(e -> {
             FileIO.GetInstance().convertMidiFile();
             MainWindow.GetInstance().outputTextArea.setText("");
-            MainWindow.GetInstance().playDirectMenuItem.setText("Play");
+            MainWindow.GetInstance().playBtn.setText("▶");
             MidiPlayer.GetInstance().stop();
 
             if (!FileIO.GetInstance().generateTempMidiFile())
                 return;
 
             MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            Pianoroll.GetInstance().reset();
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(true);

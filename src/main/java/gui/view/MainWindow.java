@@ -8,6 +8,7 @@ import java.awt.event.*;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 import gui.controller.Diaglogs;
 import gui.controller.FileIO;
@@ -83,6 +84,12 @@ public class MainWindow extends JFrame {
         // 播放进度条
         playSlider.addMouseListener(new MouseAdapter() {
             @Override
+            public void mousePressed(MouseEvent e) {
+                int value = ((BasicSliderUI) playSlider.getUI()).valueForXPosition(e.getX());
+                playSlider.setValue(value);
+            }
+
+            @Override
             public void mouseReleased(MouseEvent e) {
                 if (playSlider.isEnabled()) {
                     long currentMicrosecond = (long) (playSlider.getValue() / 1000000.0f * MidiPlayer.GetInstance().getSequencer().getMicrosecondLength());
@@ -91,6 +98,11 @@ public class MainWindow extends JFrame {
                             , MidiPlayer.GetInstance().getSequencer().getTickPosition()
                             , MidiPlayer.GetInstance().getSequencer().getSequence().getResolution());
                 }
+            }
+        });
+        playSlider.addMouseListener(((BasicSliderUI) playSlider.getUI()).new TrackListener(){
+            @Override public boolean shouldScroll(int dir) {
+                return false;
             }
         });
 
@@ -153,15 +165,12 @@ public class MainWindow extends JFrame {
         separator3 = new JSeparator();
         saveMenuItem = new JMenuItem();
         saveAsMenuItem = new JMenuItem();
-        separator4 = new JSeparator();
-        exportMidiMenuItem = new JMenuItem();
         exitMenuItem = new JMenuItem();
         JMenu playerMenu = new JMenu();
         loadSoundFontMenuItem = new JMenuItem();
         rebuildMenuItem = new JMenuItem();
-        playDirectMenuItem = new JMenuItem();
-        stopDirectMenuItem = new JMenuItem();
         playExternalMenuItem = new JMenuItem();
+        exportMidiMenuItem = new JMenuItem();
         loadMidiFileMenuItem = new JMenuItem();
         arduinoMenu = new JMenu();
         generateInoMenuItem = new JMenuItem();
@@ -194,6 +203,7 @@ public class MainWindow extends JFrame {
         sustainToggleBtn = new JToggleButton();
         timeLength = new JLabel();
         currTime = new JLabel();
+        playBtn = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -235,11 +245,6 @@ public class MainWindow extends JFrame {
                     //---- saveAsMenuItem ----
                     saveAsMenuItem.setText("Save As...");
                     fileMenu.add(saveAsMenuItem);
-                    fileMenu.add(separator4);
-
-                    //---- exportMidiMenuItem ----
-                    exportMidiMenuItem.setText("Export Midi File");
-                    fileMenu.add(exportMidiMenuItem);
                     fileMenu.addSeparator();
 
                     //---- exitMenuItem ----
@@ -250,7 +255,7 @@ public class MainWindow extends JFrame {
 
                 //======== playerMenu ========
                 {
-                    playerMenu.setText("MidiPlayer");
+                    playerMenu.setText("Midi");
 
                     //---- loadSoundFontMenuItem ----
                     loadSoundFontMenuItem.setText("Load SoundFont");
@@ -262,18 +267,14 @@ public class MainWindow extends JFrame {
                     playerMenu.add(rebuildMenuItem);
                     playerMenu.addSeparator();
 
-                    //---- playDirectMenuItem ----
-                    playDirectMenuItem.setText("Play");
-                    playerMenu.add(playDirectMenuItem);
-
-                    //---- stopDirectMenuItem ----
-                    stopDirectMenuItem.setText("Stop");
-                    playerMenu.add(stopDirectMenuItem);
-                    playerMenu.addSeparator();
-
                     //---- playExternalMenuItem ----
                     playExternalMenuItem.setText("Play From External ");
                     playerMenu.add(playExternalMenuItem);
+                    playerMenu.addSeparator();
+
+                    //---- exportMidiMenuItem ----
+                    exportMidiMenuItem.setText("Export Midi File");
+                    playerMenu.add(exportMidiMenuItem);
 
                     //---- loadMidiFileMenuItem ----
                     loadMidiFileMenuItem.setText("Load Midi File");
@@ -381,8 +382,6 @@ public class MainWindow extends JFrame {
 
             //======== inputScrollPane ========
             {
-                inputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                inputScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
                 //---- inputTextPane ----
                 inputTextPane.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
@@ -438,7 +437,7 @@ public class MainWindow extends JFrame {
                 playSlider.setMaximum(1000000);
                 playSlider.setEnabled(false);
                 panel1.add(playSlider);
-                playSlider.setBounds(45, 5, 700, 20);
+                playSlider.setBounds(105, 5, 640, 20);
 
                 //---- keyComboBox ----
                 keyComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -489,7 +488,14 @@ public class MainWindow extends JFrame {
                 //---- currTime ----
                 currTime.setText("00:00");
                 panel1.add(currTime);
-                currTime.setBounds(5, 0, 40, 30);
+                currTime.setBounds(65, 0, 40, 30);
+
+                //---- playBtn ----
+                playBtn.setText("\u25b6");
+                playBtn.setForeground(new Color(128, 185, 226));
+                playBtn.setFocusable(false);
+                panel1.add(playBtn);
+                playBtn.setBounds(5, 5, 50, 20);
             }
             layeredPane.add(panel1, JLayeredPane.POPUP_LAYER);
             panel1.setBounds(0, 0, 1145, 31);
@@ -526,14 +532,11 @@ public class MainWindow extends JFrame {
     private JSeparator separator3;
     public JMenuItem saveMenuItem;
     public JMenuItem saveAsMenuItem;
-    private JSeparator separator4;
-    public JMenuItem exportMidiMenuItem;
     public JMenuItem exitMenuItem;
     public JMenuItem loadSoundFontMenuItem;
     public JMenuItem rebuildMenuItem;
-    public JMenuItem playDirectMenuItem;
-    public JMenuItem stopDirectMenuItem;
     public JMenuItem playExternalMenuItem;
+    public JMenuItem exportMidiMenuItem;
     public JMenuItem loadMidiFileMenuItem;
     private JMenu arduinoMenu;
     public JMenuItem generateInoMenuItem;
@@ -565,5 +568,6 @@ public class MainWindow extends JFrame {
     private JToggleButton sustainToggleBtn;
     public JLabel timeLength;
     public JLabel currTime;
+    public JButton playBtn;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
