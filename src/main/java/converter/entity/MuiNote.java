@@ -20,7 +20,7 @@ public class MuiNote {
         String note=null;
         if(pitch==-1){
             note="0";
-            for(int i=0;i<noteNumbers;i++)
+            for(int i=0;i<noteNumbers;++i)
                 pitchString.append(note);
             return pitchString.toString();
         }
@@ -74,6 +74,9 @@ public class MuiNote {
             pitchString.append("(");
         for(int i=0;i<middleBracket;i++)
             pitchString.append("[");
+        if(noteNumbers==0){
+            System.out.println("pause");
+        }
         for(int i=0;i<noteNumbers;i++)
             pitchString.append(note);
         for(int i=0;i<smallBracket;i++)

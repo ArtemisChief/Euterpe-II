@@ -39,6 +39,9 @@ public class MidiConverter {
 
     private int noteCount = 0;
 
+    private double currentTick=0;
+    private double lastDuration=0;
+
     public String converterToMui(File midiFile) {
         MidiParser parser = MidiParser.GetInstance();
         try {
@@ -52,7 +55,8 @@ public class MidiConverter {
                 mui.append("paragraph Track" + midiChannel.getTrackNumber()
                         + "Channel" + midiChannel.getChannelNumber() + "\n" + "1=C\n");
                 noteCount = 0;
-                double currentTick = 0, lastDuration = 0;
+                currentTick = 0;
+                lastDuration = 0;
                 sameTime = false;
                 note = new StringBuilder();
                 time = new StringBuilder();
@@ -71,17 +75,23 @@ public class MidiConverter {
 
                     if (midiEvent instanceof BpmEvent) {
                         BpmEvent bpmEvent = (BpmEvent) midiEvent;
-                        changeStatusAddNote();
+                        changeStatusAddNote(bpmEvent.getTriggerTick());
                         mui.append("speed=" + String.format("%.1f", bpmEvent.getBpm()) + "\n");
+                        currentTick=bpmEvent.getTriggerTick();
+                        lastDuration=0;
                     } else if (midiEvent instanceof InstrumentEvent) {
                         InstrumentEvent instrumentEvent = (InstrumentEvent) midiEvent;
-                        changeStatusAddNote();
+                        changeStatusAddNote(instrumentEvent.getTriggerTick());
+                        currentTick=instrumentEvent.getTriggerTick();
+                        lastDuration=0;
                         if (midiChannel.getChannelNumber() == 9)
                             mui.append("instrument= -1\n");
                         else
                             mui.append("instrument=" + instrumentEvent.getInstrumentNumber() + "\n");
                     } else {
                         NoteEvent noteEvent = (NoteEvent) midiEvent;
+                        if(noteEvent.getDurationTicks()<=1)
+                            continue;
                         if (noteEvent.getTriggerTick() == currentTick && lastDuration != 0) {
                             sameTime = true;
                             muiNote=muiNote.getStandardMuiNote(resolution);
@@ -115,16 +125,21 @@ public class MidiConverter {
                                 lastDuration=muiNote.getDurationTicks();
                             } else {
                                 MuiNote restNote = getMuiNote(-1, noteEvent.getTriggerTick() - currentTick);
-
-                                note.insert(0, "|" + restNote.getStandardMuiNote(resolution).getPitchString() + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
-                                time.insert(0, restNote.getStandardMuiNote(resolution).getTimeString() + muiNote.getStandardMuiNote(resolution).getTimeString());
-                                front.append(note);
-                                note.delete(0, note.length());
-                                latter.append(time);
-                                time.delete(0, time.length());
-                                noteCount += muiNote.getStandardMuiNote(resolution).getNoteNumbers() + restNote.getNoteNumbers();
-                                sameTime = false;
-
+                                if(muiNote!=null) {
+                                    note.insert(0, "|" + restNote.getStandardMuiNote(resolution).getPitchString() + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
+                                    time.insert(0, restNote.getStandardMuiNote(resolution).getTimeString() + muiNote.getStandardMuiNote(resolution).getTimeString());
+                                    front.append(note);
+                                    note.delete(0, note.length());
+                                    latter.append(time);
+                                    time.delete(0, time.length());
+                                    noteCount += muiNote.getStandardMuiNote(resolution).getNoteNumbers() + restNote.getNoteNumbers();
+                                    sameTime = false;
+                                }
+                                else {
+                                    front.append(restNote.getPitchString());
+                                    latter.append(restNote.getTimeString());
+                                    noteCount += restNote.getNoteNumbers();
+                                }
                                 currentTick = noteEvent.getTriggerTick();
                                 muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks());
                                 lastDuration=muiNote.getDurationTicks();
@@ -316,25 +331,33 @@ public class MidiConverter {
         return midiChannels;
     }
 
-    private void changeStatusAddNote() {
-        if (muiNote != null) {
-            if (sameTime) {
-                note.insert(0, "|" + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
-                time.insert(0, muiNote.getStandardMuiNote(resolution).getTimeString());
+    private void changeStatusAddNote(double triggerTick) {
+        if(triggerTick>currentTick+lastDuration){
+            addNote();
+            MuiNote restNote = getMuiNote(-1, triggerTick - currentTick- lastDuration);
+            muiNote=restNote;
+            addNote();
+        }else if(triggerTick<currentTick+lastDuration){
+            MuiNote restNote = getMuiNote(-1, triggerTick - currentTick);
+            if(muiNote!=null) {
+                note.insert(0, "|" + restNote.getStandardMuiNote(resolution).getPitchString() + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
+                time.insert(0, restNote.getStandardMuiNote(resolution).getTimeString() + muiNote.getStandardMuiNote(resolution).getTimeString());
                 front.append(note);
-                latter.append(time);
                 note.delete(0, note.length());
+                latter.append(time);
                 time.delete(0, time.length());
-                noteCount += muiNote.getStandardMuiNote(resolution).getNoteNumbers();
-                muiNote = null;
+                noteCount += muiNote.getStandardMuiNote(resolution).getNoteNumbers() + restNote.getNoteNumbers();
                 sameTime = false;
-            } else {
-                front.append(muiNote.getPitchString());
-                latter.append(muiNote.getTimeString());
-                noteCount += muiNote.getNoteNumbers();
-                muiNote = null;
+                muiNote=null;
+            }
+            else {
+                front.append(restNote.getPitchString());
+                latter.append(restNote.getTimeString());
+                noteCount += restNote.getNoteNumbers();
             }
         }
+
+        addNote();
         if (noteCount != 0) {
             mui.append(front).append("  <").append(latter).append(">\n");
             front.delete(0, front.length());
@@ -359,6 +382,10 @@ public class MidiConverter {
             latter.append(muiNote.getTimeString());
             noteCount += muiNote.getNoteNumbers();
         }
+        muiNote=null;
     }
+
+
+
 
 }
