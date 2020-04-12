@@ -165,6 +165,7 @@ public class MainWindow extends JFrame {
         playDirectMenuItem = new JMenuItem();
         stopDirectMenuItem = new JMenuItem();
         playExternalMenuItem = new JMenuItem();
+        loadMidiFileMenuItem = new JMenuItem();
         arduinoMenu = new JMenu();
         converterMenu = new JMenu();
         convertToMuiMenuItem = new JMenuItem();
@@ -273,6 +274,10 @@ public class MainWindow extends JFrame {
                     //---- playExternalMenuItem ----
                     playExternalMenuItem.setText("Play From External ");
                     playerMenu.add(playExternalMenuItem);
+
+                    //---- loadMidiFileMenuItem ----
+                    loadMidiFileMenuItem.setText("Load Midi File");
+                    playerMenu.add(loadMidiFileMenuItem);
                 }
                 menuBar2.add(playerMenu);
 
@@ -517,6 +522,7 @@ public class MainWindow extends JFrame {
     public JMenuItem playDirectMenuItem;
     public JMenuItem stopDirectMenuItem;
     public JMenuItem playExternalMenuItem;
+    public JMenuItem loadMidiFileMenuItem;
     private JMenu arduinoMenu;
     private JMenu converterMenu;
     public JMenuItem convertToMuiMenuItem;
