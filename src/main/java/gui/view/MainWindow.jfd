@@ -285,6 +285,8 @@ new FormModel {
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "inputScrollPane"
+					"verticalScrollBarPolicy": 22
+					"horizontalScrollBarPolicy": 32
 					add( new FormComponent( "javax.swing.JTextPane" ) {
 						name: "inputTextPane"
 						"font": new java.awt.Font( "Microsoft YaHei", 0, 14 )
@@ -312,8 +314,6 @@ new FormModel {
 				}
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "outputScrollPane"
-					"verticalScrollBarPolicy": 22
-					"horizontalScrollBarPolicy": 32
 					auxiliary() {
 						"JavaCodeGenerator.variableModifiers": 1
 					}

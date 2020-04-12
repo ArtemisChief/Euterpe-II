@@ -381,6 +381,8 @@ public class MainWindow extends JFrame {
 
             //======== inputScrollPane ========
             {
+                inputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+                inputScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
                 //---- inputTextPane ----
                 inputTextPane.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
@@ -415,8 +417,6 @@ public class MainWindow extends JFrame {
 
             //======== outputScrollPane ========
             {
-                outputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                outputScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
                 //---- outputTextArea ----
                 outputTextArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));

@@ -454,6 +454,28 @@ public class Semantic {
                 }
             }
 
+            // 处理同时音、连音后的速度、音量和乐器
+            while (paragraph.getEventQueue().peek() != null && paragraph.getEventQueue().peek().getPosition() == index) {
+                Event event = paragraph.getEventQueue().poll();
+
+                switch (event.getType()) {
+                    case 0:
+                        midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
+                        break;
+                    case 1:
+                        midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                        break;
+                    case 2:
+                        if (Byte.parseByte(event.getData()) == -1)
+                            channel = (byte) 9;
+                        else
+                            channel = tempChannel;
+
+                        midiTrackBuilder.setInstrument(channel, Byte.parseByte(event.getData()));
+                        break;
+                }
+            }
+
             if (index < count) {
                 //特殊符号外的音
                 midiTrackBuilder.insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
