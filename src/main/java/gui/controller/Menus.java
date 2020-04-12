@@ -27,7 +27,7 @@ public class Menus {
                 MainWindow.GetInstance().playDirectMenuItem.setText("Play");
                 MidiPlayer.GetInstance().stop();
                 Pianoroll.GetInstance().reset();
-                MainWindow.GetInstance().playSlider.setValue(0);
+                MidiPlayer.GetInstance().setMicrosecondPosition(0);
             }
         });
 
@@ -46,6 +46,7 @@ public class Menus {
             MidiPlayer.GetInstance().setLoadedMidiFile(false);
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(false);
+            MainWindow.GetInstance().timeLength.setText("00:00");
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
@@ -108,6 +109,7 @@ public class Menus {
             MidiPlayer.GetInstance().setLoadedMidiFile(false);
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(false);
+            MainWindow.GetInstance().timeLength.setText("00:00");
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
@@ -129,6 +131,9 @@ public class Menus {
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(true);
+            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
         });
 
         // 保存文件
@@ -180,6 +185,9 @@ public class Menus {
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(true);
+            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
         });
 
         // 播放
@@ -193,6 +201,9 @@ public class Menus {
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
                 MainWindow.GetInstance().playSlider.setValue(0);
                 MainWindow.GetInstance().playSlider.setEnabled(true);
+                int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+                int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+                MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
             }
 
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
@@ -240,6 +251,9 @@ public class Menus {
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(true);
+            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
         });
 
         // 转换Mui到五线谱

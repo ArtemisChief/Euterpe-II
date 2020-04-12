@@ -34,11 +34,7 @@ public class MainWindow extends JFrame {
         return instance;
     }
 
-    boolean playSliderPressed;
-
     private MainWindow() {
-
-        playSliderPressed=false;
 
         // 初始化组件
         initComponents();
@@ -72,25 +68,26 @@ public class MainWindow extends JFrame {
 
         // 进度条以及时间改变
         Timer timer=new Timer(50,e -> {
-            if (playSlider.isEnabled() && !playSliderPressed) {
-                playSlider.setValue((int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / (float)MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() * 1000000));
-            }
+            if (playSlider.isEnabled())
+                if (!playSlider.getValueIsAdjusting()) {
+                    playSlider.setValue((int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / (float) MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() * 1000000));
+                    int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / 1_000_000f) / 60;
+                    int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / 1_000_000f) % 60;
+                    currTime.setText(String.format("%02d:%02d",minutes,seconds));
+                } else {
+                    long currentMicrosecond = (long) (playSlider.getValue() / 1000000.0f * MidiPlayer.GetInstance().getSequencer().getMicrosecondLength());
+                    int minutes = (int) (currentMicrosecond / 1_000_000f) / 60;
+                    int seconds = (int) (currentMicrosecond / 1_000_000f) % 60;
+                    currTime.setText(String.format("%02d:%02d",minutes,seconds));
+                }
         });
         timer.start();
 
         // 播放进度条
         playSlider.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                if (playSlider.isEnabled()) {
-                    playSliderPressed = true;
-                }
-            }
-
-            @Override
             public void mouseReleased(MouseEvent e) {
                 if (playSlider.isEnabled()) {
-                    playSliderPressed = false;
                     long currentMicrosecond = (long) (playSlider.getValue() / 1000000.0f * MidiPlayer.GetInstance().getSequencer().getMicrosecondLength());
                     MidiPlayer.GetInstance().setMicrosecondPosition(currentMicrosecond);
                     Pianoroll.GetInstance().setCurrentTime(currentMicrosecond / 1_000_000f
@@ -468,7 +465,7 @@ public class MainWindow extends JFrame {
                 sustainToggleBtn.setBounds(760, 5, 105, 20);
 
                 //---- timeLength ----
-                timeLength.setText("1:21");
+                timeLength.setText("00:00");
                 panel1.add(timeLength);
                 timeLength.setBounds(715, 0, 40, 30);
 
@@ -545,7 +542,7 @@ public class MainWindow extends JFrame {
     private JComboBox<String> keyComboBox;
     private JComboBox<String> octaveComboBox;
     private JToggleButton sustainToggleBtn;
-    private JLabel timeLength;
-    private JLabel currTime;
+    public JLabel timeLength;
+    public JLabel currTime;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

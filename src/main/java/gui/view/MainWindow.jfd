@@ -381,7 +381,10 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "timeLength"
-						"text": "1:21"
+						"text": "00:00"
+						auxiliary() {
+							"JavaCodeGenerator.variableModifiers": 1
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 						"x": 715
 						"height": 30
@@ -391,6 +394,9 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "currTime"
 						"text": "00:00"
+						auxiliary() {
+							"JavaCodeGenerator.variableModifiers": 1
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 						"x": 5
 						"y": 0

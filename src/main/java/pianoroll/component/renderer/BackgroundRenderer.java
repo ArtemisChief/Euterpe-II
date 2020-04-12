@@ -187,7 +187,6 @@ public class BackgroundRenderer {
         gl.glUniform1i(program.get("trackID"), piano.getTrackID());
         gl.glUniform1f(program.get("offsetY"), piano.getOffsetY());
         gl.glUniform1f(program.get("posZ"), 0.4f);
-        gl.glUniform1i(program.get("colorID"), Semantic.Color.GREY);
         gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
         gl.glBindVertexArray(0);
