@@ -3,9 +3,8 @@ package gui.controller;
 import converter.component.MidiConverter;
 import gui.view.MainWindow;
 import midibuilder.component.MidiFileBuilder;
-import midiplayer.component.MidiPlayer;
+import midiplayer.MidiPlayer;
 import gui.entity.Status;
-import pianoroll.component.Pianoroll;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

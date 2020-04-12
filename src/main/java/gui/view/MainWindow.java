@@ -8,8 +8,6 @@ import java.awt.event.*;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.plaf.metal.MetalSliderUI;
 
 import gui.controller.Diaglogs;
 import gui.controller.FileIO;
@@ -18,8 +16,7 @@ import gui.controller.Menus;
 import gui.entity.Status;
 import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
-import midiplayer.component.MidiPlayer;
-import net.miginfocom.swing.*;
+import midiplayer.MidiPlayer;
 
 /**
  * @author Chief
@@ -167,6 +164,9 @@ public class MainWindow extends JFrame {
         playExternalMenuItem = new JMenuItem();
         loadMidiFileMenuItem = new JMenuItem();
         arduinoMenu = new JMenu();
+        generateInoMenuItem = new JMenuItem();
+        compileVerifyMenuItem = new JMenuItem();
+        uploadArduinoMenuItem = new JMenuItem();
         converterMenu = new JMenu();
         convertToMuiMenuItem = new JMenuItem();
         convertToStaveMenuItem = new JMenuItem();
@@ -284,6 +284,18 @@ public class MainWindow extends JFrame {
                 //======== arduinoMenu ========
                 {
                     arduinoMenu.setText("Arduino");
+
+                    //---- generateInoMenuItem ----
+                    generateInoMenuItem.setText("Generate .ino File");
+                    arduinoMenu.add(generateInoMenuItem);
+
+                    //---- compileVerifyMenuItem ----
+                    compileVerifyMenuItem.setText("Compile / Verify");
+                    arduinoMenu.add(compileVerifyMenuItem);
+
+                    //---- uploadArduinoMenuItem ----
+                    uploadArduinoMenuItem.setText("Upload to Arduino");
+                    arduinoMenu.add(uploadArduinoMenuItem);
                 }
                 menuBar2.add(arduinoMenu);
 
@@ -524,6 +536,9 @@ public class MainWindow extends JFrame {
     public JMenuItem playExternalMenuItem;
     public JMenuItem loadMidiFileMenuItem;
     private JMenu arduinoMenu;
+    public JMenuItem generateInoMenuItem;
+    public JMenuItem compileVerifyMenuItem;
+    public JMenuItem uploadArduinoMenuItem;
     private JMenu converterMenu;
     public JMenuItem convertToMuiMenuItem;
     public JMenuItem convertToStaveMenuItem;

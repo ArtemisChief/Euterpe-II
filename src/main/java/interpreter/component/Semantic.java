@@ -285,14 +285,16 @@ public class Semantic {
                 case "playlist":
                     String paraName = "";
                     int index = 0;
+                    int channel = 0;
                     int totalDuration = 0;
 
                     for (Node playList : child.getChildren()) {
                         switch (playList.getContent()) {
                             case "&":
                                 index++;
-                                if (index > 15 || index == 9)
-                                    index = ++index % 16;
+                                channel++;
+                                if (channel > 15 || channel == 9)
+                                    channel = ++channel % 16;
                                 break;
 
                             case ",":
@@ -320,11 +322,11 @@ public class Semantic {
                                 MidiTrack midiTrack;
 
                                 if (index > midiTracks.size() - 1) {
-                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), totalDuration, (byte) index);
+                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), totalDuration, (byte) channel);
                                     if (midiTrack != null)
                                         midiTracks.add(midiTrack);
                                 } else {
-                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), 0, (byte) index);
+                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), 0, (byte) channel);
                                     if (midiTrack != null)
                                         midiTrackBuilder.merge(midiTracks.get(index), midiTrack);
                                 }

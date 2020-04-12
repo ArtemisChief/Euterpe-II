@@ -1,16 +1,15 @@
 package gui.controller;
 
 import gui.view.MainWindow;
-import midiplayer.component.MidiPlayer;
+import midiplayer.MidiPlayer;
 import gui.entity.Status;
 import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
-import pianoroll.util.Semantic;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class Menus {
 
@@ -471,6 +470,10 @@ public class Menus {
             MainWindow.GetInstance().outputTextArea.setText(str);
             MainWindow.GetInstance().outputTextArea.setCaretPosition(0);
             MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+        });
+
+        MainWindow.GetInstance().generateInoMenuItem.addActionListener(e -> {
+
         });
 
     }

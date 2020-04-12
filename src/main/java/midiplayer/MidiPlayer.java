@@ -1,4 +1,4 @@
-package midiplayer.component;
+package midiplayer;
 
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;

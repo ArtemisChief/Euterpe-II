@@ -1,7 +1,6 @@
 package pianoroll.component.controller;
 
-import midiplayer.component.MidiPlayer;
-import pianoroll.component.InputProcessor;
+import midiplayer.MidiPlayer;
 import pianoroll.component.Pianoroll;
 import pianoroll.entity.GraphicElement;
 import pianoroll.entity.Key;
