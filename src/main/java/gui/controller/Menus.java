@@ -29,7 +29,8 @@ public class Menus {
             if (meta.getType() == 47) {
                 MainWindow.GetInstance().playBtn.setText("▶");
                 MidiPlayer.GetInstance().stop();
-                Pianoroll.GetInstance().reset();
+                Pianoroll.GetInstance().setPlaying(false);
+                Pianoroll.GetInstance().setCurrentTime(0.0f, 0, 120);
                 MidiPlayer.GetInstance().setMicrosecondPosition(0);
             }
         });
@@ -40,7 +41,7 @@ public class Menus {
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
 
-            Pianoroll.GetInstance().reset();
+            Pianoroll.GetInstance().clear();
 
             MainWindow.GetInstance().inputTextPane.setText("");
             MainWindow.GetInstance().tipsMenuItem.doClick();
@@ -60,7 +61,7 @@ public class Menus {
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
 
-            Pianoroll.GetInstance().reset();
+            Pianoroll.GetInstance().clear();
 
             String str = "/*\n" +
                     " 数字乐谱模板\n" +
@@ -122,8 +123,6 @@ public class Menus {
         MainWindow.GetInstance().openMenuItem.addActionListener(e -> {
             if (!FileIO.GetInstance().openMuiFile())
                 return;
-
-            Pianoroll.GetInstance().reset();
 
             MainWindow.GetInstance().outputTextArea.setText("");
             MainWindow.GetInstance().playBtn.setText("▶");

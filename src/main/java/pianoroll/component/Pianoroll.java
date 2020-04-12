@@ -105,7 +105,7 @@ public class Pianoroll {
                     if (trackID < 0 || trackID > 88)
                         continue;
 
-                    rollController.createRoll(trackID,offsetY,scaleY);
+                    rollController.createRoll(trackID, offsetY, scaleY);
                 }
 
                 // 变速
@@ -138,16 +138,9 @@ public class Pianoroll {
             calculateLengthPerSecond(120);
     }
 
-    public void reset() {
-        for(Roll roll:rollController.getRollList()) {
-            roll.setOffsetY(roll.getOffsetY() + distanceSum);
-            roll.setColorID(roll.getTrackID());
-            roll.setValid(true);
-            roll.setTriggered(false);
-        }
-
-        for(Background row:backgroundController.getRowList())
-            row.setOffsetY(row.getOffsetY() + distanceSum);
+    public void clear() {
+        rollController.getRollList().clear();
+        backgroundController.getRowList().clear();
 
         triggeredTrackList.clear();
         timeBpmList.clear();
@@ -157,7 +150,7 @@ public class Pianoroll {
         isPlaying = false;
     }
 
-    public void setCurrentTime(float second,long tick,int resolution) {
+    public void setCurrentTime(float second, long tick, int resolution) {
         triggeredTrackList.clear();
         this.index = 0;
 
@@ -181,7 +174,7 @@ public class Pianoroll {
     }
 
     public void update(float deltaTime) {
-        if(isPlaying) {
+        if (isPlaying) {
             timeSum += deltaTime;
 
             while (index < timeBpmList.size() && timeSum > timeBpmList.get(index).getKey())

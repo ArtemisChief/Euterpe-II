@@ -115,6 +115,25 @@ public class BackgroundRenderer {
             columnList.add(column);
         }
 
+        for (int i = 0; i < 2; i++) {
+            Background row = new Background(Semantic.Piano.KEY_MAX / 2, i * 4 * Semantic.Pianoroll.LENGTH_PER_CROTCHET);
+
+            gl.glGenVertexArrays(1, row.getVao());
+
+            gl.glBindVertexArray(row.getVao().get(0));
+            {
+                gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_ROW));
+                {
+                    gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
+                    gl.glVertexAttribPointer(Semantic.Attr.POSITION, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
+                }
+                gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
+            gl.glBindVertexArray(0);
+
+            rowList.add(row);
+        }
+
         gl.glGenVertexArrays(1, piano.getVao());
 
         gl.glBindVertexArray(piano.getVao().get(0));

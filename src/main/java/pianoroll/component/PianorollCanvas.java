@@ -4,6 +4,8 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
+import pianoroll.component.inputprocessor.KeyboardProcessor;
+import pianoroll.component.inputprocessor.MouseProcessor;
 import pianoroll.component.renderer.BackgroundRenderer;
 import pianoroll.component.renderer.ParticleRenderer;
 import pianoroll.component.renderer.PianoRenderer;
@@ -86,7 +88,8 @@ public class PianorollCanvas implements GLEventListener {
                 "shaders", "Particle.vert", "Particle.frag",
                 "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
 
-        glcanvas.addKeyListener(new InputProcessor());
+        glcanvas.addKeyListener(new KeyboardProcessor());
+        glcanvas.addMouseMotionListener(new MouseProcessor());
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);
@@ -137,8 +140,6 @@ public class PianorollCanvas implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        Pianoroll pianoroll = Pianoroll.GetInstance();
-
         gl.glDeleteProgram(pianorollProgram.name);
         gl.glDeleteProgram(particleProgram.name);
 
@@ -156,14 +157,6 @@ public class PianorollCanvas implements GLEventListener {
 
     public RollRenderer getRollRenderer() {
         return rollRenderer;
-    }
-
-    public PianoRenderer getPianoRenderer() {
-        return pianoRenderer;
-    }
-
-    public ParticleRenderer getParticleRenderer() {
-        return particleRenderer;
     }
 
     public BackgroundRenderer getBackgroundRenderer() {

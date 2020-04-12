@@ -1,24 +1,22 @@
-package pianoroll.component;
+package pianoroll.component.inputprocessor;
 
+import pianoroll.component.Pianoroll;
+
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class InputProcessor implements KeyListener {
+public class KeyboardProcessor extends KeyAdapter {
 
     private final List<Integer> keyboardKeyDownList;
     private final List<Integer> pianoKeyDownList;
 
-    public InputProcessor() {
+    public KeyboardProcessor() {
         keyboardKeyDownList = new ArrayList<>();
         pianoKeyDownList=new ArrayList<>();
     }
-
-    @Override
-    public void keyTyped(KeyEvent e) { }
 
     @Override
     public void keyPressed(KeyEvent e) {
