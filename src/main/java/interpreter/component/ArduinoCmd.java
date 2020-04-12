@@ -5,6 +5,14 @@ import java.io.InputStream;
 
 public class ArduinoCmd {
 
+    private static ArduinoCmd instance=new ArduinoCmd();
+
+    public static ArduinoCmd GetInstance(){
+        return instance;
+    }
+
+    private ArduinoCmd(){}
+
     private static final String ArduinoPath = "F:\\Arduino\\arduino_debug.exe";
 
     public static InputStream error;

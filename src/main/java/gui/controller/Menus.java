@@ -1,6 +1,7 @@
 package gui.controller;
 
 import gui.view.MainWindow;
+import interpreter.component.ArduinoCmd;
 import midiplayer.MidiPlayer;
 import gui.entity.Status;
 import pianoroll.component.Pianoroll;
@@ -472,10 +473,121 @@ public class Menus {
             MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
         });
 
-        MainWindow.GetInstance().generateInoMenuItem.addActionListener(e -> {
 
+
+
+
+
+
+        // 生成Arduino的.ino文件
+        MainWindow.GetInstance().generateInoMenuItem.addActionListener(e -> {
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+
+            Interpreter.GetInstance().runArduinoInterpret();
         });
 
+        // 编译验证Arduino代码
+        MainWindow.GetInstance().compileVerifyMenuItem.addActionListener(e -> {
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+
+            String code = Interpreter.GetInstance().runArduinoInterpret();
+
+            File tempFile;
+
+            try {
+                tempFile = new File("C:\\Users\\Chief\\Documents\\Arduino\\temp.ino");
+                if (!tempFile.exists())
+                    tempFile.createNewFile();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
+                bufferedWriter.write(code);
+                bufferedWriter.close();
+
+                ArduinoCmd.GetInstance().compile(tempFile.getAbsolutePath());
+                readCmd();
+
+            } catch (IOException e1) {
+//                e1.printStackTrace();
+            }
+        });
+
+        // 上传Arduino代码
+        MainWindow.GetInstance().uploadArduinoMenuItem.addActionListener(e -> {
+
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+
+            String code = Interpreter.GetInstance().runArduinoInterpret();
+
+            File tempFile;
+
+            try {
+                tempFile = new File("C:\\Users\\Chief\\Documents\\Arduino\\temp.ino");
+                if (!tempFile.exists())
+                    tempFile.createNewFile();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
+                bufferedWriter.write(code);
+                bufferedWriter.close();
+
+                ArduinoCmd.GetInstance().upload(tempFile.getAbsolutePath());
+                readCmd();
+            } catch (IOException e1) {
+//                e1.printStackTrace();
+            }
+        });
+
+    }
+
+    //读取Arduino CMD数据流
+    private String cmdOutput;
+    private void readCmd() {
+        MainWindow.GetInstance().compileVerifyMenuItem.setEnabled(false);
+        MainWindow.GetInstance().uploadArduinoMenuItem.setEnabled(false);
+        cmdOutput = "";
+
+        //处理输出的线程
+        new Thread(() -> {
+            int count = 0;
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ArduinoCmd.output, "GBK"));
+                String tempStr;
+                while ((tempStr = bufferedReader.readLine()) != null) {
+                    count++;
+                    if (count > 12) {
+                        cmdOutput += tempStr + "\n";
+                        MainWindow.GetInstance().outputTextArea.setText(cmdOutput);
+                    }
+                }
+                MainWindow.GetInstance().compileVerifyMenuItem.setEnabled(true);
+                MainWindow.GetInstance().uploadArduinoMenuItem.setEnabled(true);
+            } catch (IOException IOE) {
+                IOE.printStackTrace();
+            } finally {
+                try {
+                    ArduinoCmd.output.close();
+                } catch (IOException IOE) {
+                    IOE.printStackTrace();
+                }
+            }
+        }).start();
+
+        //处理错误信息的线程
+        new Thread(() -> {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ArduinoCmd.error, "GBK"));
+                String tempStr;
+                while ((tempStr = bufferedReader.readLine()) != null) {
+                    cmdOutput += tempStr + "\n";
+                    MainWindow.GetInstance().outputTextArea.setText(cmdOutput);
+                }
+            } catch (IOException IOE) {
+                IOE.printStackTrace();
+            } finally {
+                try {
+                    ArduinoCmd.error.close();
+                } catch (IOException IOE) {
+                    IOE.printStackTrace();
+                }
+            }
+        }).start();
     }
 
 }

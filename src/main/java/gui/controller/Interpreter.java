@@ -50,15 +50,18 @@ public class Interpreter {
             return null;
         }
 
+        for (Token token : tokens)
+            output.append(token);
+
         return tokens;
     }
 
     // 语法分析
     private Node runSyn(List<Token> tokens, StringBuilder output) {
-        Node AbstractSyntaxTree = syntactic.Parse(tokens);
+        Node abstractSyntaxTree = syntactic.Parse(tokens);
 
         if (syntactic.getIsError()) {
-            output.append(syntactic.getErrors(AbstractSyntaxTree));
+            output.append(syntactic.getErrors(abstractSyntaxTree));
             output.append("检测到错误");
             MainWindow.GetInstance().outputTextArea.setText(output.toString());
             MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
@@ -72,7 +75,9 @@ public class Interpreter {
             return null;
         }
 
-        return AbstractSyntaxTree;
+        output.append(abstractSyntaxTree.print(0));
+
+        return abstractSyntaxTree;
     }
 
     // 语义分析
@@ -92,9 +97,9 @@ public class Interpreter {
                 );
             }
             return null;
-        } else {
-            output.append(code);
         }
+
+        output.append(code);
 
         return code;
     }
@@ -111,9 +116,6 @@ public class Interpreter {
         if (tokens == null)
             return false;
 
-        for (Token token : tokens)
-            stringBuilder.append(token);
-
         stringBuilder.append("\n\n=======================================词法分析结束=============开始语法分析=======================================\n\n");
 
         Node AbstractSyntaxTree = runSyn(tokens, stringBuilder);
@@ -121,14 +123,14 @@ public class Interpreter {
         if (AbstractSyntaxTree == null)
             return false;
 
-        stringBuilder.append(AbstractSyntaxTree.print(0)+ "\n\n=======================================语法分析结束=============开始语义分析=======================================\n\n");
+        stringBuilder.append("\n\n=======================================语法分析结束=============开始语义分析=======================================\n\n");
 
         String code = runMidiSem(AbstractSyntaxTree, stringBuilder);
 
         if (code == null)
             return false;
 
-        stringBuilder.append(code + "\n\n==================================================================================================\nMidi Successfully Generated");
+        stringBuilder.append("\n\n==================================================================================================\nMidi Successfully Generated");
 
         MainWindow.GetInstance().outputTextArea.setText(stringBuilder.toString());
 
@@ -149,6 +151,7 @@ public class Interpreter {
             output.append(semanticArduino.getErrors());
             output.append("\n检测到语义错误，分析停止\n");
             MainWindow.GetInstance().outputTextArea.setText(output.toString());
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
             for (int line : semanticArduino.getErrorLines()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),
@@ -164,33 +167,31 @@ public class Interpreter {
         return code;
     }
 
-    public boolean runArduinoInterpret(){
+    public String runArduinoInterpret(){
         StringBuilder stringBuilder = new StringBuilder();
 
         if (MainWindow.GetInstance().inputTextPane.getText().isEmpty())
-            return false;
+            return null;
 
         List<Token> tokens = runLex(MainWindow.GetInstance().inputTextPane.getText(), stringBuilder);
 
         if (tokens == null)
-            return false;
+            return null;
 
         stringBuilder.append("\n\n=======================================词法分析结束=============开始语法分析=======================================\n\n");
 
         Node AbstractSyntaxTree = runSyn(tokens, stringBuilder);
 
         if (AbstractSyntaxTree == null)
-            return false;
+            return null;
 
         stringBuilder.append("\n\n=======================================语法分析结束=============开始语义分析=======================================\n\n");
 
         String code = runArduinoSem(AbstractSyntaxTree, stringBuilder);
 
-        if (code == null)
-            return false;
+        MainWindow.GetInstance().outputTextArea.setText(stringBuilder.toString());
 
-
-        return true;
+        return code;
     }
 
 }
