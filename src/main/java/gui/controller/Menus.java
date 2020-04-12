@@ -47,6 +47,7 @@ public class Menus {
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(false);
             MainWindow.GetInstance().timeLength.setText("00:00");
+            MainWindow.GetInstance().currTime.setText("00:00");
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
@@ -110,6 +111,7 @@ public class Menus {
             MainWindow.GetInstance().playSlider.setValue(0);
             MainWindow.GetInstance().playSlider.setEnabled(false);
             MainWindow.GetInstance().timeLength.setText("00:00");
+            MainWindow.GetInstance().currTime.setText("00:00");
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 

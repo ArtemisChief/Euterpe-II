@@ -408,7 +408,7 @@ public class MainWindow extends JFrame {
                 outputScrollPane.setViewportView(outputTextArea);
             }
             layeredPane.add(outputScrollPane, JLayeredPane.DEFAULT_LAYER);
-            outputScrollPane.setBounds(0, 0, 1145, 773);
+            outputScrollPane.setBounds(0, 31, 1145, 742);
 
             //======== panel1 ========
             {
@@ -421,7 +421,7 @@ public class MainWindow extends JFrame {
                 playSlider.setMaximum(1000000);
                 playSlider.setEnabled(false);
                 panel1.add(playSlider);
-                playSlider.setBounds(45, 5, 670, 20);
+                playSlider.setBounds(45, 5, 700, 20);
 
                 //---- keyComboBox ----
                 keyComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -442,7 +442,7 @@ public class MainWindow extends JFrame {
                 keyComboBox.setFocusable(false);
                 keyComboBox.setSelectedIndex(4);
                 panel1.add(keyComboBox);
-                keyComboBox.setBounds(880, 5, 120, 20);
+                keyComboBox.setBounds(900, 5, 110, 20);
 
                 //---- octaveComboBox ----
                 octaveComboBox.setMaximumRowCount(5);
@@ -456,18 +456,18 @@ public class MainWindow extends JFrame {
                 octaveComboBox.setFocusable(false);
                 octaveComboBox.setSelectedIndex(2);
                 panel1.add(octaveComboBox);
-                octaveComboBox.setBounds(1010, 5, 120, 20);
+                octaveComboBox.setBounds(1020, 5, 110, 20);
 
                 //---- sustainToggleBtn ----
                 sustainToggleBtn.setText("Sustain Off");
                 sustainToggleBtn.setFocusable(false);
                 panel1.add(sustainToggleBtn);
-                sustainToggleBtn.setBounds(760, 5, 105, 20);
+                sustainToggleBtn.setBounds(795, 5, 90, 20);
 
                 //---- timeLength ----
                 timeLength.setText("00:00");
                 panel1.add(timeLength);
-                timeLength.setBounds(715, 0, 40, 30);
+                timeLength.setBounds(745, 0, 40, 30);
 
                 //---- currTime ----
                 currTime.setText("00:00");
@@ -475,7 +475,7 @@ public class MainWindow extends JFrame {
                 currTime.setBounds(5, 0, 40, 30);
             }
             layeredPane.add(panel1, JLayeredPane.POPUP_LAYER);
-            panel1.setBounds(0, 0, 1145, 30);
+            panel1.setBounds(0, 0, 1145, 31);
         }
         contentPane.add(layeredPane);
         layeredPane.setBounds(450, 0, 1150, 770);

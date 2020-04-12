@@ -302,7 +302,9 @@ new FormModel {
 					"location": new java.awt.Point( 545, 835 )
 					"size": new java.awt.Dimension( 125, 305 )
 					"width": 1145
-					"height": 773
+					"height": 742
+					"x": 0
+					"y": 31
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
 					"autoSize": false
@@ -321,7 +323,7 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 						"x": 45
 						"y": 5
-						"width": 670
+						"width": 700
 						"height": 20
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -345,10 +347,10 @@ new FormModel {
 						"focusable": false
 						"selectedIndex": 4
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 880
+						"x": 900
 						"y": 5
 						"height": 20
-						"width": 120
+						"width": 110
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "octaveComboBox"
@@ -364,20 +366,20 @@ new FormModel {
 						"focusable": false
 						"selectedIndex": 2
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 1010
+						"x": 1020
 						"y": 5
 						"height": 20
-						"width": 120
+						"width": 110
 					} )
 					add( new FormComponent( "javax.swing.JToggleButton" ) {
 						name: "sustainToggleBtn"
 						"text": "Sustain Off"
 						"focusable": false
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 760
+						"x": 795
 						"y": 5
 						"height": 20
-						"width": 105
+						"width": 90
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "timeLength"
@@ -386,7 +388,7 @@ new FormModel {
 							"JavaCodeGenerator.variableModifiers": 1
 						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 715
+						"x": 745
 						"height": 30
 						"width": 40
 						"y": 0
@@ -404,10 +406,9 @@ new FormModel {
 						"width": 40
 					} )
 				}, new FormLayoutConstraints( null ) {
-					"x": 0
 					"layer": 300
 					"width": 1145
-					"height": 30
+					"height": 31
 					"y": 0
 				} )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
