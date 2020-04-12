@@ -100,4 +100,32 @@ public class MuiNote {
     public double getDurationTicks() {
         return durationTicks;
     }
+
+    public MuiNote getStandardMuiNote(int resolution){
+        if(durationTicks>=5.5*resolution)
+            return new MuiNote(pitch,"1*",1,6*resolution);
+        else if(durationTicks>=3.75*resolution)
+            return new MuiNote(pitch,"1",1,4*resolution);
+        else if(durationTicks>=2.75*resolution)
+            return new MuiNote(pitch,"2*",1,3*resolution);
+        else if(durationTicks>=1.85*resolution)
+            return new MuiNote(pitch,"2",1,2*resolution);
+        else if(durationTicks>=1.35*resolution)
+            return new MuiNote(pitch,"4*",1,1.5*resolution);
+        else if(durationTicks>=0.925*resolution)
+            return new MuiNote(pitch,"4",1,resolution);
+        else if(durationTicks>=0.695*resolution)
+            return new MuiNote(pitch,"8*",1,0.75*resolution);
+        else if(durationTicks>=0.4575*resolution)
+            return new MuiNote(pitch,"8",1,0.5*resolution);
+        else if(durationTicks>=0.3325*resolution)
+            return new MuiNote(pitch,"g*",1,0.375*resolution);
+        else if(durationTicks>=0.2025*resolution)
+            return new MuiNote(pitch,"g",1,0.25*resolution);
+        else
+            return new MuiNote(pitch,"w",1,0.125*resolution);
+
+    }
+
+
 }
