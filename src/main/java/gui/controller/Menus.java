@@ -228,28 +228,31 @@ public class Menus {
             }
         });
 
+        // 加载Midi文件播放
         MainWindow.GetInstance().loadMidiFileMenuItem.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Midi File", "mid");
-            fileChooser.setFileFilter(filter);
-            int result = fileChooser.showOpenDialog(MainWindow.GetInstance());
+            File file=FileIO.GetInstance().openMidiFile();
 
-            if (result != JFileChooser.CANCEL_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                MidiPlayer.GetInstance().loadMidiFile(file);
-                Pianoroll.GetInstance().loadMidiFile(file);
-                MainWindow.GetInstance().playSlider.setValue(0);
-                MainWindow.GetInstance().playSlider.setEnabled(true);
-                int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
-                int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-                MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
-            }
+            if(file==null)
+                return;
+
+            MainWindow.GetInstance().outputTextArea.setText("");
+            MainWindow.GetInstance().playBtn.setText("▶");
+            MidiPlayer.GetInstance().stop();
+
+            MidiPlayer.GetInstance().loadMidiFile(file);
+            Pianoroll.GetInstance().loadMidiFile(file);
+            MainWindow.GetInstance().playSlider.setValue(0);
+            MainWindow.GetInstance().playSlider.setEnabled(true);
+            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
         });
 
         // 转换Midi到Mui
         MainWindow.GetInstance().convertToMuiMenuItem.addActionListener(e -> {
-            FileIO.GetInstance().convertMidiFile();
+            if(!FileIO.GetInstance().convertMidiFile())
+                return;
+
             MainWindow.GetInstance().outputTextArea.setText("");
             MainWindow.GetInstance().playBtn.setText("▶");
             MidiPlayer.GetInstance().stop();
