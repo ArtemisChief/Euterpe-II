@@ -12,9 +12,9 @@ public class Note {
 
     private final byte note;
 
-    private final boolean isPrimary;
+    private final byte isPrimary;
 
-    public Note(int deltaTime, byte note, boolean isPrimary) {
+    public Note(int deltaTime, byte note, byte isPrimary) {
         this.deltaTime = deltaTime;
         this.note = note;
         this.isPrimary = isPrimary;
@@ -32,7 +32,7 @@ public class Note {
         return note;
     }
 
-    public boolean getIsPrimary() {
+    public byte getIsPrimary() {
         return isPrimary;
     }
 

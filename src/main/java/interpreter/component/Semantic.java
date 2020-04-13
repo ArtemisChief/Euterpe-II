@@ -354,7 +354,12 @@ public class Semantic {
         List<Integer> noteList = paragraph.getNoteList();
         List<Integer> durationList = paragraph.getDurationList();
 
-        Queue<Note> bufferNotes = new PriorityQueue<>(Comparator.comparingInt(Note::getDeltaTime));
+        Queue<Note> bufferNotes = new PriorityQueue<>((o1, o2) -> {
+            if (o1.getDeltaTime() == o2.getDeltaTime()) {
+                return o1.getIsPrimary() - o2.getIsPrimary();
+            } else
+                return o1.getDeltaTime() - o2.getDeltaTime();
+        });
 
         Queue<Symbol> symbolQueue = paragraph.getSymbolQueue();
 
@@ -398,8 +403,8 @@ public class Semantic {
                                 break;
                             }
 
-                            for (boolean isPrimary = true; true; isPrimary = false) {
-                                midiTrackBuilder.insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
+                            for (byte isPrimary = 1; true; isPrimary = 0) {
+                                midiTrackBuilder.insertNoteOn(0,channel, noteList.get(index).byteValue(), (byte) 80);
                                 tempNote = new Note(durationList.get(index), noteList.get(index++).byteValue(), isPrimary);
                                 bufferNotes.offer(tempNote);
 
@@ -413,12 +418,13 @@ public class Semantic {
                                 midiTrackBuilder.insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
                                 reduceDeltaTimeInQueue(bufferNotes, tempNote.getDeltaTime());
                             }
-                            while (!bufferNotes.isEmpty() && (!tempNote.getIsPrimary() || bufferNotes.peek().getDeltaTime() == 0));
+                            while (!bufferNotes.isEmpty() && (tempNote.getIsPrimary()!=1 || bufferNotes.peek().getDeltaTime() == 0));
                         }
                         break;
 
                     case 0:
                         //连音
+
                         if (!symbolQueue.isEmpty()) {
                             if (symbolQueue.peek().getSymbol() != 2) {
                                 int line = symbolQueue.peek().getLine();
@@ -430,12 +436,13 @@ public class Semantic {
                             byte currentNote;
                             byte lastNote = -1;
                             int totalDuration = 0;
+                            int tempIndex=index;
 
                             do {
                                 currentNote = noteList.get(index).byteValue();
                                 if (currentNote != lastNote) {
                                     if (lastNote != -1) {
-                                        midiTrackBuilder.insertNoteOn(channel, lastNote, (byte) 80);
+                                        midiTrackBuilder.insertNoteOn(0, channel, lastNote, (byte) 80);
                                         midiTrackBuilder.insertNoteOff(totalDuration, channel, lastNote);
                                         totalDuration = 0;
                                     }
@@ -447,7 +454,20 @@ public class Semantic {
 
                             symbolQueue.poll();
 
-                            midiTrackBuilder.insertNoteOn(channel, lastNote, (byte) 80);
+                            midiTrackBuilder.insertNoteOn(0, channel, lastNote, (byte) 80);
+
+                            if (!bufferNotes.isEmpty()) {
+                                //还有同时音在播放中
+                                while (!bufferNotes.isEmpty() && durationList.get(tempIndex) >= bufferNotes.peek().getDeltaTime()) {
+                                    tempNote = bufferNotes.poll();
+                                    midiTrackBuilder.insertNoteOff(tempNote.getDeltaTime(), channel, tempNote.getNote());
+                                    reduceDeltaTimeInQueue(bufferNotes, tempNote.getDeltaTime());
+                                    durationList.set(tempIndex, durationList.get(tempIndex) - tempNote.getDeltaTime());
+                                    totalDuration-=tempNote.getDeltaTime();
+                                }
+                                reduceDeltaTimeInQueue(bufferNotes, durationList.get(tempIndex));
+                            }
+
                             midiTrackBuilder.insertNoteOff(totalDuration, channel, lastNote);
                         }
                         break;
@@ -478,7 +498,7 @@ public class Semantic {
 
             if (index < count) {
                 //特殊符号外的音
-                midiTrackBuilder.insertNoteOn(channel, noteList.get(index).byteValue(), (byte) 80);
+                midiTrackBuilder.insertNoteOn(0, channel, noteList.get(index).byteValue(), (byte) 80);
 
                 if (!bufferNotes.isEmpty()) {
                     //还有同时音在播放中

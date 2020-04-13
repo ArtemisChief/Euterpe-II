@@ -79,15 +79,22 @@ public class MidiTrackBuilder {
         return this;
     }
 
-    public MidiTrackBuilder insertNoteOn(byte channel, byte note, byte velocity) {
+    public MidiTrackBuilder insertNoteOn(int deltaTime, byte channel, byte note, byte velocity) {
+
+        byte[] midiTrackContentData = currentMidiTrack.getMidiTrackContentData();
+
+        midiTrackContentData = MidiBuilderUtil.mergeByte(midiTrackContentData, MidiBuilderUtil.buildBytes(deltaTime));
+
         byte[] noteOn;
 
         if (note != 0)
-            noteOn = new byte[]{0x00, (byte) (0x90 + channel), note, velocity};
+            noteOn = new byte[]{(byte) (0x90 + channel), note, velocity};
         else
-            noteOn = new byte[]{0x00, (byte) (0x90 + channel), note, 0x00};
+            noteOn = new byte[]{(byte) (0x90 + channel), note, 0x00};
 
-        currentMidiTrack.setMidiTrackContentData(MidiBuilderUtil.mergeByte(currentMidiTrack.getMidiTrackContentData(), noteOn));
+        midiTrackContentData = MidiBuilderUtil.mergeByte(midiTrackContentData, noteOn);
+
+        currentMidiTrack.setMidiTrackContentData(midiTrackContentData);
 
         return this;
     }
