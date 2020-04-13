@@ -35,8 +35,8 @@ public class MidiConverter {
     private StringBuilder latter = null;
     private StringBuilder mui = null;
 
-//    private StringBuilder test=new StringBuilder();
-//    private StringBuilder test2=new StringBuilder();
+    private StringBuilder test=new StringBuilder();
+    private StringBuilder test2=new StringBuilder();
 
     private boolean sameTime = false;
 
@@ -100,6 +100,12 @@ public class MidiConverter {
                             mui.append("instrument=" + instrumentEvent.getInstrumentNumber() + "\n");
                     } else {
                         NoteEvent noteEvent = (NoteEvent) midiEvent;
+
+//                        if(noteEvent.getPitch()==73){
+//                            System.out.println("aaaaa");
+//                        }
+
+
                         if((!sameTime)&&(noteEvent.getIntensity()!=intensity)) {
                             intensity = noteEvent.getIntensity();
                             changeStatusAddNote(noteEvent.getTriggerTick());
@@ -417,7 +423,7 @@ public class MidiConverter {
                 MuiNote restNote = getMuiNote(-1, triggerTick - currentTick- lastDuration);
                 muiNote=restNote;
                 addNote();
-                currentTick+=restNote.getDurationTicks();
+                currentTick+=restNote.getDurationTicks()+lastDuration;
                 lastDuration=0;
             }else {
                 currentTick+=lastDuration;
