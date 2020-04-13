@@ -194,8 +194,11 @@ public class FileIO {
 
         String result = MidiConverter.GetInstance().converterToMui(midiFile);
 
+        isOpeningFile=true;
         MainWindow.GetInstance().inputTextPane.setText(result);
         MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
+        isOpeningFile=false;
+        InputTexts.GetInstance().refreshColor();
 
         Status.SetCurrentStatus(Status.NEW_FILE);
     }
