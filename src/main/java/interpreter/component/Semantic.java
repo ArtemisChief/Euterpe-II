@@ -404,6 +404,28 @@ public class Semantic {
                             }
 
                             for (byte isPrimary = 1; true; isPrimary = 0) {
+                                // 处理同时音中的速度、音量和乐器
+                                while (paragraph.getEventQueue().peek() != null && paragraph.getEventQueue().peek().getPosition() == index) {
+                                    Event event = paragraph.getEventQueue().poll();
+
+                                    switch (event.getType()) {
+                                        case 0:
+                                            midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
+                                            break;
+                                        case 1:
+                                            midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                                            break;
+                                        case 2:
+                                            if (Byte.parseByte(event.getData()) == -1)
+                                                channel = (byte) 9;
+                                            else
+                                                channel = tempChannel;
+
+                                            midiTrackBuilder.setInstrument(channel, Byte.parseByte(event.getData()));
+                                            break;
+                                    }
+                                }
+
                                 midiTrackBuilder.insertNoteOn(0,channel, noteList.get(index).byteValue(), (byte) 80);
                                 tempNote = new Note(durationList.get(index), noteList.get(index++).byteValue(), isPrimary);
                                 bufferNotes.offer(tempNote);
@@ -439,6 +461,28 @@ public class Semantic {
                             int tempIndex=index;
 
                             do {
+                                // 处理连音中的速度、音量和乐器
+                                while (paragraph.getEventQueue().peek() != null && paragraph.getEventQueue().peek().getPosition() == index) {
+                                    Event event = paragraph.getEventQueue().poll();
+
+                                    switch (event.getType()) {
+                                        case 0:
+                                            midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
+                                            break;
+                                        case 1:
+                                            midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                                            break;
+                                        case 2:
+                                            if (Byte.parseByte(event.getData()) == -1)
+                                                channel = (byte) 9;
+                                            else
+                                                channel = tempChannel;
+
+                                            midiTrackBuilder.setInstrument(channel, Byte.parseByte(event.getData()));
+                                            break;
+                                    }
+                                }
+
                                 currentNote = noteList.get(index).byteValue();
                                 if (currentNote != lastNote) {
                                     if (lastNote != -1) {
