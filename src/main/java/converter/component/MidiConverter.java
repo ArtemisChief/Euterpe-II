@@ -35,12 +35,17 @@ public class MidiConverter {
     private StringBuilder latter = null;
     private StringBuilder mui = null;
 
+//    private StringBuilder test=new StringBuilder();
+//    private StringBuilder test2=new StringBuilder();
+
     private boolean sameTime = false;
 
     private int noteCount = 0;
 
     private double currentTick=0;
     private double lastDuration=0;
+
+    private int intensity=-1;
 
     public String converterToMui(File midiFile) {
         MidiParser parser = MidiParser.GetInstance();
@@ -64,7 +69,12 @@ public class MidiConverter {
                 latter = new StringBuilder();
                 muiNote = null;
                 int end = midiChannel.getMidiEventList().size();
-                for (MidiEvent midiEvent : midiChannel.getMidiEventList()) {
+                for (int i=0;i<midiChannel.getMidiEventList().size();++i) {
+
+                    MidiEvent midiEvent=midiChannel.getMidiEventList().get(i);
+
+//                    if(midiEvent.getTriggerTick()==52140)
+//                        System.out.println("aaa");
 
                     if (noteCount >= 10 && !sameTime) {
                         mui.append(front).append("  <").append(latter).append(">\n");
@@ -90,6 +100,12 @@ public class MidiConverter {
                             mui.append("instrument=" + instrumentEvent.getInstrumentNumber() + "\n");
                     } else {
                         NoteEvent noteEvent = (NoteEvent) midiEvent;
+                        if((!sameTime)&&(noteEvent.getIntensity()!=intensity)) {
+                            intensity = noteEvent.getIntensity();
+                            changeStatusAddNote(noteEvent.getTriggerTick());
+                            mui.append("volume=" + intensity + "\n");
+                        }
+
                         if(noteEvent.getDurationTicks()<=1)
                             continue;
                         if (noteEvent.getTriggerTick() == currentTick && lastDuration != 0) {
@@ -100,6 +116,7 @@ public class MidiConverter {
                                 note.append(tempMuiNote.getPitchString());
                                 time.append(tempMuiNote.getTimeString());
                                 noteCount += tempMuiNote.getNoteNumbers();
+
                             } else {
                                 note.append(muiNote.getPitchString());
                                 time.append(muiNote.getTimeString());
@@ -108,41 +125,77 @@ public class MidiConverter {
                                 lastDuration = muiNote.getDurationTicks();
                             }
 
+//                            test.append("Add note triggerTick:"+currentTick+"\n");
+
                         } else {
                             if (currentTick + lastDuration == noteEvent.getTriggerTick()) {
                                 addNote();
                                 currentTick = noteEvent.getTriggerTick();
-                                muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks());
+                                muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks()).getStandardMuiNote(resolution); //11
                                 lastDuration=muiNote.getDurationTicks();
                             } else if (currentTick + lastDuration < noteEvent.getTriggerTick()) {
                                 addNote();
-                                MuiNote restNote = getMuiNote(-1, noteEvent.getTriggerTick() - currentTick - lastDuration);
-                                front.append(restNote.getPitchString());
-                                latter.append(restNote.getTimeString());
-                                noteCount += restNote.getNoteNumbers();
-                                currentTick = noteEvent.getTriggerTick();
-                                muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks());
-                                lastDuration=muiNote.getDurationTicks();
+                                if(noteEvent.getTriggerTick() - currentTick- lastDuration>=0.0625*resolution){
+                                    MuiNote restNote = getMuiNote(-1, noteEvent.getTriggerTick() - currentTick - lastDuration);
+                                    front.append(restNote.getPitchString());
+                                    latter.append(restNote.getTimeString());
+                                    noteCount += restNote.getNoteNumbers();
+                                    currentTick = noteEvent.getTriggerTick();
+                                    muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks()).getStandardMuiNote(resolution); //
+                                    lastDuration=muiNote.getDurationTicks();
+                                }
+                                else {
+                                    currentTick+=lastDuration;
+                                    muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks()).getStandardMuiNote(resolution);
+                                    lastDuration=muiNote.getDurationTicks();
+                                }
+
                             } else {
-                                MuiNote restNote = getMuiNote(-1, noteEvent.getTriggerTick() - currentTick);
+
+                                if(noteEvent.getTriggerTick()-currentTick<0.0625*resolution){
+                                    NoteEvent newNoteEvent=new NoteEvent(noteEvent.getChannel(),(long)(currentTick),
+                                            noteEvent.getPitch(),noteEvent.getIntensity());
+                                    newNoteEvent.setDurationTicks(noteEvent.getDurationTicks());
+                                    midiChannel.getMidiEventList().add(i,newNoteEvent);
+                                    midiChannel.getMidiEventList().remove(i+1);
+                                    --i;
+                                    continue;
+                                }
+
+                                if(noteEvent.getTriggerTick()-currentTick<0.125*resolution){
+                                    NoteEvent newNoteEvent=new NoteEvent(noteEvent.getChannel(),(long)(currentTick+0.125*resolution),
+                                            noteEvent.getPitch(),noteEvent.getIntensity());
+                                    newNoteEvent.setDurationTicks(noteEvent.getDurationTicks());
+                                    midiChannel.getMidiEventList().add(i,newNoteEvent);
+                                    midiChannel.getMidiEventList().remove(i+1);
+                                }
+
+                                MuiNote restNote = getMuiNote(-1, 0.125*resolution);
                                 if(muiNote!=null) {
-                                    note.insert(0, "|" + restNote.getStandardMuiNote(resolution).getPitchString() + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
-                                    time.insert(0, restNote.getStandardMuiNote(resolution).getTimeString() + muiNote.getStandardMuiNote(resolution).getTimeString());
+                                    restNote=restNote.getStandardMuiNote(resolution);
+                                    muiNote=muiNote.getStandardMuiNote(resolution);
+                                    note.insert(0, "|" + restNote.getPitchString() + muiNote.getPitchString()).append("|");
+                                    time.insert(0, restNote.getTimeString() + muiNote.getTimeString());
+
+//                                    test.append("Add note triggerTick:"+currentTick+"\n");
+
                                     front.append(note);
                                     note.delete(0, note.length());
                                     latter.append(time);
                                     time.delete(0, time.length());
-                                    noteCount += muiNote.getStandardMuiNote(resolution).getNoteNumbers() + restNote.getNoteNumbers();
+                                    noteCount += muiNote.getNoteNumbers() + restNote.getNoteNumbers();
                                     sameTime = false;
+                                    muiNote=null;
                                 }
                                 else {
                                     front.append(restNote.getPitchString());
                                     latter.append(restNote.getTimeString());
                                     noteCount += restNote.getNoteNumbers();
                                 }
-                                currentTick = noteEvent.getTriggerTick();
-                                muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks());
-                                lastDuration=muiNote.getDurationTicks();
+                                lastDuration=0.125*resolution;
+                                --i;
+                                end++;
+
                             }
                         }
                     }
@@ -157,6 +210,9 @@ public class MidiConverter {
                         if (sameTime) {
                             note.insert(0, "|" + muiNote.getPitchString()).append("|");
                             time.insert(0, muiNote.getTimeString());
+
+//                            test.append("Add note triggerTick:"+currentTick+"\n");
+
                             front.append(note);
                             latter.append(time);
                             note.delete(0, note.length());
@@ -165,6 +221,9 @@ public class MidiConverter {
                         } else if(muiNote!=null){
                             front.append(muiNote.getPitchString());
                             latter.append(muiNote.getTimeString());
+
+//                            test.append("Add note triggerTick:"+currentTick+"\n");
+
                         }
                         if(front.length()!=0) {
                             mui.append(front).append("  <").append(latter).append(">\n");
@@ -174,6 +233,7 @@ public class MidiConverter {
                     }
                 }
                 mui.append("end\n\n\n");
+                intensity=-1;
             }
             mui.append("\nplay(");
             for (int i = 0; i < midiChannels.size(); ++i) {
@@ -189,6 +249,15 @@ public class MidiConverter {
             for (int i = 0; i < 5; i++)
                 result = result.replaceAll("\\)\\(", "").replaceAll("\\]\\[", "");
 
+
+//            for (MidiChannel midiChannel:midiChannels) {
+//                for (int i=0;i<midiChannel.getMidiEventList().size();++i) {
+//                    MidiEvent midiEvent=midiChannel.getMidiEventList().get(i);
+//                    if (midiEvent instanceof NoteEvent) {
+//                        test2.append("Add note triggerTick:"+midiEvent.getTriggerTick()+"\n");
+//                    }
+//                }
+//            }
 
             return result;
 
@@ -259,10 +328,19 @@ public class MidiConverter {
                 timeString.insert(0, "w");
                 minDurationTicks = resolution * 0.125;
                 remainTick -= minDurationTicks;
-            } else {
-                //时值少于32分音符的按32分音符处理
+            } else if(remainTick >= resolution * 0.125*0.5){
+                //时值多于32分音符的一半但少于32分音符的按32分音符处理
+                ++noteNumbers;
+                timeString.insert(0, "w");
                 double roundingDuration = resolution * 0.125 - remainTick;
-                return getMuiNote(pitch, durationTicks + roundingDuration);
+                durationTicks+=roundingDuration;
+                remainTick=0;
+            }else if(remainTick==durationTicks) {
+                ++noteNumbers;
+                timeString.insert(0, "w");
+                durationTicks=0.125*resolution;
+            }else{
+                remainTick=0;
             }
         }
         return new MuiNote(pitch, timeString.toString(),noteNumbers, durationTicks);
@@ -276,13 +354,14 @@ public class MidiConverter {
 
                 if (midiEvent instanceof BpmEvent) {
                     BpmEvent tempBpmEvent = (BpmEvent) midiEvent;
-                    boolean repeat = false;
+                    int i=-1;
                     for (BpmEvent bpmEvent : bpmEvents) {
-                        if (tempBpmEvent.getBpm() == bpmEvent.getBpm())
-                            repeat = true;
+                        if (tempBpmEvent.getTriggerTick() == bpmEvent.getTriggerTick())
+                            i=bpmEvents.indexOf(bpmEvent);
                     }
-                    if (!repeat)
-                        bpmEvents.add(tempBpmEvent);
+                    if (i!=-1)
+                        bpmEvents.remove(i);
+                    bpmEvents.add(tempBpmEvent);
                 } else if (midiEvent instanceof InstrumentEvent) {
                     InstrumentEvent tempInstrumentEvent = (InstrumentEvent) midiEvent;
                     MidiChannel tempMidiChannel = null;
@@ -334,19 +413,32 @@ public class MidiConverter {
     private void changeStatusAddNote(double triggerTick) {
         if(triggerTick>currentTick+lastDuration){
             addNote();
-            MuiNote restNote = getMuiNote(-1, triggerTick - currentTick- lastDuration);
-            muiNote=restNote;
-            addNote();
+            if(triggerTick - currentTick- lastDuration>=0.0625*resolution){
+                MuiNote restNote = getMuiNote(-1, triggerTick - currentTick- lastDuration);
+                muiNote=restNote;
+                addNote();
+                currentTick+=restNote.getDurationTicks();
+                lastDuration=0;
+            }else {
+                currentTick+=lastDuration;
+                lastDuration=0;
+            }
+
         }else if(triggerTick<currentTick+lastDuration){
-            MuiNote restNote = getMuiNote(-1, triggerTick - currentTick);
+            MuiNote restNote = getMuiNote(-1, 0.125*resolution);
             if(muiNote!=null) {
-                note.insert(0, "|" + restNote.getStandardMuiNote(resolution).getPitchString() + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
-                time.insert(0, restNote.getStandardMuiNote(resolution).getTimeString() + muiNote.getStandardMuiNote(resolution).getTimeString());
+                muiNote=muiNote.getStandardMuiNote(resolution);
+                note.insert(0, "|" + restNote.getPitchString() + muiNote.getPitchString()).append("|");
+                time.insert(0, restNote.getTimeString() + muiNote.getTimeString());
+
+//                if(!muiNote.getPitchString().contains("0"))
+//                    test.append("Add note triggerTick:"+currentTick+"\n");
+
                 front.append(note);
                 note.delete(0, note.length());
                 latter.append(time);
                 time.delete(0, time.length());
-                noteCount += muiNote.getStandardMuiNote(resolution).getNoteNumbers() + restNote.getNoteNumbers();
+                noteCount += muiNote.getNoteNumbers() + restNote.getNoteNumbers();
                 sameTime = false;
                 muiNote=null;
             }
@@ -355,6 +447,10 @@ public class MidiConverter {
                 latter.append(restNote.getTimeString());
                 noteCount += restNote.getNoteNumbers();
             }
+            currentTick+=0.125*resolution;
+            lastDuration=0;
+            if(triggerTick>=currentTick)
+                changeStatusAddNote(triggerTick);
         }
 
         addNote();
@@ -371,6 +467,10 @@ public class MidiConverter {
         if (sameTime) {
             note.insert(0, "|" + muiNote.getStandardMuiNote(resolution).getPitchString()).append("|");
             time.insert(0, muiNote.getStandardMuiNote(resolution).getTimeString());
+
+//            if(!muiNote.getPitchString().contains("0"))
+//                test.append("Add note triggerTick:"+currentTick+"\n");
+
             front.append(note);
             note.delete(0, note.length());
             latter.append(time);
@@ -381,6 +481,10 @@ public class MidiConverter {
             front.append(muiNote.getPitchString());
             latter.append(muiNote.getTimeString());
             noteCount += muiNote.getNoteNumbers();
+
+//            if(!muiNote.getPitchString().contains("0"))
+//                test.append("Add note triggerTick:"+currentTick+"\n");
+
         }
         muiNote=null;
     }
