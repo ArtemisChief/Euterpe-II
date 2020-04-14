@@ -69,6 +69,7 @@ public class MidiConverter {
                 latter = new StringBuilder();
                 muiNote = null;
                 int end = midiChannel.getMidiEventList().size();
+
                 for (int i=0;i<midiChannel.getMidiEventList().size();++i) {
 
                     MidiEvent midiEvent=midiChannel.getMidiEventList().get(i);
@@ -211,12 +212,8 @@ public class MidiConverter {
                     }
 
                     --end;
-                    if(end==0){
-                        --i;
-                        continue;
-                    }
 
-                    if (end == -1) {
+                    if (end == 0) {
                         if (noteCount >= 10 && !sameTime) {
                             mui.append(front).append("  <").append(latter).append(">\n");
                             front.delete(0, front.length());
