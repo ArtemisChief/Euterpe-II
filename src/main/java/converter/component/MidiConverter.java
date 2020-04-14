@@ -98,8 +98,7 @@ public class MidiConverter {
                     } else {
                         NoteEvent noteEvent = (NoteEvent) midiEvent;
 
-
-                        if(!(noteEvent.getTriggerTick() == currentTick && lastDuration != 0)&&(noteEvent.getIntensity()!=intensity)) {
+                        if(!(noteEvent.getTriggerTick() - currentTick<0.125*resolution && lastDuration != 0)&&(noteEvent.getIntensity()!=intensity)) {
                             intensity = noteEvent.getIntensity();
                             changeStatusAddNote(noteEvent.getTriggerTick());
                             mui.append("volume=" + intensity + "\n");
