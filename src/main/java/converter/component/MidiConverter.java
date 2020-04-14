@@ -35,8 +35,8 @@ public class MidiConverter {
     private StringBuilder latter = null;
     private StringBuilder mui = null;
 
-    private StringBuilder test=new StringBuilder();
-    private StringBuilder test2=new StringBuilder();
+//    private StringBuilder test=new StringBuilder();
+//    private StringBuilder test2=new StringBuilder();
 
     private boolean sameTime = false;
 
@@ -73,7 +73,7 @@ public class MidiConverter {
 
                     MidiEvent midiEvent=midiChannel.getMidiEventList().get(i);
 
-//                    if(midiEvent.getTriggerTick()==52140)
+//                    if(midiEvent.getTriggerTick()==98400)
 //                        System.out.println("aaa");
 
                     if (noteCount >= 10 && !sameTime) {
@@ -87,13 +87,9 @@ public class MidiConverter {
                         BpmEvent bpmEvent = (BpmEvent) midiEvent;
                         changeStatusAddNote(bpmEvent.getTriggerTick());
                         mui.append("speed=" + String.format("%.1f", bpmEvent.getBpm()) + "\n");
-                        currentTick=bpmEvent.getTriggerTick();
-                        lastDuration=0;
                     } else if (midiEvent instanceof InstrumentEvent) {
                         InstrumentEvent instrumentEvent = (InstrumentEvent) midiEvent;
                         changeStatusAddNote(instrumentEvent.getTriggerTick());
-                        currentTick=instrumentEvent.getTriggerTick();
-                        lastDuration=0;
                         if (midiChannel.getChannelNumber() == 9)
                             mui.append("instrument= -1\n");
                         else
@@ -101,12 +97,8 @@ public class MidiConverter {
                     } else {
                         NoteEvent noteEvent = (NoteEvent) midiEvent;
 
-//                        if(noteEvent.getPitch()==73){
-//                            System.out.println("aaaaa");
-//                        }
 
-
-                        if((!sameTime)&&(noteEvent.getIntensity()!=intensity)) {
+                        if(!(noteEvent.getTriggerTick() == currentTick && lastDuration != 0)&&(noteEvent.getIntensity()!=intensity)) {
                             intensity = noteEvent.getIntensity();
                             changeStatusAddNote(noteEvent.getTriggerTick());
                             mui.append("volume=" + intensity + "\n");
@@ -174,6 +166,9 @@ public class MidiConverter {
                                     newNoteEvent.setDurationTicks(noteEvent.getDurationTicks());
                                     midiChannel.getMidiEventList().add(i,newNoteEvent);
                                     midiChannel.getMidiEventList().remove(i+1);
+                                    --i;
+                                    continue;
+
                                 }
 
                                 MuiNote restNote = getMuiNote(-1, 0.125*resolution);
@@ -198,7 +193,8 @@ public class MidiConverter {
                                     latter.append(restNote.getTimeString());
                                     noteCount += restNote.getNoteNumbers();
                                 }
-                                lastDuration=0.125*resolution;
+                                currentTick+=0.125*resolution;
+                                lastDuration=0;
                                 --i;
                                 end++;
 
@@ -429,34 +425,34 @@ public class MidiConverter {
                 currentTick+=lastDuration;
                 lastDuration=0;
             }
+        }else if((triggerTick<currentTick+lastDuration)&&(triggerTick-currentTick>=0.0625*resolution)){
 
-        }else if(triggerTick<currentTick+lastDuration){
-            MuiNote restNote = getMuiNote(-1, 0.125*resolution);
-            if(muiNote!=null) {
-                muiNote=muiNote.getStandardMuiNote(resolution);
-                note.insert(0, "|" + restNote.getPitchString() + muiNote.getPitchString()).append("|");
-                time.insert(0, restNote.getTimeString() + muiNote.getTimeString());
+                MuiNote restNote = getMuiNote(-1, 0.125*resolution);
+                if(muiNote!=null) {
+                    muiNote=muiNote.getStandardMuiNote(resolution);
+                    note.insert(0, "|" + restNote.getPitchString() + muiNote.getPitchString()).append("|");
+                    time.insert(0, restNote.getTimeString() + muiNote.getTimeString());
 
-//                if(!muiNote.getPitchString().contains("0"))
-//                    test.append("Add note triggerTick:"+currentTick+"\n");
+//                    if(!muiNote.getPitchString().contains("0"))
+//                        test.append("Add note triggerTick:"+currentTick+"\n");
 
-                front.append(note);
-                note.delete(0, note.length());
-                latter.append(time);
-                time.delete(0, time.length());
-                noteCount += muiNote.getNoteNumbers() + restNote.getNoteNumbers();
-                sameTime = false;
-                muiNote=null;
-            }
-            else {
-                front.append(restNote.getPitchString());
-                latter.append(restNote.getTimeString());
-                noteCount += restNote.getNoteNumbers();
-            }
-            currentTick+=0.125*resolution;
-            lastDuration=0;
-            if(triggerTick>=currentTick)
-                changeStatusAddNote(triggerTick);
+                    front.append(note);
+                    note.delete(0, note.length());
+                    latter.append(time);
+                    time.delete(0, time.length());
+                    noteCount += muiNote.getNoteNumbers() + restNote.getNoteNumbers();
+                    sameTime = false;
+                    muiNote=null;
+                }
+                else {
+                    front.append(restNote.getPitchString());
+                    latter.append(restNote.getTimeString());
+                    noteCount += restNote.getNoteNumbers();
+                }
+                currentTick+=0.125*resolution;
+                lastDuration=0;
+                if(triggerTick>=currentTick)
+                    changeStatusAddNote(triggerTick);
         }
 
         addNote();
@@ -467,6 +463,8 @@ public class MidiConverter {
             noteCount = 0;
             mui.append("\n");
         }
+
+
     }
 
     private void addNote() {
