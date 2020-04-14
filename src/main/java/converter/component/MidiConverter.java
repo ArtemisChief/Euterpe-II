@@ -133,7 +133,7 @@ public class MidiConverter {
                                 lastDuration=muiNote.getDurationTicks();
                             } else if (currentTick + lastDuration < noteEvent.getTriggerTick()) {
                                 addNote();
-                                if(noteEvent.getTriggerTick() - currentTick- lastDuration>=0.0625*resolution){
+                                if(noteEvent.getTriggerTick() - currentTick- lastDuration>=0.125*resolution){
                                     addNote();
                                     MuiNote restNote = getMuiNote(-1, noteEvent.getTriggerTick() - currentTick - lastDuration);
                                     front.append(restNote.getPitchString());
@@ -211,7 +211,12 @@ public class MidiConverter {
                     }
 
                     --end;
-                    if (end == 0) {
+                    if(end==0){
+                        --i;
+                        continue;
+                    }
+
+                    if (end == -1) {
                         if (noteCount >= 10 && !sameTime) {
                             mui.append(front).append("  <").append(latter).append(">\n");
                             front.delete(0, front.length());
@@ -340,6 +345,10 @@ public class MidiConverter {
                 remainTick -= minDurationTicks;
             } else if(remainTick >= resolution * 0.125*0.5){
                 //时值多于32分音符的一半但少于32分音符的按32分音符处理
+                if(pitch==-1) {
+                    durationTicks-=remainTick;
+                    break;
+                }
                 ++noteNumbers;
                 timeString.insert(0, "w");
                 double roundingDuration = resolution * 0.125 - remainTick;
@@ -355,7 +364,6 @@ public class MidiConverter {
 
         }while(pitch==-1&&remainTick!=0&&remainTick!=1);
         MuiNote temp=new MuiNote(pitch, timeString.toString(),noteNumbers, durationTicks);
-        timeString=null;
         return temp;
     }
 
