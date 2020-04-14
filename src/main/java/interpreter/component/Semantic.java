@@ -365,6 +365,7 @@ public class Semantic {
 
         Note tempNote;
         byte tempChannel=channel;
+        byte intensity=80;
 
         int count = noteList.size();
         for (int index = 0; index < count; ++index) {
@@ -377,7 +378,7 @@ public class Semantic {
                         midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
                         break;
                     case 1:
-                        midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                        intensity=Byte.parseByte(event.getData());
                         break;
                     case 2:
                         if (Byte.parseByte(event.getData()) == -1)
@@ -413,7 +414,7 @@ public class Semantic {
                                             midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
                                             break;
                                         case 1:
-                                            midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                                            intensity=Byte.parseByte(event.getData());
                                             break;
                                         case 2:
                                             if (Byte.parseByte(event.getData()) == -1)
@@ -426,7 +427,7 @@ public class Semantic {
                                     }
                                 }
 
-                                midiTrackBuilder.insertNoteOn(0, channel, noteList.get(index).byteValue(), (byte) 80);
+                                midiTrackBuilder.insertNoteOn(0, channel, noteList.get(index).byteValue(), intensity);
                                 tempNote = new Note(durationList.get(index), noteList.get(index++).byteValue(), isPrimary);
                                 bufferNotes.offer(tempNote);
 
@@ -470,7 +471,7 @@ public class Semantic {
                                             midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
                                             break;
                                         case 1:
-                                            midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                                            intensity=Byte.parseByte(event.getData());
                                             break;
                                         case 2:
                                             if (Byte.parseByte(event.getData()) == -1)
@@ -486,7 +487,7 @@ public class Semantic {
                                 currentNote = noteList.get(index).byteValue();
                                 if (currentNote != lastNote) {
                                     if (lastNote != -1) {
-                                        midiTrackBuilder.insertNoteOn(0, channel, lastNote, (byte) 80);
+                                        midiTrackBuilder.insertNoteOn(0, channel, lastNote, intensity);
                                         midiTrackBuilder.insertNoteOff(totalDuration, channel, lastNote);
                                         totalDuration = 0;
                                     }
@@ -501,7 +502,7 @@ public class Semantic {
 
                             symbolQueue.poll();
 
-                            midiTrackBuilder.insertNoteOn(0, channel, lastNote, (byte) 80);
+                            midiTrackBuilder.insertNoteOn(0, channel, lastNote, intensity);
 
                             //还有同时音在播放中
                             while (!bufferNotes.isEmpty() && durationList.get(tempIndex) >= bufferNotes.peek().getDeltaTime()) {
@@ -528,7 +529,7 @@ public class Semantic {
                         midiTrackBuilder.setBpm(Float.parseFloat(event.getData()));
                         break;
                     case 1:
-                        midiTrackBuilder.addController(channel, (byte) 0x07, Byte.parseByte(event.getData()));
+                        intensity=Byte.parseByte(event.getData());
                         break;
                     case 2:
                         if (Byte.parseByte(event.getData()) == -1)
@@ -543,7 +544,7 @@ public class Semantic {
 
             if (index < count) {
                 //特殊符号外的音
-                midiTrackBuilder.insertNoteOn(0, channel, noteList.get(index).byteValue(), (byte) 80);
+                midiTrackBuilder.insertNoteOn(0, channel, noteList.get(index).byteValue(), intensity);
 
                 //还有同时音在播放中
                 while (!bufferNotes.isEmpty() && durationList.get(index) >= bufferNotes.peek().getDeltaTime()) {
