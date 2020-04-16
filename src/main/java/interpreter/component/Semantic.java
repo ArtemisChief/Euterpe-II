@@ -339,7 +339,7 @@ public class Semantic {
                                 MidiTrack midiTrack;
 
                                 if (index > midiTracks.size() - 1) {
-                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), totalDuration, (byte) channel);
+                                    midiTrack = constructMidiTrackPart(paragraphMap.get(paraName), totalDuration, (byte) channel);
                                     if (midiTrack != null)
                                         midiTracks.add(midiTrack);
                                 } else {
@@ -357,7 +357,7 @@ public class Semantic {
                                     } else
                                         durationDiff = 0;
 
-                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), durationDiff, (byte) channel);
+                                    midiTrack = constructMidiTrackPart(paragraphMap.get(paraName), durationDiff, (byte) channel);
                                     if (midiTrack != null)
                                         midiTrackBuilder.merge(midiTracks.get(index), midiTrack);
                                 }
@@ -378,7 +378,7 @@ public class Semantic {
         }
     }
 
-    private MidiTrack constuctMidiTrackPart(Paragraph paragraph, int duration, byte channel) {
+    private MidiTrack constructMidiTrackPart(Paragraph paragraph, int duration, byte channel) {
         if (getIsError())
             return null;
 
