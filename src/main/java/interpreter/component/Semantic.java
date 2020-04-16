@@ -283,41 +283,58 @@ public class Semantic {
                     break;
 
                 case "playlist":
-                    String paraName = "";
                     int index = 0;
                     int channel = 0;
                     int totalDuration = 0;
+                    int lastDuration=0;
+                    List<String> paraNameList = new ArrayList<>();
+
+                    Map<Integer, Paragraph> trackLastParagraphMap = new HashMap<>();
 
                     for (Node playList : child.getChildren()) {
                         switch (playList.getContent()) {
                             case "&":
                                 index++;
+
                                 channel++;
                                 if (channel > 15 || channel == 9)
                                     channel = ++channel % 16;
                                 break;
 
                             case ",":
-                                if (!paragraphMap.containsKey(paraName))
+                                if (paraNameList.isEmpty())
                                     break;
 
                                 index = 0;
 
-                                List<Integer> duration = paragraphMap.get(paraName).getDurationList();
+                                lastDuration = 0;
+                                for (String paraName : paraNameList) {
+                                    List<Integer> mDurationList = paragraphMap.get(paraName).getDurationList();
 
-                                for (int dura : duration)
-                                    totalDuration += dura;
+                                    int mDuration = 0;
+
+                                    for (int dura : mDurationList)
+                                        mDuration += dura;
+
+                                    lastDuration = Math.max(mDuration, lastDuration);
+                                }
+
+                                totalDuration += lastDuration;
+
+                                paraNameList.clear();
 
                                 break;
 
                             default:
-                                paraName = playList.getContent();
+                                String paraName = playList.getContent();
 
                                 if (!paragraphMap.containsKey(paraName)) {
                                     errorInfo.append("Line: ").append(playList.getLine()).append("\t未声明的段落名").append(paraName).append("\n");
                                     errorLines.add(playList.getLine());
                                     break;
                                 }
+
+                                paraNameList.add(paraName);
 
                                 MidiTrack midiTrack;
 
@@ -326,10 +343,29 @@ public class Semantic {
                                     if (midiTrack != null)
                                         midiTracks.add(midiTrack);
                                 } else {
-                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), 0, (byte) channel);
+                                    int durationDiff;
+
+                                    if (trackLastParagraphMap.containsKey(index)) {
+                                        durationDiff = lastDuration;
+
+                                        int mDuration = 0;
+
+                                        for (int dura : trackLastParagraphMap.get(index).getDurationList())
+                                            mDuration += dura;
+
+                                        durationDiff -= mDuration;
+                                    } else
+                                        durationDiff = 0;
+
+                                    midiTrack = constuctMidiTrackPart(paragraphMap.get(paraName), durationDiff, (byte) channel);
                                     if (midiTrack != null)
                                         midiTrackBuilder.merge(midiTracks.get(index), midiTrack);
                                 }
+
+                                if (trackLastParagraphMap.containsKey(index))
+                                    trackLastParagraphMap.replace(index, paragraphMap.get(paraName));
+                                else
+                                    trackLastParagraphMap.put(index, paragraphMap.get(paraName));
 
                                 break;
                         }
