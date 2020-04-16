@@ -172,7 +172,6 @@ public class MainWindow extends JFrame {
         playExternalMenuItem = new JMenuItem();
         exportMidiMenuItem = new JMenuItem();
         loadMidiFileMenuItem = new JMenuItem();
-        arduinoMenu = new JMenu();
         converterMenu = new JMenu();
         convertToMuiMenuItem = new JMenuItem();
         convertToStaveMenuItem = new JMenuItem();
@@ -278,12 +277,6 @@ public class MainWindow extends JFrame {
                     playerMenu.add(loadMidiFileMenuItem);
                 }
                 menuBar2.add(playerMenu);
-
-                //======== arduinoMenu ========
-                {
-                    arduinoMenu.setText("Arduino");
-                }
-                menuBar2.add(arduinoMenu);
 
                 //======== converterMenu ========
                 {
@@ -523,7 +516,6 @@ public class MainWindow extends JFrame {
     public JMenuItem playExternalMenuItem;
     public JMenuItem exportMidiMenuItem;
     public JMenuItem loadMidiFileMenuItem;
-    private JMenu arduinoMenu;
     private JMenu converterMenu;
     public JMenuItem convertToMuiMenuItem;
     public JMenuItem convertToStaveMenuItem;
