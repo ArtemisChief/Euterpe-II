@@ -3,13 +3,11 @@ package gui.controller;
 import gui.view.MainWindow;
 import interpreter.component.Lexical;
 import interpreter.component.Semantic;
-import interpreter.component.SemanticArduino;
 import interpreter.component.Syntactic;
 import interpreter.entity.Node;
 import interpreter.entity.Token;
 import midibuilder.entity.MidiFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Interpreter {
@@ -28,7 +26,6 @@ public class Interpreter {
         lexical = new Lexical();
         syntactic = new Syntactic();
         semantic = new Semantic();
-        semanticArduino=new SemanticArduino();
     }
 
     // 词法分析
@@ -140,58 +137,6 @@ public class Interpreter {
     // 获取Midi文件
     public MidiFile getMidiFile(){
         return semantic.getMidiFile();
-    }
-
-    private final SemanticArduino semanticArduino;
-
-    private String runArduinoSem(Node abstractSyntaxTree, StringBuilder output) {
-        String code = semanticArduino.ConvertToArduino(abstractSyntaxTree);
-
-        if (semanticArduino.getIsError()) {
-            output.append(semanticArduino.getErrors());
-            output.append("\n检测到语义错误，分析停止\n");
-            MainWindow.GetInstance().outputTextArea.setText(output.toString());
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
-            for (int line : semanticArduino.getErrorLines()) {
-                InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
-                        InputTexts.GetInstance().getIndexByLine(line),
-                        InputTexts.GetInstance().getIndexByLine(line + 1) - InputTexts.GetInstance().getIndexByLine(line),
-                        InputTexts.GetInstance().errorAttributeSet, true
-                );
-            }
-            return null;
-        } else {
-            output.append(code);
-        }
-
-        return code;
-    }
-
-    public String runArduinoInterpret(){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        if (MainWindow.GetInstance().inputTextPane.getText().isEmpty())
-            return null;
-
-        List<Token> tokens = runLex(MainWindow.GetInstance().inputTextPane.getText(), stringBuilder);
-
-        if (tokens == null)
-            return null;
-
-        stringBuilder.append("\n\n=======================================词法分析结束=============开始语法分析=======================================\n\n");
-
-        Node AbstractSyntaxTree = runSyn(tokens, stringBuilder);
-
-        if (AbstractSyntaxTree == null)
-            return null;
-
-        stringBuilder.append("\n\n=======================================语法分析结束=============开始语义分析=======================================\n\n");
-
-        String code = runArduinoSem(AbstractSyntaxTree, stringBuilder);
-
-        MainWindow.GetInstance().outputTextArea.setText(stringBuilder.toString());
-
-        return code;
     }
 
 }

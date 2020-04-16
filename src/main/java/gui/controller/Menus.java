@@ -1,16 +1,12 @@
 package gui.controller;
 
 import gui.view.MainWindow;
-import interpreter.component.ArduinoCmd;
 import midiplayer.MidiPlayer;
 import gui.entity.Status;
 import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.util.ArrayList;
 
 public class Menus {
 
@@ -137,7 +133,7 @@ public class Menus {
             MainWindow.GetInstance().playSlider.setEnabled(true);
             int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
             int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 保存文件
@@ -187,12 +183,12 @@ public class Menus {
             MainWindow.GetInstance().playSlider.setEnabled(true);
             int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
             int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 播放
         MainWindow.GetInstance().playBtn.addActionListener(e -> {
-            if(!MidiPlayer.GetInstance().isLoadedMidiFile()){
+            if (!MidiPlayer.GetInstance().isLoadedMidiFile()) {
                 if (!FileIO.GetInstance().generateTempMidiFile())
                     return;
 
@@ -202,7 +198,7 @@ public class Menus {
                 MainWindow.GetInstance().playSlider.setEnabled(true);
                 int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
                 int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-                MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
+                MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
             }
 
             if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
@@ -217,7 +213,7 @@ public class Menus {
         });
 
         // 从外部播放Midi文件
-        MainWindow.GetInstance().playExternalMenuItem.addActionListener(e-> {
+        MainWindow.GetInstance().playExternalMenuItem.addActionListener(e -> {
             if (!FileIO.GetInstance().generateTempMidiFile())
                 return;
 
@@ -230,9 +226,9 @@ public class Menus {
 
         // 加载Midi文件播放
         MainWindow.GetInstance().loadMidiFileMenuItem.addActionListener(e -> {
-            File file=FileIO.GetInstance().openMidiFile();
+            File file = FileIO.GetInstance().openMidiFile();
 
-            if(file==null)
+            if (file == null)
                 return;
 
             MainWindow.GetInstance().outputTextArea.setText("");
@@ -245,12 +241,12 @@ public class Menus {
             MainWindow.GetInstance().playSlider.setEnabled(true);
             int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
             int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 转换Midi到Mui
         MainWindow.GetInstance().convertToMuiMenuItem.addActionListener(e -> {
-            if(!FileIO.GetInstance().convertMidiFile())
+            if (!FileIO.GetInstance().convertMidiFile())
                 return;
 
             MainWindow.GetInstance().outputTextArea.setText("");
@@ -266,7 +262,7 @@ public class Menus {
             MainWindow.GetInstance().playSlider.setEnabled(true);
             int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
             int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d",minutes,seconds));
+            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 转换Mui到五线谱
@@ -461,122 +457,6 @@ public class Menus {
             MainWindow.GetInstance().outputTextArea.setCaretPosition(0);
             MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
         });
-
-
-
-
-
-
-
-        // 生成Arduino的.ino文件
-        MainWindow.GetInstance().generateInoMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
-
-            Interpreter.GetInstance().runArduinoInterpret();
-        });
-
-        // 编译验证Arduino代码
-        MainWindow.GetInstance().compileVerifyMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
-
-            String code = Interpreter.GetInstance().runArduinoInterpret();
-
-            File tempFile;
-
-            try {
-                tempFile = new File("C:\\Users\\Chief\\Documents\\Arduino\\temp.ino");
-                if (!tempFile.exists())
-                    tempFile.createNewFile();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
-                bufferedWriter.write(code);
-                bufferedWriter.close();
-
-                ArduinoCmd.GetInstance().compile(tempFile.getAbsolutePath());
-                readCmd();
-
-            } catch (IOException e1) {
-//                e1.printStackTrace();
-            }
-        });
-
-        // 上传Arduino代码
-        MainWindow.GetInstance().uploadArduinoMenuItem.addActionListener(e -> {
-
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
-
-            String code = Interpreter.GetInstance().runArduinoInterpret();
-
-            File tempFile;
-
-            try {
-                tempFile = new File("C:\\Users\\Chief\\Documents\\Arduino\\temp.ino");
-                if (!tempFile.exists())
-                    tempFile.createNewFile();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
-                bufferedWriter.write(code);
-                bufferedWriter.close();
-
-                ArduinoCmd.GetInstance().upload(tempFile.getAbsolutePath());
-                readCmd();
-            } catch (IOException e1) {
-//                e1.printStackTrace();
-            }
-        });
-
-    }
-
-    //读取Arduino CMD数据流
-    private String cmdOutput;
-    private void readCmd() {
-        MainWindow.GetInstance().compileVerifyMenuItem.setEnabled(false);
-        MainWindow.GetInstance().uploadArduinoMenuItem.setEnabled(false);
-        cmdOutput = "";
-
-        //处理输出的线程
-        new Thread(() -> {
-            int count = 0;
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ArduinoCmd.output, "GBK"));
-                String tempStr;
-                while ((tempStr = bufferedReader.readLine()) != null) {
-                    count++;
-                    if (count > 12) {
-                        cmdOutput += tempStr + "\n";
-                        MainWindow.GetInstance().outputTextArea.setText(cmdOutput);
-                    }
-                }
-                MainWindow.GetInstance().compileVerifyMenuItem.setEnabled(true);
-                MainWindow.GetInstance().uploadArduinoMenuItem.setEnabled(true);
-            } catch (IOException IOE) {
-                IOE.printStackTrace();
-            } finally {
-                try {
-                    ArduinoCmd.output.close();
-                } catch (IOException IOE) {
-                    IOE.printStackTrace();
-                }
-            }
-        }).start();
-
-        //处理错误信息的线程
-        new Thread(() -> {
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ArduinoCmd.error, "GBK"));
-                String tempStr;
-                while ((tempStr = bufferedReader.readLine()) != null) {
-                    cmdOutput += tempStr + "\n";
-                    MainWindow.GetInstance().outputTextArea.setText(cmdOutput);
-                }
-            } catch (IOException IOE) {
-                IOE.printStackTrace();
-            } finally {
-                try {
-                    ArduinoCmd.error.close();
-                } catch (IOException IOE) {
-                    IOE.printStackTrace();
-                }
-            }
-        }).start();
     }
 
 }

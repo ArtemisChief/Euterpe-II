@@ -109,7 +109,7 @@ public class MainWindow extends JFrame {
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
 
-        for (int i = 1; i < 10000; ++i)
+        for (int i = 1; i < 100000; ++i)
             lineStr.append(i).append("\n");
 
         lineTextArea.setText(lineStr.toString());
@@ -173,9 +173,6 @@ public class MainWindow extends JFrame {
         exportMidiMenuItem = new JMenuItem();
         loadMidiFileMenuItem = new JMenuItem();
         arduinoMenu = new JMenu();
-        generateInoMenuItem = new JMenuItem();
-        compileVerifyMenuItem = new JMenuItem();
-        uploadArduinoMenuItem = new JMenuItem();
         converterMenu = new JMenu();
         convertToMuiMenuItem = new JMenuItem();
         convertToStaveMenuItem = new JMenuItem();
@@ -285,18 +282,6 @@ public class MainWindow extends JFrame {
                 //======== arduinoMenu ========
                 {
                     arduinoMenu.setText("Arduino");
-
-                    //---- generateInoMenuItem ----
-                    generateInoMenuItem.setText("Generate .ino File");
-                    arduinoMenu.add(generateInoMenuItem);
-
-                    //---- compileVerifyMenuItem ----
-                    compileVerifyMenuItem.setText("Compile / Verify");
-                    arduinoMenu.add(compileVerifyMenuItem);
-
-                    //---- uploadArduinoMenuItem ----
-                    uploadArduinoMenuItem.setText("Upload to Arduino");
-                    arduinoMenu.add(uploadArduinoMenuItem);
                 }
                 menuBar2.add(arduinoMenu);
 
@@ -378,7 +363,7 @@ public class MainWindow extends JFrame {
                 lineScrollPane.setViewportView(lineTextArea);
             }
             leftPanel.add(lineScrollPane);
-            lineScrollPane.setBounds(0, 31, 40, 742);
+            lineScrollPane.setBounds(0, 31, 50, 742);
 
             //======== inputScrollPane ========
             {
@@ -391,7 +376,7 @@ public class MainWindow extends JFrame {
                 inputScrollPane.setViewportView(inputTextPane);
             }
             leftPanel.add(inputScrollPane);
-            inputScrollPane.setBounds(39, 31, 411, 742);
+            inputScrollPane.setBounds(50, 31, 400, 742);
 
             {
                 // compute preferred size
@@ -539,9 +524,6 @@ public class MainWindow extends JFrame {
     public JMenuItem exportMidiMenuItem;
     public JMenuItem loadMidiFileMenuItem;
     private JMenu arduinoMenu;
-    public JMenuItem generateInoMenuItem;
-    public JMenuItem compileVerifyMenuItem;
-    public JMenuItem uploadArduinoMenuItem;
     private JMenu converterMenu;
     public JMenuItem convertToMuiMenuItem;
     public JMenuItem convertToStaveMenuItem;

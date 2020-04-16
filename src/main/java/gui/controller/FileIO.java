@@ -195,6 +195,12 @@ public class FileIO {
 
         String result = MidiConverter.GetInstance().converterToMui(midiFile);
 
+        if(result.equals("转换过程中出现错误，所选取文件为不支持的midi文件")) {
+            MainWindow.GetInstance().outputTextArea.setText("转换过程中出现错误，所选取文件为不支持的midi文件");
+            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            return false;
+        }
+
         isOpeningFile=true;
         MainWindow.GetInstance().inputTextPane.setText(result);
         MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
