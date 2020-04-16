@@ -181,15 +181,6 @@ public class Syntactic {
 
         //{ sentence }
         while (!hadReadToEnd() && (tokens.get(index).getType() != 5)) {
-            //没遇到end就遇到play或paragraph
-            if (tokens.get(index).getType() == 6 | tokens.get(index).getType() == 2) {
-                paragraph.addChild(new Node("Error", "Line: " + tokens.get(index - 1).getLine() + "  缺少end标识"));
-                errorList.add(tokens.get(index - 1).getLine());
-                return paragraph;
-            }
-
-            sentenceError = false;
-
             if(tokens.get(index).getType()==3){
                 Node speed = parseSpeed();
                 paragraph.addChild(speed);
@@ -210,6 +201,21 @@ public class Syntactic {
                 paragraph.addChild(volume);
                 continue;
             }
+
+            //没遇到end就遇到play或paragraph
+            if (tokens.get(index).getType() == 6 | tokens.get(index).getType() == 2) {
+                paragraph.addChild(new Node("Error", "Line: " + tokens.get(index - 1).getLine() + "  缺少end标识"));
+                errorList.add(tokens.get(index - 1).getLine());
+                return paragraph;
+            }
+
+            if(!isMelodyElement()){
+                paragraph.addChild(new Node("Error", "Line: " + tokens.get(index - 1).getLine() + "  缺少音符"));
+                errorList.add(tokens.get(index - 1).getLine());
+                return paragraph;
+            }
+
+            sentenceError = false;
 
             Node sentence = parseSentence();
             paragraph.addChild(sentence);
