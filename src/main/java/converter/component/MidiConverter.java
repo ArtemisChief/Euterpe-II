@@ -86,7 +86,7 @@ public class MidiConverter {
                         noteCount = 0;
                     }
 
-                    if(!channel9Instrument&&!(midiEvent instanceof InstrumentEvent)){
+                    if(midiChannel.getChannelNumber() == 9&&!channel9Instrument&&!(midiEvent instanceof InstrumentEvent)){
                         mui.append("instrument= -1\n");
                         channel9Instrument=true;
                     }
