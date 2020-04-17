@@ -70,6 +70,8 @@ public class MidiConverter {
                 muiNote = null;
                 int end = midiChannel.getMidiEventList().size();
 
+                boolean channel9Instrument=false;
+
                 for (int i=0;i<midiChannel.getMidiEventList().size();++i) {
 
                     MidiEvent midiEvent=midiChannel.getMidiEventList().get(i);
@@ -84,6 +86,12 @@ public class MidiConverter {
                         noteCount = 0;
                     }
 
+                    if(!channel9Instrument&&!(midiEvent instanceof InstrumentEvent)){
+                        mui.append("instrument= -1\n");
+                        channel9Instrument=true;
+                    }
+
+
                     if (midiEvent instanceof BpmEvent) {
                         BpmEvent bpmEvent = (BpmEvent) midiEvent;
                         changeStatusAddNote(bpmEvent.getTriggerTick());
@@ -91,8 +99,10 @@ public class MidiConverter {
                     } else if (midiEvent instanceof InstrumentEvent) {
                         InstrumentEvent instrumentEvent = (InstrumentEvent) midiEvent;
                         changeStatusAddNote(instrumentEvent.getTriggerTick());
-                        if (midiChannel.getChannelNumber() == 9)
+                        if (midiChannel.getChannelNumber() == 9) {
                             mui.append("instrument= -1\n");
+                            channel9Instrument=true;
+                        }
                         else
                             mui.append("instrument=" + instrumentEvent.getInstrumentNumber() + "\n");
                     } else {
