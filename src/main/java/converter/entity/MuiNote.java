@@ -74,15 +74,16 @@ public class MuiNote {
             pitchString.append("(");
         for(int i=0;i<middleBracket;i++)
             pitchString.append("[");
-        if(noteNumbers==0){
-            System.out.println("pause");
-        }
         for(int i=0;i<noteNumbers;i++)
             pitchString.append(note);
         for(int i=0;i<smallBracket;i++)
             pitchString.append(")");
         for(int i=0;i<middleBracket;i++)
             pitchString.append("]");
+
+        if(noteNumbers==0){
+            pitchString.delete(0,pitchString.length());
+        }
 
         return pitchString.toString();
     }
@@ -105,29 +106,6 @@ public class MuiNote {
     }
 
     public MuiNote getStandardMuiNote(int resolution){
-//        if(durationTicks>=5.9*resolution)
-//            return new MuiNote(pitch,"1*",1,6*resolution);
-//        else if(durationTicks>=3.9*resolution)
-//            return new MuiNote(pitch,"1",1,4*resolution);
-//        else if(durationTicks>=2.9*resolution)
-//            return new MuiNote(pitch,"2*",1,3*resolution);
-//        else if(durationTicks>=1.9*resolution)
-//            return new MuiNote(pitch,"2",1,2*resolution);
-//        else if(durationTicks>=1.45*resolution)
-//            return new MuiNote(pitch,"4*",1,1.5*resolution);
-//        else if(durationTicks>=0.95*resolution)
-//            return new MuiNote(pitch,"4",1,resolution);
-//        else if(durationTicks>=0.725*resolution)
-//            return new MuiNote(pitch,"8*",1,0.75*resolution);
-//        else if(durationTicks>=0.4725*resolution)
-//            return new MuiNote(pitch,"8",1,0.5*resolution);
-//        else if(durationTicks>=0.3625*resolution)
-//            return new MuiNote(pitch,"g*",1,0.375*resolution);
-//        else if(durationTicks>=0.24*resolution)
-//            return new MuiNote(pitch,"g",1,0.25*resolution);
-//        else
-//            return new MuiNote(pitch,"w",1,0.125*resolution);
-
         if(durationTicks>=5*resolution)
             return new MuiNote(pitch,"1*",1,6*resolution);
         else if(durationTicks>=3.5*resolution)

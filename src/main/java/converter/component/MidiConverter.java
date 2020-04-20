@@ -145,7 +145,7 @@ public class MidiConverter {
                                 addNote();
                                 if(noteEvent.getTriggerTick() - currentTick- lastDuration>=0.125*resolution){
                                     addNote();
-                                    MuiNote restNote = getMuiNote(-1, noteEvent.getTriggerTick() - currentTick - lastDuration);
+                                    MuiNote restNote = getMaxMuiNote(-1, noteEvent.getTriggerTick() - currentTick - lastDuration);
                                     front.append(restNote.getPitchString());
                                     latter.append(restNote.getTimeString());
                                     noteCount += restNote.getNoteNumbers();
@@ -189,29 +189,29 @@ public class MidiConverter {
 
                                 }
 
-                                MuiNote restNote = getMuiNote(-1, 0.125*resolution);
-                                if(muiNote!=null) {
-                                    restNote=restNote.getStandardMuiNote(resolution);
-                                    muiNote=muiNote.getStandardMuiNote(resolution);
-                                    note.insert(0, "|" + restNote.getPitchString() + muiNote.getPitchString()).append("|");
-                                    time.insert(0, restNote.getTimeString() + muiNote.getTimeString());
+                                MuiNote restNote = getMuiNote(-1,0.125*resolution);
+//                                if(muiNote!=null) {
+                                //restNote=getMuiNote(-1,0.125*resolution);
+                                muiNote=muiNote.getStandardMuiNote(resolution);
+                                note.insert(0, "|" + restNote.getPitchString() + muiNote.getPitchString()).append("|");
+                                time.insert(0, restNote.getTimeString() + muiNote.getTimeString());
 
 //                                    test.append("Add note triggerTick:"+currentTick+"\n");
 
-                                    front.append(note);
-                                    note.delete(0, note.length());
-                                    latter.append(time);
-                                    time.delete(0, time.length());
-                                    noteCount += muiNote.getNoteNumbers() + restNote.getNoteNumbers();
-                                    sameTime = false;
-                                    muiNote=null;
-                                }
-                                else {
-                                    front.append(restNote.getPitchString());
-                                    latter.append(restNote.getTimeString());
-                                    noteCount += restNote.getNoteNumbers();
-                                }
-                                currentTick+=0.125*resolution;
+                                front.append(note);
+                                note.delete(0, note.length());
+                                latter.append(time);
+                                time.delete(0, time.length());
+                                noteCount += muiNote.getNoteNumbers() + restNote.getNoteNumbers();
+                                sameTime = false;
+                                muiNote=null;
+//                                }
+//                                else {
+//                                    front.append(restNote.getPitchString());
+//                                    latter.append(restNote.getTimeString());
+//                                    noteCount += restNote.getNoteNumbers();
+//                                }
+                                currentTick+=restNote.getDurationTicks();
                                 lastDuration=0;
                                 --i;
                                 continue;
@@ -373,6 +373,79 @@ public class MidiConverter {
         return temp;
     }
 
+
+    private MuiNote getMaxMuiNote(int pitch, double durationTicks) {
+        int noteNumbers = 0;
+        double remainTick = durationTicks + 1;  //部分midi文件会出现durationTicks少1的情况，这里加上
+        double minDurationTicks = 0;
+        StringBuilder timeString = new StringBuilder();
+        do{
+            if (remainTick >= resolution * 6) {
+                ++noteNumbers;
+                timeString.insert(0, "1*");
+                minDurationTicks = resolution * 6;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 4) {
+                ++noteNumbers;
+                timeString.insert(0, "1");
+                minDurationTicks = resolution * 4;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 3) {
+                ++noteNumbers;
+                timeString.insert(0, "2*");
+                minDurationTicks = resolution * 3;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 2) {
+                ++noteNumbers;
+                timeString.insert(0, "2");
+                minDurationTicks = resolution * 2;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 1.5) {
+                ++noteNumbers;
+                timeString.insert(0, "4*");
+                minDurationTicks = resolution * 1.5;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution) {
+                ++noteNumbers;
+                timeString.insert(0, "4");
+                minDurationTicks = resolution;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 0.75) {
+                ++noteNumbers;
+                timeString.insert(0, "8*");
+                minDurationTicks = resolution * 0.75;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 0.5) {
+                ++noteNumbers;
+                timeString.insert(0, "8");
+                minDurationTicks = resolution * 0.5;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 0.375) {
+                ++noteNumbers;
+                timeString.insert(0, "g*");
+                minDurationTicks = resolution * 0.375;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 0.25) {
+                ++noteNumbers;
+                timeString.insert(0, "g");
+                minDurationTicks = resolution * 0.25;
+                remainTick -= minDurationTicks;
+            } else if (remainTick >= resolution * 0.125) {
+                ++noteNumbers;
+                timeString.insert(0, "w");
+                minDurationTicks = resolution * 0.125;
+                remainTick -= minDurationTicks;
+            }else{
+                durationTicks-=remainTick;
+                remainTick=0;
+            }
+        }while(remainTick!=0&&remainTick!=1);
+        MuiNote temp=new MuiNote(pitch, timeString.toString(),noteNumbers, durationTicks);
+        return temp;
+    }
+
+
+
     private List<MidiChannel> sortMidiChannel(List<MidiTrack> midiTracks) {
         List<MidiChannel> midiChannels = new ArrayList<>();
         List<BpmEvent> bpmEvents = new ArrayList<>();
@@ -441,7 +514,14 @@ public class MidiConverter {
         if(triggerTick>currentTick+lastDuration){
             addNote();
             if(triggerTick - currentTick- lastDuration>=0.0625*resolution){
-                while(triggerTick - currentTick- lastDuration>=0.0625*resolution) {
+                if(triggerTick - currentTick- lastDuration>=0.125*resolution) {
+                    MuiNote restNote = getMaxMuiNote(-1, triggerTick - currentTick - lastDuration);
+                    muiNote = restNote;
+                    addNote();
+                    currentTick += restNote.getDurationTicks() + lastDuration;
+                    lastDuration = 0;
+                }
+                if(triggerTick - currentTick- lastDuration>=0.0625*resolution) {
                     MuiNote restNote = getMuiNote(-1, 0.125 * resolution);
                     muiNote = restNote;
                     addNote();
