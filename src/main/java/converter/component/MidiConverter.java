@@ -461,6 +461,15 @@ public class MidiConverter {
         double remainTick = durationTicks + 1;  //部分midi文件会出现durationTicks少1的情况，这里加上
         double newDurationTicks = 0;
         StringBuilder timeString = new StringBuilder();
+
+        if(remainTick<0.125*resolution&&remainTick>=0.0625*resolution){
+            ++noteNumbers;
+            timeString.insert(0, "w");
+            newDurationTicks += resolution * 0.125;
+            remainTick=0;
+        }
+
+
         do{
             if (remainTick >= resolution * 6) {
                 ++noteNumbers;
