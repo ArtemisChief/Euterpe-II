@@ -24,10 +24,6 @@ dependencies {
     compile "org.jogamp.gluegen:gluegen-rt-main:$joglVersion"
     compile "org.jogamp.jogl:jogl-all-main:$joglVersion"
 
-    def miglayoutVersion = '5.2'
-    compile "com.miglayout:miglayout-core:$miglayoutVersion"
-    compile "com.miglayout:miglayout-swing:$miglayoutVersion"
-
 }
 
 tasks.withType(JavaCompile) {

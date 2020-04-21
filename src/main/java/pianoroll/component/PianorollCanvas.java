@@ -10,6 +10,7 @@ import pianoroll.component.renderer.BackgroundRenderer;
 import pianoroll.component.renderer.ParticleRenderer;
 import pianoroll.component.renderer.PianoRenderer;
 import pianoroll.component.renderer.RollRenderer;
+import pianoroll.util.Semantic;
 import uno.glsl.Program;
 
 import java.nio.FloatBuffer;
@@ -62,7 +63,7 @@ public class PianorollCanvas implements GLEventListener {
         GLCapabilities glCapabilities = new GLCapabilities(glProfile);
 
         glcanvas = new GLCanvas(glCapabilities);
-        glcanvas.setBounds(0, 0, 1150, 800);
+        glcanvas.setBounds(0, 0, Semantic.Canvas.WIDTH, Semantic.Canvas.HEIGHT);
         glcanvas.addGLEventListener(instance);
 
         Animator animator = new Animator(glcanvas);
@@ -81,15 +82,19 @@ public class PianorollCanvas implements GLEventListener {
         particleRenderer.init(gl);
 
         pianorollProgram = new Program(gl, getClass(),
-                "shaders", "Pianoroll.vert", "Pianoroll.frag",
+                "/shaders", "Pianoroll.vert", "Pianoroll.frag",
                 "trackID", "scaleY", "offsetY", "proj", "posZ", "colorID");
 
         particleProgram = new Program(gl, getClass(),
-                "shaders", "Particle.vert", "Particle.frag",
+                "/shaders", "Particle.vert", "Particle.frag",
                 "trackID", "offset", "scale", "degrees", "proj", "colorID", "life");
 
-        glcanvas.addKeyListener(new KeyboardProcessor());
-        glcanvas.addMouseMotionListener(new MouseProcessor());
+        KeyboardProcessor keyboardProcessor = new KeyboardProcessor();
+        MouseProcessor mouseProcessor = new MouseProcessor();
+
+        glcanvas.addKeyListener(keyboardProcessor);
+        glcanvas.addMouseListener(mouseProcessor);
+        glcanvas.addMouseMotionListener(mouseProcessor);
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glEnable(GL_BLEND);
@@ -125,8 +130,7 @@ public class PianorollCanvas implements GLEventListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL3 gl = drawable.getGL().getGL3();
 
-        float ratio = (float) glcanvas.getSize().width / (float) glcanvas.getSize().height;
-        glm.ortho(-ratio, ratio, -1.0f, 1.0f, -1f, 1f).scale(0.02365f).to(matBuffer);
+        glm.ortho(-Semantic.Canvas.RATIO, Semantic.Canvas.RATIO, -1.0f, 1.0f, -1f, 1f).scale(Semantic.Canvas.SCALE_FACTOR).to(matBuffer);
 
         gl.glUseProgram(pianorollProgram.name);
         gl.glUniformMatrix4fv(pianorollProgram.get("proj"), 1, false, matBuffer);

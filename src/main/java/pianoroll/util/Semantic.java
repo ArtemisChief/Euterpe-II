@@ -17,6 +17,20 @@ public abstract class Semantic {
         int VERTEX_PIANO = 2;
     }
 
+    public interface Canvas {
+        int WIDTH = 1150;
+        int HEIGHT = 800;
+        float SCALE_FACTOR = 0.02365f;
+        float RATIO = (float) WIDTH / (float) HEIGHT;
+    }
+
+    public interface Color {
+        int HIGH_LIGHT = 100;
+        int WHITE = 200;
+        int BLACK = 201;
+        int GREY = 202;
+    }
+
     public interface Piano {
         int KEY_MAX = 88;
     }
@@ -25,13 +39,6 @@ public abstract class Semantic {
         int PARTICLE_AMOUNT = 5000;
         float DEFAULT_LENGTH_PER_SECOND = 30.0f;
         float LENGTH_PER_CROTCHET = 10.0f;
-    }
-
-    public interface Color {
-        int HIGH_LIGHT = 100;
-        int WHITE = 200;
-        int BLACK = 201;
-        int GREY = 202;
     }
 
 }

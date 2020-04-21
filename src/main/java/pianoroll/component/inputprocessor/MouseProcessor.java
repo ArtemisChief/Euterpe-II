@@ -1,31 +1,126 @@
 package pianoroll.component.inputprocessor;
 
+import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
+import pianoroll.entity.GraphicElement;
+import pianoroll.util.Semantic;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 
-public class MouseProcessor extends MouseMotionAdapter {
+public class MouseProcessor extends MouseAdapter implements MouseMotionListener {
 
-    public MouseProcessor() {
-        for (int i = 0; i < 88; i++) {
-            System.out.println(parsePosX(i));
+    private int currentTrackID;
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (getTrackID(getMousePos(e)) == -1) {
+            Pianoroll.GetInstance().suspend(currentTrackID);
+            Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+            currentTrackID = -1;
+        } else if (getTrackID(getMousePos(e)) != currentTrackID) {
+            Pianoroll.GetInstance().suspend(currentTrackID);
+            Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+
+            currentTrackID = getTrackID(getMousePos(e));
+
+            Pianoroll.GetInstance().trigger(currentTrackID);
+            Pianoroll.GetInstance().getPianoController().pressKey(currentTrackID);
         }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        float width = (float) PianorollCanvas.GetGlcanvas().getWidth();
-        float height = (float) PianorollCanvas.GetGlcanvas().getHeight();
-        float ratio = width / height;
 
-        float posX = (2 * e.getX() / width - 1) / 0.02365f * ratio;
-        float posY = (1 - 2 * e.getY() / height) / 0.02365f + 26.9f;
-
-        System.out.println(posX + ", " + posY);
     }
 
-    float parsePosX(int index) {
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+        currentTrackID = getTrackID(getMousePos(e));
+        if (currentTrackID != -1) {
+            Pianoroll.GetInstance().trigger(currentTrackID);
+            Pianoroll.GetInstance().getPianoController().pressKey(currentTrackID);
+        }
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (currentTrackID != -1) {
+            Pianoroll.GetInstance().suspend(currentTrackID);
+            Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+        }
+    }
+
+    private float[] getMousePos(MouseEvent e) {
+        float posX = (2 * e.getX() / (float) Semantic.Canvas.WIDTH - 1) / Semantic.Canvas.SCALE_FACTOR * Semantic.Canvas.RATIO;
+        float posY = (1 - 2 * e.getY() / (float) Semantic.Canvas.HEIGHT) / Semantic.Canvas.SCALE_FACTOR + 26.9f;
+
+        return new float[]{posX, posY};
+    }
+
+    private int getTrackID(float[] pos) {
+        float posX = pos[0];
+        float posY = pos[1];
+
+        if (posY <= 0.0f) {
+            for (int index = 0; index < Semantic.Piano.KEY_MAX; index += 12) {
+                int tempIndex = index + 1;
+                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                    return tempIndex;
+
+                tempIndex = index + 4;
+                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                    return tempIndex;
+
+                tempIndex = index + 6;
+                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                    return tempIndex;
+
+                tempIndex = index + 9;
+                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                    return tempIndex;
+
+                tempIndex = index + 11;
+                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                    return tempIndex;
+            }
+
+            for (int index = 0; index < Semantic.Piano.KEY_MAX; index += 12) {
+                int tempIndex = index;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+
+                tempIndex = index + 2;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+
+                tempIndex = index + 3;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+
+                tempIndex = index + 5;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+
+                tempIndex = index + 7;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+
+                tempIndex = index + 8;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+
+                tempIndex = index + 10;
+                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                    return tempIndex;
+            }
+        }
+
+        return -1;
+    }
+
+    private float getOffsetX(int index) {
         float width = 2.2f;
         float gap = 0.13f;
 
