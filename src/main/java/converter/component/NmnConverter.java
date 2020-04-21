@@ -23,13 +23,6 @@ public class NmnConverter {
     //用于保存上一个音符事件在MUI中对应的字符串
     private MuiNote muiNote = null;
 
-
-    //标志是否进入同时音状态
-    private boolean sameTime = false;
-
-    //记录尚未添加到mui中的音乐句子有多少个音符，用于判断是否需要另起一行的以保证美观的参考
-    private int noteCount = 0;
-
     //当前播放到的时点
     private double currentTick=0;
 
@@ -66,7 +59,6 @@ public class NmnConverter {
                 //对各变量进行初始化
                 currentTick = 0;
                 lastDuration = 0;
-                sameTime = false;
                 muiNote = null;
                 int end = midiChannel.getMidiEventList().size();
 
@@ -113,8 +105,6 @@ public class NmnConverter {
 
                         //如果当前音符事件的开始时间和目前播放到的时间相同，且还存在未开始播放的音，则说明当前音符事件和未播放的音是同时音，进入同时音的添加
                         if (noteEvent.getTriggerTick() == currentTick && lastDuration != 0) {
-                            sameTime = true;
-
                             //对上一个音符进行规范化
                             muiNote=muiNote.getStandardMuiNote(resolution);
                             //对当前音符事件进行规范化
@@ -216,8 +206,6 @@ public class NmnConverter {
 
                                 muiNoteList.add(restNote);
                                 muiNoteList.add(muiNote);
-
-                                sameTime = false;
                                 muiNote=null;
                                 currentTick+=restNote.getDurationTicks();
                                 lastDuration=0;
@@ -519,8 +507,6 @@ public class NmnConverter {
 
                 muiNoteList.add(restNote);
                 muiNoteList.add(muiNote);
-
-                sameTime = false;
                 muiNote=null;
             }
             else
