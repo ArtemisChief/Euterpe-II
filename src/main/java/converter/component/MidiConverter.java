@@ -124,6 +124,7 @@ public class MidiConverter {
                                 note.append(tempMuiNote.getPitchString());
                                 time.append(tempMuiNote.getTimeString());
                                 noteCount += tempMuiNote.getNoteNumbers();
+                                lastDuration=muiNote.getDurationTicks();
 
                             } else {
                                 note.append(muiNote.getPitchString());
@@ -139,7 +140,7 @@ public class MidiConverter {
                             if (currentTick + lastDuration == noteEvent.getTriggerTick()) {
                                 addNote();
                                 currentTick = noteEvent.getTriggerTick();
-                                muiNote = getMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks()).getStandardMuiNote(resolution); //11
+                                muiNote = getMaxMuiNote(noteEvent.getPitch(), noteEvent.getDurationTicks()); //11
                                 lastDuration=muiNote.getDurationTicks();
                             } else if (currentTick + lastDuration < noteEvent.getTriggerTick()) {
                                 addNote();
@@ -377,70 +378,69 @@ public class MidiConverter {
     private MuiNote getMaxMuiNote(int pitch, double durationTicks) {
         int noteNumbers = 0;
         double remainTick = durationTicks + 1;  //部分midi文件会出现durationTicks少1的情况，这里加上
-        double minDurationTicks = 0;
+        double newDurationTicks = 0;
         StringBuilder timeString = new StringBuilder();
         do{
             if (remainTick >= resolution * 6) {
                 ++noteNumbers;
                 timeString.insert(0, "1*");
-                minDurationTicks = resolution * 6;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 6;
+                remainTick -= resolution * 6;
             } else if (remainTick >= resolution * 4) {
                 ++noteNumbers;
                 timeString.insert(0, "1");
-                minDurationTicks = resolution * 4;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 4;
+                remainTick -= resolution * 4;
             } else if (remainTick >= resolution * 3) {
                 ++noteNumbers;
                 timeString.insert(0, "2*");
-                minDurationTicks = resolution * 3;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 3;
+                remainTick -= resolution * 3;
             } else if (remainTick >= resolution * 2) {
                 ++noteNumbers;
                 timeString.insert(0, "2");
-                minDurationTicks = resolution * 2;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 2;
+                remainTick -= resolution * 2;
             } else if (remainTick >= resolution * 1.5) {
                 ++noteNumbers;
                 timeString.insert(0, "4*");
-                minDurationTicks = resolution * 1.5;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 1.5;
+                remainTick -= resolution * 1.5;
             } else if (remainTick >= resolution) {
                 ++noteNumbers;
                 timeString.insert(0, "4");
-                minDurationTicks = resolution;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution;
+                remainTick -= resolution;
             } else if (remainTick >= resolution * 0.75) {
                 ++noteNumbers;
                 timeString.insert(0, "8*");
-                minDurationTicks = resolution * 0.75;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 0.75;
+                remainTick -= resolution * 0.75;
             } else if (remainTick >= resolution * 0.5) {
                 ++noteNumbers;
                 timeString.insert(0, "8");
-                minDurationTicks = resolution * 0.5;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 0.5;
+                remainTick -= resolution * 0.5;
             } else if (remainTick >= resolution * 0.375) {
                 ++noteNumbers;
                 timeString.insert(0, "g*");
-                minDurationTicks = resolution * 0.375;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 0.375;
+                remainTick -= resolution * 0.375;
             } else if (remainTick >= resolution * 0.25) {
                 ++noteNumbers;
                 timeString.insert(0, "g");
-                minDurationTicks = resolution * 0.25;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 0.25;
+                remainTick -= resolution * 0.25;
             } else if (remainTick >= resolution * 0.125) {
                 ++noteNumbers;
                 timeString.insert(0, "w");
-                minDurationTicks = resolution * 0.125;
-                remainTick -= minDurationTicks;
+                newDurationTicks += resolution * 0.125;
+                remainTick -= resolution * 0.125;
             }else{
-                durationTicks-=remainTick;
                 remainTick=0;
             }
         }while(remainTick!=0&&remainTick!=1);
-        MuiNote temp=new MuiNote(pitch, timeString.toString(),noteNumbers, durationTicks);
+        MuiNote temp=new MuiNote(pitch, timeString.toString(),noteNumbers, newDurationTicks);
         return temp;
     }
 
