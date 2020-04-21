@@ -35,7 +35,7 @@ public class PianorollCanvas implements GLEventListener {
     private final FloatBuffer clearDepth;
     private final FloatBuffer matBuffer;
 
-    private long timeLastFrame;
+    private volatile double timeLastFrame;
 
     private final RollRenderer rollRenderer;
     private final PianoRenderer pianoRenderer;
@@ -50,7 +50,7 @@ public class PianorollCanvas implements GLEventListener {
         clearDepth = GLBuffers.newDirectFloatBuffer(1);
         matBuffer = GLBuffers.newDirectFloatBuffer(16);
 
-        timeLastFrame = 0;
+        timeLastFrame =  0;
 
         rollRenderer = new RollRenderer();
         pianoRenderer = new PianoRenderer();
@@ -74,7 +74,7 @@ public class PianorollCanvas implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        timeLastFrame = System.currentTimeMillis();
+        timeLastFrame =  com.jogamp.common.os.Platform.currentTimeMicros();
 
         rollRenderer.init(gl);
         pianoRenderer.init(gl);
@@ -108,8 +108,8 @@ public class PianorollCanvas implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        long timeCurrentFrame = System.currentTimeMillis();
-        float deltaTime = (timeCurrentFrame - timeLastFrame) / 1_000f;
+        double timeCurrentFrame = com.jogamp.common.os.Platform.currentTimeMicros();
+        float deltaTime = (float) (timeCurrentFrame - timeLastFrame) / 1_000_000f;
         timeLastFrame = timeCurrentFrame;
 
         Pianoroll.GetInstance().update(deltaTime);

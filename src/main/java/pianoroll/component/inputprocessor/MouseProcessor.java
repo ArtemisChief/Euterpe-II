@@ -1,8 +1,6 @@
 package pianoroll.component.inputprocessor;
 
 import pianoroll.component.Pianoroll;
-import pianoroll.component.PianorollCanvas;
-import pianoroll.entity.GraphicElement;
 import pianoroll.util.Semantic;
 
 import java.awt.event.*;
@@ -11,20 +9,24 @@ public class MouseProcessor extends MouseAdapter implements MouseMotionListener 
 
     private int currentTrackID;
 
+    private boolean isLeftButtonDown;
+
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (getTrackID(getMousePos(e)) == -1) {
-            Pianoroll.GetInstance().suspend(currentTrackID);
-            Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
-            currentTrackID = -1;
-        } else if (getTrackID(getMousePos(e)) != currentTrackID) {
-            Pianoroll.GetInstance().suspend(currentTrackID);
-            Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+        if(isLeftButtonDown) {
+            if (getTrackID(getMousePos(e)) == -1) {
+                Pianoroll.GetInstance().suspend(currentTrackID);
+                Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+                currentTrackID = -1;
+            } else if (getTrackID(getMousePos(e)) != currentTrackID) {
+                Pianoroll.GetInstance().suspend(currentTrackID);
+                Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
 
-            currentTrackID = getTrackID(getMousePos(e));
+                currentTrackID = getTrackID(getMousePos(e));
 
-            Pianoroll.GetInstance().trigger(currentTrackID);
-            Pianoroll.GetInstance().getPianoController().pressKey(currentTrackID);
+                Pianoroll.GetInstance().trigger(currentTrackID);
+                Pianoroll.GetInstance().getPianoController().pressKey(currentTrackID);
+            }
         }
     }
 
@@ -35,20 +37,24 @@ public class MouseProcessor extends MouseAdapter implements MouseMotionListener 
 
     @Override
     public void mousePressed(MouseEvent e) {
-
-        currentTrackID = getTrackID(getMousePos(e));
-        if (currentTrackID != -1) {
-            Pianoroll.GetInstance().trigger(currentTrackID);
-            Pianoroll.GetInstance().getPianoController().pressKey(currentTrackID);
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            currentTrackID = getTrackID(getMousePos(e));
+            if (currentTrackID != -1) {
+                Pianoroll.GetInstance().trigger(currentTrackID);
+                Pianoroll.GetInstance().getPianoController().pressKey(currentTrackID);
+                isLeftButtonDown=true;
+            }
         }
-
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (currentTrackID != -1) {
-            Pianoroll.GetInstance().suspend(currentTrackID);
-            Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            if (currentTrackID != -1) {
+                Pianoroll.GetInstance().suspend(currentTrackID);
+                Pianoroll.GetInstance().getPianoController().releaseKey(currentTrackID);
+                isLeftButtonDown=false;
+            }
         }
     }
 
@@ -70,19 +76,19 @@ public class MouseProcessor extends MouseAdapter implements MouseMotionListener 
                     return tempIndex;
 
                 tempIndex = index + 4;
-                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
                     return tempIndex;
 
                 tempIndex = index + 6;
-                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
                     return tempIndex;
 
                 tempIndex = index + 9;
-                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
                     return tempIndex;
 
                 tempIndex = index + 11;
-                if (posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 0.68f && posX < getOffsetX(tempIndex) + 0.68f && posY > -8.3f)
                     return tempIndex;
             }
 
@@ -100,19 +106,19 @@ public class MouseProcessor extends MouseAdapter implements MouseMotionListener 
                     return tempIndex;
 
                 tempIndex = index + 5;
-                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
                     return tempIndex;
 
                 tempIndex = index + 7;
-                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
                     return tempIndex;
 
                 tempIndex = index + 8;
-                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
                     return tempIndex;
 
                 tempIndex = index + 10;
-                if (posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
+                if (tempIndex < Semantic.Piano.KEY_MAX && posX > getOffsetX(tempIndex) - 1.113f && posX < getOffsetX(tempIndex) + 1.113f)
                     return tempIndex;
             }
         }
