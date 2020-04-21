@@ -526,6 +526,11 @@ public class MidiConverter {
                 timeString.insert(0, "w");
                 newDurationTicks += resolution * 0.125;
                 remainTick -= resolution * 0.125;
+            }else if (remainTick >= resolution * 0.0625) {
+                ++noteNumbers;
+                timeString.insert(0, "w");
+                newDurationTicks += resolution * 0.125;
+                remainTick =0;
             }else{
                 remainTick=0;
             }
