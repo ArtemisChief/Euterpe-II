@@ -5,12 +5,27 @@ public class MuiNote {
     private String timeString;
     private int noteNumbers;
     private double durationTicks;
+    private long triggerTick;
+    private int channelNumber;
+    private int resolution;
+    private int trackNumber;
 
     public MuiNote(int pitch, String timeString, int noteNumbers, double durationTicks) {
         this.pitch = pitch;
         this.timeString = timeString;
         this.noteNumbers = noteNumbers;
         this.durationTicks = durationTicks;
+    }
+
+    public MuiNote(int pitch, String timeString, int noteNumbers, double durationTicks, long triggerTick, int channelNumber, int resolution,int trackNumber) {
+        this.pitch = pitch;
+        this.timeString = timeString;
+        this.noteNumbers = noteNumbers;
+        this.durationTicks = durationTicks;
+        this.triggerTick = triggerTick;
+        this.channelNumber = channelNumber;
+        this.resolution = resolution;
+        this.trackNumber=trackNumber;
     }
 
     public String getPitchString() {
@@ -107,27 +122,27 @@ public class MuiNote {
 
     public MuiNote getStandardMuiNote(int resolution){
         if(durationTicks>=5*resolution)
-            return new MuiNote(pitch,"1*",1,6*resolution);
+            return new MuiNote(pitch,"1*",1,6*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=3.5*resolution)
-            return new MuiNote(pitch,"1",1,4*resolution);
+            return new MuiNote(pitch,"1",1,4*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=2.5*resolution)
-            return new MuiNote(pitch,"2*",1,3*resolution);
+            return new MuiNote(pitch,"2*",1,3*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=1.75*resolution)
-            return new MuiNote(pitch,"2",1,2*resolution);
+            return new MuiNote(pitch,"2",1,2*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=1.25*resolution)
-            return new MuiNote(pitch,"4*",1,1.5*resolution);
+            return new MuiNote(pitch,"4*",1,1.5*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=0.875*resolution)
-            return new MuiNote(pitch,"4",1,resolution);
+            return new MuiNote(pitch,"4",1,resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=0.625*resolution)
-            return new MuiNote(pitch,"8*",1,0.75*resolution);
+            return new MuiNote(pitch,"8*",1,0.75*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=0.4375*resolution)
-            return new MuiNote(pitch,"8",1,0.5*resolution);
+            return new MuiNote(pitch,"8",1,0.5*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=0.3125*resolution)
-            return new MuiNote(pitch,"g*",1,0.375*resolution);
+            return new MuiNote(pitch,"g*",1,0.375*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else if(durationTicks>=0.1875*resolution)
-            return new MuiNote(pitch,"g",1,0.25*resolution);
+            return new MuiNote(pitch,"g",1,0.25*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
         else
-            return new MuiNote(pitch,"w",1,0.125*resolution);
+            return new MuiNote(pitch,"w",1,0.125*resolution,this.triggerTick,this.channelNumber,this.resolution,this.trackNumber);
 
     }
 
