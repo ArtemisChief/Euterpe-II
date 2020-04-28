@@ -22,7 +22,11 @@ public class Interpreter {
         return instance;
     }
 
+    private final MainWindow mainWindow;
+
     private Interpreter() {
+        mainWindow = MainWindow.GetInstance();
+
         lexical = new Lexical();
         syntactic = new Syntactic();
         semantic = new Semantic();
@@ -35,8 +39,8 @@ public class Interpreter {
         if (lexical.getError()) {
             output.append(lexical.getErrorInfo(tokens));
             output.append("检测到错误");
-            MainWindow.GetInstance().outputTextArea.setText(output.toString());
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText(output.toString());
+            mainWindow.outputTextRadioMenuItem.doClick();
             for (int line : lexical.getErrorLine()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),
@@ -60,8 +64,8 @@ public class Interpreter {
         if (syntactic.getIsError()) {
             output.append(syntactic.getErrors(abstractSyntaxTree));
             output.append("检测到错误");
-            MainWindow.GetInstance().outputTextArea.setText(output.toString());
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText(output.toString());
+            mainWindow.outputTextRadioMenuItem.doClick();
             for (int line : syntactic.getErrorList()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),
@@ -84,8 +88,8 @@ public class Interpreter {
         if (semantic.getIsError()) {
             output.append(semantic.getErrors());
             output.append("检测到错误");
-            MainWindow.GetInstance().outputTextArea.setText(output.toString());
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText(output.toString());
+            mainWindow.outputTextRadioMenuItem.doClick();
             for (int line : semantic.getErrorLines()) {
                 InputTexts.GetInstance().inputStyledDocument.setCharacterAttributes(
                         InputTexts.GetInstance().getIndexByLine(line),
@@ -105,10 +109,10 @@ public class Interpreter {
     public boolean runInterpret() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        if (MainWindow.GetInstance().inputTextPane.getText().isEmpty())
+        if (mainWindow.inputTextPane.getText().isEmpty())
             return false;
 
-        List<Token> tokens = runLex(MainWindow.GetInstance().inputTextPane.getText(), stringBuilder);
+        List<Token> tokens = runLex(mainWindow.inputTextPane.getText(), stringBuilder);
 
         if (tokens == null)
             return false;
@@ -129,7 +133,7 @@ public class Interpreter {
 
         stringBuilder.append("\n\n==================================================================================================\nMidi Successfully Generated");
 
-        MainWindow.GetInstance().outputTextArea.setText(stringBuilder.toString());
+        mainWindow.outputTextArea.setText(stringBuilder.toString());
 
         return true;
     }

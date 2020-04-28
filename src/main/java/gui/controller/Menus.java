@@ -6,6 +6,10 @@ import gui.entity.Status;
 import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSliderUI;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 
 public class Menus {
@@ -16,43 +20,176 @@ public class Menus {
         return instance;
     }
 
+    private final MainWindow mainWindow;
+    private final MidiPlayer midiPlayer;
+
+    private int tonalityIndex;
+    private int octaveIndex;
+
     private Menus() {
+        mainWindow = MainWindow.GetInstance();
+        midiPlayer = MidiPlayer.GetInstance();
+
+        tonalityIndex = 4;
+        octaveIndex = 2;
     }
 
     public void init() {
 
-        MidiPlayer.GetInstance().getSequencer().addMetaEventListener(meta -> {
+        // 监听播放完毕
+        midiPlayer.getSequencer().addMetaEventListener(meta -> {
             if (meta.getType() == 47) {
-                MainWindow.GetInstance().playBtn.setText("▶");
-                MidiPlayer.GetInstance().stop();
+                mainWindow.playBtn.setText("▶");
+                midiPlayer.stop();
                 Pianoroll.GetInstance().setPlaying(false);
                 Pianoroll.GetInstance().setCurrentTime(0.0f, 0, 120);
-                MidiPlayer.GetInstance().setMicrosecondPosition(0);
+                midiPlayer.setMicrosecondPosition(0);
             }
         });
 
+        // ---------------------------------------------- 右侧菜单栏 ----------------------------------------------
+
+        // 进度条以及时间改变
+        Timer timer=new Timer(50,e -> {
+            if (mainWindow.playSlider.isEnabled())
+                if (!mainWindow.playSlider.getValueIsAdjusting()) {
+                    mainWindow.playSlider.setValue((int) (midiPlayer.getSequencer().getMicrosecondPosition() / (float) midiPlayer.getSequencer().getMicrosecondLength() * 1000000));
+                    int minutes = (int) (midiPlayer.getSequencer().getMicrosecondPosition() / 1_000_000f) / 60;
+                    int seconds = (int) (midiPlayer.getSequencer().getMicrosecondPosition() / 1_000_000f) % 60;
+                    mainWindow.currTime.setText(String.format("%02d:%02d",minutes,seconds));
+                } else {
+                    long currentMicrosecond = (long) (mainWindow.playSlider.getValue() / 1000000.0f * midiPlayer.getSequencer().getMicrosecondLength());
+                    int minutes = (int) (currentMicrosecond / 1_000_000f) / 60;
+                    int seconds = (int) (currentMicrosecond / 1_000_000f) % 60;
+                    mainWindow.currTime.setText(String.format("%02d:%02d",minutes,seconds));
+                }
+        });
+        timer.start();
+
+        // 播放进度条
+        mainWindow.playSlider.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int value = ((BasicSliderUI) mainWindow.playSlider.getUI()).valueForXPosition(e.getX());
+                mainWindow.playSlider.setValue(value);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (mainWindow.playSlider.isEnabled()) {
+                    long currentMicrosecond = (long) (mainWindow.playSlider.getValue() / 1000000.0f * midiPlayer.getSequencer().getMicrosecondLength());
+                    midiPlayer.setMicrosecondPosition(currentMicrosecond);
+                    Pianoroll.GetInstance().setCurrentTime(currentMicrosecond / 1_000_000f
+                            , midiPlayer.getSequencer().getTickPosition()
+                            , midiPlayer.getSequencer().getSequence().getResolution());
+                }
+            }
+        });
+        mainWindow.playSlider.addMouseListener(((BasicSliderUI) mainWindow.playSlider.getUI()).new TrackListener(){
+            @Override public boolean shouldScroll(int dir) {
+                return false;
+            }
+        });
+
+        // 开关延音
+        mainWindow.sustainToggleBtn.addActionListener(e-> {
+            if(mainWindow.sustainToggleBtn.isSelected())
+                mainWindow.sustainToggleBtn.setText("Sustain On");
+            else
+                mainWindow.sustainToggleBtn.setText("Sustain Off");
+            Pianoroll.GetInstance().getPianoController().setSustainEnable(mainWindow.sustainToggleBtn.isSelected());
+        });
+
+        // 调性选择
+        mainWindow.tonalityTextField.addMouseListener(new MouseAdapter() {
+            String tonalities[] = new String[]{
+                    "1 = Ab (-4)",
+                    "1 = A (-3)",
+                    "1 = Bb (-2)",
+                    "1 = B (-1)",
+                    "1 = C (0)",
+                    "1 = Db (+1)",
+                    "1 = D (+2)",
+                    "1 = Eb (+3)",
+                    "1 = E (+4)",
+                    "1 = F (+5)",
+                    "1 = F# (+6)",
+                    "1 = G (+7)"
+            };
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (++tonalityIndex > 11)
+                        tonalityIndex -= 12;
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    if (--tonalityIndex < 0)
+                        tonalityIndex += 12;
+                }
+
+                mainWindow.tonalityTextField.setText(tonalities[tonalityIndex]);
+
+                Pianoroll.GetInstance().getPianoController().setPitchOffset(tonalityIndex - 4 + (octaveIndex - 2) * 12);
+            }
+        });
+
+        // 八度选择
+        mainWindow.octaveTextField.addMouseListener(new MouseAdapter() {
+            String octaves[] = new String[]{
+                    "Octave -2",
+                    "Octave -1",
+                    "Octave  0",
+                    "Octave +1",
+                    "Octave +2"
+            };
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (++octaveIndex > 4)
+                        octaveIndex -= 5;
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    if (--octaveIndex < 0)
+                        octaveIndex += 5;
+                }
+
+                mainWindow.octaveTextField.setText(octaves[octaveIndex]);
+
+                Pianoroll.GetInstance().getPianoController().setPitchOffset(tonalityIndex - 4 + (octaveIndex - 2) * 12);
+            }
+        });
+
+        // ---------------------------------------------- 左侧菜单栏 ----------------------------------------------
+
+        // 单选按钮添加到组
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(mainWindow.pianorollRadioMenuItem);
+        buttonGroup.add(mainWindow.outputTextRadioMenuItem);
+        buttonGroup.add(mainWindow.staveRadioMenuItem);
+        buttonGroup.add(mainWindow.nmnRadioMenuItem);
+
         // 新建空文件
-        MainWindow.GetInstance().newEmptyMenuItem.addActionListener(e -> {
+        mainWindow.newEmptyMenuItem.addActionListener(e -> {
             if (Status.GetCurrentStatus().getIsEdited())
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
 
             Pianoroll.GetInstance().clear();
 
-            MainWindow.GetInstance().inputTextPane.setText("");
-            MainWindow.GetInstance().tipsMenuItem.doClick();
-            MainWindow.GetInstance().playBtn.setText("▶");
-            MidiPlayer.GetInstance().stop();
-            MidiPlayer.GetInstance().setLoadedMidiFile(false);
-            MainWindow.GetInstance().playSlider.setValue(0);
-            MainWindow.GetInstance().playSlider.setEnabled(false);
-            MainWindow.GetInstance().timeLength.setText("00:00");
-            MainWindow.GetInstance().currTime.setText("00:00");
+            mainWindow.inputTextPane.setText("");
+            mainWindow.tipsMenuItem.doClick();
+            mainWindow.playBtn.setText("▶");
+            midiPlayer.stop();
+            midiPlayer.setLoadedMidiFile(false);
+            mainWindow.playSlider.setValue(0);
+            mainWindow.playSlider.setEnabled(false);
+            mainWindow.timeLength.setText("00:00");
+            mainWindow.currTime.setText("00:00");
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
         // 新建模板文件
-        MainWindow.GetInstance().newTemplateMenuItem.addActionListener(e -> {
+        mainWindow.newTemplateMenuItem.addActionListener(e -> {
             if (Status.GetCurrentStatus().getIsEdited())
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
@@ -102,57 +239,57 @@ public class Menus {
                     "//多声部同时播放\n" +
                     "play(Name1&Name2)";
 
-            MainWindow.GetInstance().inputTextPane.setText(str);
-            MainWindow.GetInstance().tipsMenuItem.doClick();
-            MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
-            MainWindow.GetInstance().playBtn.setText("▶");
-            MidiPlayer.GetInstance().stop();
-            MidiPlayer.GetInstance().setLoadedMidiFile(false);
-            MainWindow.GetInstance().playSlider.setValue(0);
-            MainWindow.GetInstance().playSlider.setEnabled(false);
-            MainWindow.GetInstance().timeLength.setText("00:00");
-            MainWindow.GetInstance().currTime.setText("00:00");
+            mainWindow.inputTextPane.setText(str);
+            mainWindow.tipsMenuItem.doClick();
+            mainWindow.inputTextPane.setCaretPosition(0);
+            mainWindow.playBtn.setText("▶");
+            midiPlayer.stop();
+            midiPlayer.setLoadedMidiFile(false);
+            mainWindow.playSlider.setValue(0);
+            mainWindow.playSlider.setEnabled(false);
+            mainWindow.timeLength.setText("00:00");
+            mainWindow.currTime.setText("00:00");
             Status.SetCurrentStatus(Status.NEW_FILE);
         });
 
         // 打开文件
-        MainWindow.GetInstance().openMenuItem.addActionListener(e -> {
+        mainWindow.openMenuItem.addActionListener(e -> {
             if (!FileIO.GetInstance().openMuiFile())
                 return;
 
-            MainWindow.GetInstance().outputTextArea.setText("");
-            MainWindow.GetInstance().playBtn.setText("▶");
-            MidiPlayer.GetInstance().stop();
+            mainWindow.outputTextArea.setText("");
+            mainWindow.playBtn.setText("▶");
+            midiPlayer.stop();
 
             if (!FileIO.GetInstance().generateTempMidiFile())
                 return;
 
-            MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            midiPlayer.loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            MainWindow.GetInstance().playSlider.setValue(0);
-            MainWindow.GetInstance().playSlider.setEnabled(true);
-            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
-            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
+            mainWindow.playSlider.setValue(0);
+            mainWindow.playSlider.setEnabled(true);
+            int minutes = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            mainWindow.timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 保存文件
-        MainWindow.GetInstance().saveMenuItem.addActionListener(e -> {
+        mainWindow.saveMenuItem.addActionListener(e -> {
             FileIO.GetInstance().saveMuiFile();
         });
 
         // 另存为文件
-        MainWindow.GetInstance().saveAsMenuItem.addActionListener(e -> {
+        mainWindow.saveAsMenuItem.addActionListener(e -> {
             FileIO.GetInstance().saveAsMuiFile();
         });
 
         // 导出Midi文件
-        MainWindow.GetInstance().exportMidiMenuItem.addActionListener(e -> {
+        mainWindow.exportMidiMenuItem.addActionListener(e -> {
             FileIO.GetInstance().exportMidiFile();
         });
 
         // 退出
-        MainWindow.GetInstance().exitMenuItem.addActionListener(e -> {
+        mainWindow.exitMenuItem.addActionListener(e -> {
             if (Status.GetCurrentStatus().getIsEdited())
                 if (!Diaglogs.GetInstance().askSaving())
                     return;
@@ -160,60 +297,60 @@ public class Menus {
             if (FileIO.GetInstance().getTempMidiFile() != null && FileIO.GetInstance().getTempMidiFile().exists())
                 FileIO.GetInstance().getTempMidiFile().delete();
 
-            MidiPlayer.GetInstance().close();
+            midiPlayer.close();
             System.exit(0);
         });
 
         // 加载SoundFont文件
-        MainWindow.GetInstance().loadSoundFontMenuItem.addActionListener(e -> {
+        mainWindow.loadSoundFontMenuItem.addActionListener(e -> {
             FileIO.GetInstance().loadSoundFont();
         });
 
         // 重新编译Midi文件
-        MainWindow.GetInstance().rebuildMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().playBtn.setText("▶");
-            MidiPlayer.GetInstance().stop();
+        mainWindow.rebuildMenuItem.addActionListener(e -> {
+            mainWindow.playBtn.setText("▶");
+            midiPlayer.stop();
 
             if (!FileIO.GetInstance().generateTempMidiFile())
                 return;
 
-            MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            midiPlayer.loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            MainWindow.GetInstance().playSlider.setValue(0);
-            MainWindow.GetInstance().playSlider.setEnabled(true);
-            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
-            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
+            mainWindow.playSlider.setValue(0);
+            mainWindow.playSlider.setEnabled(true);
+            int minutes = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            mainWindow.timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 播放
-        MainWindow.GetInstance().playBtn.addActionListener(e -> {
-            if (!MidiPlayer.GetInstance().isLoadedMidiFile()) {
+        mainWindow.playBtn.addActionListener(e -> {
+            if (!midiPlayer.isLoadedMidiFile()) {
                 if (!FileIO.GetInstance().generateTempMidiFile())
                     return;
 
-                MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+                midiPlayer.loadMidiFile(FileIO.GetInstance().getTempMidiFile());
                 Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-                MainWindow.GetInstance().playSlider.setValue(0);
-                MainWindow.GetInstance().playSlider.setEnabled(true);
-                int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
-                int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-                MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
+                mainWindow.playSlider.setValue(0);
+                mainWindow.playSlider.setEnabled(true);
+                int minutes = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+                int seconds = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+                mainWindow.timeLength.setText(String.format("%02d:%02d", minutes, seconds));
             }
 
-            if (MidiPlayer.GetInstance().getSequencer().isRunning()) {
-                MidiPlayer.GetInstance().pause();
-                MainWindow.GetInstance().playBtn.setText("▶");
+            if (midiPlayer.getSequencer().isRunning()) {
+                midiPlayer.pause();
+                mainWindow.playBtn.setText("▶");
                 Pianoroll.GetInstance().setPlaying(false);
             } else {
-                MidiPlayer.GetInstance().play();
-                MainWindow.GetInstance().playBtn.setText("||");
+                midiPlayer.play();
+                mainWindow.playBtn.setText("||");
                 Pianoroll.GetInstance().setPlaying(true);
             }
         });
 
         // 从外部播放Midi文件
-        MainWindow.GetInstance().playExternalMenuItem.addActionListener(e -> {
+        mainWindow.playExternalMenuItem.addActionListener(e -> {
             if (!FileIO.GetInstance().generateTempMidiFile())
                 return;
 
@@ -225,78 +362,78 @@ public class Menus {
         });
 
         // 加载Midi文件播放
-        MainWindow.GetInstance().loadMidiFileMenuItem.addActionListener(e -> {
+        mainWindow.loadMidiFileMenuItem.addActionListener(e -> {
             File file = FileIO.GetInstance().openMidiFile();
 
             if (file == null)
                 return;
 
-            MainWindow.GetInstance().outputTextArea.setText("");
-            MainWindow.GetInstance().playBtn.setText("▶");
-            MidiPlayer.GetInstance().stop();
+            mainWindow.outputTextArea.setText("");
+            mainWindow.playBtn.setText("▶");
+            midiPlayer.stop();
 
-            MidiPlayer.GetInstance().loadMidiFile(file);
+            midiPlayer.loadMidiFile(file);
             Pianoroll.GetInstance().loadMidiFile(file);
-            MainWindow.GetInstance().playSlider.setValue(0);
-            MainWindow.GetInstance().playSlider.setEnabled(true);
-            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
-            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
+            mainWindow.playSlider.setValue(0);
+            mainWindow.playSlider.setEnabled(true);
+            int minutes = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            mainWindow.timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 转换Midi到Mui
-        MainWindow.GetInstance().convertToMuiMenuItem.addActionListener(e -> {
+        mainWindow.convertToMuiMenuItem.addActionListener(e -> {
             if (!FileIO.GetInstance().convertMidiFile())
                 return;
 
-            MainWindow.GetInstance().outputTextArea.setText("");
-            MainWindow.GetInstance().playBtn.setText("▶");
-            MidiPlayer.GetInstance().stop();
+            mainWindow.outputTextArea.setText("");
+            mainWindow.playBtn.setText("▶");
+            midiPlayer.stop();
 
             if (!FileIO.GetInstance().generateTempMidiFile())
                 return;
 
-            MidiPlayer.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
+            midiPlayer.loadMidiFile(FileIO.GetInstance().getTempMidiFile());
             Pianoroll.GetInstance().loadMidiFile(FileIO.GetInstance().getTempMidiFile());
-            MainWindow.GetInstance().playSlider.setValue(0);
-            MainWindow.GetInstance().playSlider.setEnabled(true);
-            int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
-            int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
-            MainWindow.GetInstance().timeLength.setText(String.format("%02d:%02d", minutes, seconds));
+            mainWindow.playSlider.setValue(0);
+            mainWindow.playSlider.setEnabled(true);
+            int minutes = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) / 60;
+            int seconds = (int) (midiPlayer.getSequencer().getMicrosecondLength() / 1_000_000f) % 60;
+            mainWindow.timeLength.setText(String.format("%02d:%02d", minutes, seconds));
         });
 
         // 转换Mui到五线谱
-        MainWindow.GetInstance().convertToStaveMenuItem.addActionListener(e -> {
+        mainWindow.convertToStaveMenuItem.addActionListener(e -> {
 
         });
 
         // 转换Mui到简谱
-        MainWindow.GetInstance().convertToNmnMenuItem.addActionListener(e -> {
+        mainWindow.convertToNmnMenuItem.addActionListener(e -> {
 
         });
 
         // 打开钢琴卷帘面板
-        MainWindow.GetInstance().pianorollRadioMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().layeredPane.moveToFront(PianorollCanvas.GetGlcanvas());
+        mainWindow.pianorollRadioMenuItem.addActionListener(e -> {
+            mainWindow.layeredPane.moveToFront(PianorollCanvas.GetGlcanvas());
         });
 
         // 打开输出文字面板
-        MainWindow.GetInstance().outputTextRadioMenuItem.addActionListener(e -> {
-            MainWindow.GetInstance().layeredPane.moveToFront(MainWindow.GetInstance().outputScrollPane);
+        mainWindow.outputTextRadioMenuItem.addActionListener(e -> {
+            mainWindow.layeredPane.moveToFront(mainWindow.outputScrollPane);
         });
 
         // 打开五线谱面板
-        MainWindow.GetInstance().staveRadioMenuItem.addActionListener(e -> {
+        mainWindow.staveRadioMenuItem.addActionListener(e -> {
 
         });
 
         // 打开简谱面板
-        MainWindow.GetInstance().nmnRadioMenuItem.addActionListener(e -> {
+        mainWindow.nmnRadioMenuItem.addActionListener(e -> {
 
         });
 
         // 打开乐器菜单
-        MainWindow.GetInstance().instruMenuItem.addActionListener(e -> {
+        mainWindow.instruMenuItem.addActionListener(e -> {
             String str = "=========================================================\n" +
                     "                                                             Instrument\n" +
                     "----------------------------------------------------------------------------------------------\n" +
@@ -382,13 +519,13 @@ public class Menus {
                     "62\t合成铜管1\t                |\t126\t鼓掌\n" +
                     "63\t合成铜管2\t                |\t127\t枪声\n" +
                     "=========================================================";
-            MainWindow.GetInstance().outputTextArea.setText(str);
-            MainWindow.GetInstance().outputTextArea.setCaretPosition(0);
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText(str);
+            mainWindow.outputTextArea.setCaretPosition(0);
+            mainWindow.outputTextRadioMenuItem.doClick();
         });
 
         // 打开提示
-        MainWindow.GetInstance().tipsMenuItem.addActionListener(e -> {
+        mainWindow.tipsMenuItem.addActionListener(e -> {
             String str = "============================================\n" +
                     "                                                  Tips\n" +
                     "-------------------------------------------------------------------------\n" +
@@ -421,13 +558,13 @@ public class Menus {
                     "\t2）“&”左右的声部将同时播放，\n" +
                     "\t3）“ , ”左右的声部将先后播放\n" +
                     "===========================================";
-            MainWindow.GetInstance().outputTextArea.setText(str);
-            MainWindow.GetInstance().outputTextArea.setCaretPosition(0);
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText(str);
+            mainWindow.outputTextArea.setCaretPosition(0);
+            mainWindow.outputTextRadioMenuItem.doClick();
         });
 
         // 打开关于
-        MainWindow.GetInstance().aboutMenuItem.addActionListener(e -> {
+        mainWindow.aboutMenuItem.addActionListener(e -> {
             String str = "============================================\n" +
                     "\t\t          Euterpe II\n" +
                     "--------------------------------------------------------------------------\n" +
@@ -453,9 +590,9 @@ public class Menus {
                     "\t\t\t\t   All Rights Reserved. \n" +
                     "    \t    Copyright © 2018-2021 Chief, yyzih and AsrielMao.\n" +
                     "============================================";
-            MainWindow.GetInstance().outputTextArea.setText(str);
-            MainWindow.GetInstance().outputTextArea.setCaretPosition(0);
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText(str);
+            mainWindow.outputTextArea.setCaretPosition(0);
+            mainWindow.outputTextRadioMenuItem.doClick();
         });
     }
 

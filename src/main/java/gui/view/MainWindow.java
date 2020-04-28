@@ -43,69 +43,6 @@ public class MainWindow extends JFrame {
         // 钢琴卷帘组件加入到窗口
         layeredPane.add(PianorollCanvas.GetGlcanvas(), new Integer(100));
 
-        // 设置调性下拉框
-        keyComboBox.setSelectedIndex(4);
-        keyComboBox.addActionListener(e -> {
-            Pianoroll.GetInstance().getPianoController().setPitchOffset(keyComboBox.getSelectedIndex() - 4 + (octaveComboBox.getSelectedIndex() - 2) * 12);
-        });
-
-        // 设置音高下拉框
-        octaveComboBox.setSelectedIndex(2);
-        octaveComboBox.addActionListener(e -> {
-            Pianoroll.GetInstance().getPianoController().setPitchOffset(keyComboBox.getSelectedIndex() - 4 + (octaveComboBox.getSelectedIndex() - 2) * 12);
-        });
-
-        // 开关延音
-        sustainToggleBtn.addActionListener(e-> {
-            if(sustainToggleBtn.isSelected())
-                sustainToggleBtn.setText("Sustain On");
-            else
-                sustainToggleBtn.setText("Sustain Off");
-            Pianoroll.GetInstance().getPianoController().setSustainEnable(sustainToggleBtn.isSelected());
-        });
-
-        // 进度条以及时间改变
-        Timer timer=new Timer(50,e -> {
-            if (playSlider.isEnabled())
-                if (!playSlider.getValueIsAdjusting()) {
-                    playSlider.setValue((int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / (float) MidiPlayer.GetInstance().getSequencer().getMicrosecondLength() * 1000000));
-                    int minutes = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / 1_000_000f) / 60;
-                    int seconds = (int) (MidiPlayer.GetInstance().getSequencer().getMicrosecondPosition() / 1_000_000f) % 60;
-                    currTime.setText(String.format("%02d:%02d",minutes,seconds));
-                } else {
-                    long currentMicrosecond = (long) (playSlider.getValue() / 1000000.0f * MidiPlayer.GetInstance().getSequencer().getMicrosecondLength());
-                    int minutes = (int) (currentMicrosecond / 1_000_000f) / 60;
-                    int seconds = (int) (currentMicrosecond / 1_000_000f) % 60;
-                    currTime.setText(String.format("%02d:%02d",minutes,seconds));
-                }
-        });
-        timer.start();
-
-        // 播放进度条
-        playSlider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                int value = ((BasicSliderUI) playSlider.getUI()).valueForXPosition(e.getX());
-                playSlider.setValue(value);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (playSlider.isEnabled()) {
-                    long currentMicrosecond = (long) (playSlider.getValue() / 1000000.0f * MidiPlayer.GetInstance().getSequencer().getMicrosecondLength());
-                    MidiPlayer.GetInstance().setMicrosecondPosition(currentMicrosecond);
-                    Pianoroll.GetInstance().setCurrentTime(currentMicrosecond / 1_000_000f
-                            , MidiPlayer.GetInstance().getSequencer().getTickPosition()
-                            , MidiPlayer.GetInstance().getSequencer().getSequence().getResolution());
-                }
-            }
-        });
-        playSlider.addMouseListener(((BasicSliderUI) playSlider.getUI()).new TrackListener(){
-            @Override public boolean shouldScroll(int dir) {
-                return false;
-            }
-        });
-
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();
 
@@ -119,13 +56,7 @@ public class MainWindow extends JFrame {
         inputScrollPane.getVerticalScrollBar().addAdjustmentListener(
                 e -> lineScrollPane.getVerticalScrollBar().setValue(inputScrollPane.getVerticalScrollBar().getValue()));
 
-        // 单选按钮添加到组
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(pianorollRadioMenuItem);
-        buttonGroup.add(outputTextRadioMenuItem);
-        buttonGroup.add(staveRadioMenuItem);
-        buttonGroup.add(nmnRadioMenuItem);
-
+        // 设置层叠面板中的文字面板层次
         layeredPane.setLayer(outputScrollPane, 100);
 
         // 关闭窗口
@@ -194,12 +125,12 @@ public class MainWindow extends JFrame {
         outputTextArea = new JTextArea();
         panel1 = new JPanel();
         playSlider = new JSlider();
-        keyComboBox = new JComboBox<>();
-        octaveComboBox = new JComboBox<>();
         sustainToggleBtn = new JToggleButton();
         timeLength = new JLabel();
         currTime = new JLabel();
         playBtn = new JButton();
+        tonalityTextField = new JTextField();
+        octaveTextField = new JTextField();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -415,53 +346,18 @@ public class MainWindow extends JFrame {
                 playSlider.setMaximum(1000000);
                 playSlider.setEnabled(false);
                 panel1.add(playSlider);
-                playSlider.setBounds(105, 5, 640, 20);
-
-                //---- keyComboBox ----
-                keyComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
-                    "1 = Ab (-4)",
-                    "1 = A (-3)",
-                    "1 = Bb (-2)",
-                    "1 = B (-1)",
-                    "1 = C (0)",
-                    "1 = Db (+1)",
-                    "1 = D (+2)",
-                    "1 = Eb (+3)",
-                    "1 = E (+4)",
-                    "1 = F (+5)",
-                    "1 = F# (+6)",
-                    "1 = G (+7)"
-                }));
-                keyComboBox.setMaximumRowCount(12);
-                keyComboBox.setFocusable(false);
-                keyComboBox.setSelectedIndex(4);
-                panel1.add(keyComboBox);
-                keyComboBox.setBounds(900, 5, 110, 20);
-
-                //---- octaveComboBox ----
-                octaveComboBox.setMaximumRowCount(5);
-                octaveComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
-                    "Octave -2",
-                    "Octave -1",
-                    "Octave  0",
-                    "Octave  1",
-                    "Octave  2"
-                }));
-                octaveComboBox.setFocusable(false);
-                octaveComboBox.setSelectedIndex(2);
-                panel1.add(octaveComboBox);
-                octaveComboBox.setBounds(1020, 5, 110, 20);
+                playSlider.setBounds(105, 5, 730, 20);
 
                 //---- sustainToggleBtn ----
                 sustainToggleBtn.setText("Sustain Off");
                 sustainToggleBtn.setFocusable(false);
                 panel1.add(sustainToggleBtn);
-                sustainToggleBtn.setBounds(795, 5, 90, 20);
+                sustainToggleBtn.setBounds(880, 5, 90, 20);
 
                 //---- timeLength ----
                 timeLength.setText("00:00");
                 panel1.add(timeLength);
-                timeLength.setBounds(745, 0, 40, 30);
+                timeLength.setBounds(835, 0, 40, 30);
 
                 //---- currTime ----
                 currTime.setText("00:00");
@@ -474,6 +370,27 @@ public class MainWindow extends JFrame {
                 playBtn.setFocusable(false);
                 panel1.add(playBtn);
                 playBtn.setBounds(5, 5, 50, 20);
+
+                //---- tonalityTextField ----
+                tonalityTextField.setText("1 = C (0)");
+                tonalityTextField.setEditable(false);
+                tonalityTextField.setFocusable(false);
+                tonalityTextField.setRequestFocusEnabled(false);
+                tonalityTextField.setVerifyInputWhenFocusTarget(false);
+                tonalityTextField.setHorizontalAlignment(SwingConstants.LEFT);
+                panel1.add(tonalityTextField);
+                tonalityTextField.setBounds(980, 5, 75, 20);
+
+                //---- octaveTextField ----
+                octaveTextField.setEditable(false);
+                octaveTextField.setFocusable(false);
+                octaveTextField.setRequestFocusEnabled(false);
+                octaveTextField.setVerifyInputWhenFocusTarget(false);
+                octaveTextField.setForeground(new Color(51, 59, 66));
+                octaveTextField.setText("Octave  0");
+                octaveTextField.setHorizontalAlignment(SwingConstants.CENTER);
+                panel1.add(octaveTextField);
+                octaveTextField.setBounds(1065, 5, 70, 20);
             }
             layeredPane.add(panel1, JLayeredPane.POPUP_LAYER);
             panel1.setBounds(0, 0, 1145, 31);
@@ -537,11 +454,11 @@ public class MainWindow extends JFrame {
     public JTextArea outputTextArea;
     private JPanel panel1;
     public JSlider playSlider;
-    private JComboBox<String> keyComboBox;
-    private JComboBox<String> octaveComboBox;
-    private JToggleButton sustainToggleBtn;
+    public JToggleButton sustainToggleBtn;
     public JLabel timeLength;
     public JLabel currTime;
     public JButton playBtn;
+    public JTextField tonalityTextField;
+    public JTextField octaveTextField;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

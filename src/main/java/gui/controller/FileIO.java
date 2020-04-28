@@ -20,6 +20,8 @@ public class FileIO {
         return instance;
     }
 
+    private final MainWindow mainWindow;
+
     private File tempMidiFile;
 
     private File file;
@@ -27,9 +29,11 @@ public class FileIO {
     private boolean isOpeningFile;
 
     private FileIO() {
+        mainWindow = MainWindow.GetInstance();
+
         tempMidiFile = null;
         file = null;
-        isOpeningFile=false;
+        isOpeningFile = false;
     }
 
     public boolean openMuiFile() {
@@ -41,7 +45,7 @@ public class FileIO {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Euterpe File", "mui");
         fileChooser.setFileFilter(filter);
-        int result = fileChooser.showOpenDialog(MainWindow.GetInstance());
+        int result = fileChooser.showOpenDialog(mainWindow);
 
         if (result != JFileChooser.CANCEL_OPTION) {
             file = fileChooser.getSelectedFile();
@@ -59,8 +63,8 @@ public class FileIO {
                 bufferedReader.close();
 
                 isOpeningFile=true;
-                MainWindow.GetInstance().inputTextPane.setText(stringBuilder.toString());
-                MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
+                mainWindow.inputTextPane.setText(stringBuilder.toString());
+                mainWindow.inputTextPane.setCaretPosition(0);
                 isOpeningFile=false;
 
                 InputTexts.GetInstance().refreshColor();
@@ -84,7 +88,7 @@ public class FileIO {
                     file.createNewFile();
 
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-                bufferedWriter.write(MainWindow.GetInstance().inputTextPane.getText());
+                bufferedWriter.write(mainWindow.inputTextPane.getText());
                 bufferedWriter.close();
 
                 Status.SetCurrentStatus(Status.SAVED_FILE);
@@ -102,7 +106,7 @@ public class FileIO {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Euterpe File", "mui");
         fileChooser.setFileFilter(filter);
-        int result = fileChooser.showSaveDialog(MainWindow.GetInstance());
+        int result = fileChooser.showSaveDialog(mainWindow);
 
         if (result != JFileChooser.CANCEL_OPTION) {
             String fileStr = fileChooser.getSelectedFile().getAbsoluteFile().toString();
@@ -117,7 +121,7 @@ public class FileIO {
                     file.createNewFile();
 
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-                bufferedWriter.write(MainWindow.GetInstance().inputTextPane.getText());
+                bufferedWriter.write(mainWindow.inputTextPane.getText());
                 bufferedWriter.close();
 
                 Status.SetCurrentStatus(Status.SAVED_FILE);
@@ -136,7 +140,7 @@ public class FileIO {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Midi File", "mid");
         fileChooser.setFileFilter(filter);
-        int result = fileChooser.showSaveDialog(MainWindow.GetInstance());
+        int result = fileChooser.showSaveDialog(mainWindow);
 
         if (result != JFileChooser.CANCEL_OPTION) {
             String fileStr = fileChooser.getSelectedFile().getAbsoluteFile().toString();
@@ -172,7 +176,7 @@ public class FileIO {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("SoundFont File", "sf2","sf3");
         fileChooser.setFileFilter(filter);
-        int value = fileChooser.showOpenDialog(MainWindow.GetInstance());
+        int value = fileChooser.showOpenDialog(mainWindow);
         if (value == JFileChooser.CANCEL_OPTION)
             return;
         File soundFontFile = fileChooser.getSelectedFile();
@@ -188,7 +192,7 @@ public class FileIO {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Midi File", "mid");
         fileChooser.setFileFilter(filter);
-        int value = fileChooser.showOpenDialog(MainWindow.GetInstance());
+        int value = fileChooser.showOpenDialog(mainWindow);
         if (value == JFileChooser.CANCEL_OPTION)
             return false;
         File midiFile = fileChooser.getSelectedFile();
@@ -196,14 +200,14 @@ public class FileIO {
         String result = MidiConverter.GetInstance().converterToMui(midiFile);
 
         if(result.equals("转换过程中出现错误，所选取文件为不支持的midi文件")) {
-            MainWindow.GetInstance().outputTextArea.setText("转换过程中出现错误，所选取文件为不支持的midi文件");
-            MainWindow.GetInstance().outputTextRadioMenuItem.doClick();
+            mainWindow.outputTextArea.setText("转换过程中出现错误，所选取文件为不支持的midi文件");
+            mainWindow.outputTextRadioMenuItem.doClick();
             return false;
         }
 
         isOpeningFile=true;
-        MainWindow.GetInstance().inputTextPane.setText(result);
-        MainWindow.GetInstance().inputTextPane.setCaretPosition(0);
+        mainWindow.inputTextPane.setText(result);
+        mainWindow.inputTextPane.setCaretPosition(0);
         isOpeningFile=false;
         InputTexts.GetInstance().refreshColor();
 
@@ -221,7 +225,7 @@ public class FileIO {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Midi File", "mid");
         fileChooser.setFileFilter(filter);
-        int result = fileChooser.showOpenDialog(MainWindow.GetInstance());
+        int result = fileChooser.showOpenDialog(mainWindow);
 
         if (result == JFileChooser.CANCEL_OPTION)
             return null;

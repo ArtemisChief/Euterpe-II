@@ -17,7 +17,11 @@ public class InputTexts {
         return instance;
     }
 
-    private InputTexts(){ }
+    private final MainWindow mainWindow;
+
+    private InputTexts() {
+        mainWindow = MainWindow.GetInstance();
+    }
 
     public SimpleAttributeSet attributeSet;
     public SimpleAttributeSet statementAttributeSet;
@@ -116,7 +120,7 @@ public class InputTexts {
 
     public void init() {
 
-        inputTextPane = MainWindow.GetInstance().inputTextPane;
+        inputTextPane = mainWindow.inputTextPane;
 
         //样式
         attributeSet = new SimpleAttributeSet();

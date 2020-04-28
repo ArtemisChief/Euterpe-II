@@ -12,11 +12,14 @@ public class Diaglogs {
         return instance;
     }
 
+    private final MainWindow mainWindow;
+
     private Diaglogs() {
+        mainWindow = MainWindow.GetInstance();
     }
 
     public boolean askSaving() {
-        int result = JOptionPane.showConfirmDialog(MainWindow.GetInstance(), "Exist unsaved content, do you want to save?",
+        int result = JOptionPane.showConfirmDialog(mainWindow, "Exist unsaved content, do you want to save?",
                 "Confirm Saving", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         switch (result) {
@@ -32,8 +35,7 @@ public class Diaglogs {
     }
 
     public void showErrorInfo(String str) {
-        JOptionPane.showMessageDialog(MainWindow.GetInstance(), str, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(mainWindow, str, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 }
-
