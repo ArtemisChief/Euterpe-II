@@ -25,18 +25,18 @@ public class NmnRenderer {
     IntBuffer EBO;
     IntBuffer TEXTURE;
 
-    public NmnRenderer(){
+    public NmnRenderer() {
 
     }
 
     public void init(GL3 gl) {
 
         final float[] triVertices = {
-                //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-                0.3f,  0.6f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // 右上
-                0.3f, -0.3f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   // 右下
-                -0.3f, -0.3f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,   // 左下
-                -0.3f,  0.6f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 0.0f    // 左上
+                //   ---- 位置 ----      - 纹理坐标 -
+                 0.3f,  0.6f,             1.0f, 0.0f,   // 右上
+                 0.3f, -0.3f,             1.0f, 1.0f,   // 右下
+                -0.3f, -0.3f,             0.0f, 1.0f,   // 左下
+                -0.3f,  0.6f,             0.0f, 0.0f    // 左上
         };
 
         /*
@@ -48,10 +48,6 @@ public class NmnRenderer {
                 -0.3f,  0.6f, 0.0f    // 左上
         };
         */
-        int[] indices = { // 注意索引从0开始!
-                0, 1, 3, // 第一个三角形
-                1, 2, 3  // 第二个三角形
-        };
 
         //生成VBO
         VBO = GLBuffers.newDirectIntBuffer(1);
@@ -60,39 +56,17 @@ public class NmnRenderer {
         //生成VAO
         VAO = GLBuffers.newDirectIntBuffer(1);
         gl.glGenVertexArrays(1, VAO);
-        //生成EBO
-        EBO = GLBuffers.newDirectIntBuffer(1);
-        IntBuffer indicesBufferTriangle = GLBuffers.newDirectIntBuffer(indices);
-        gl.glGenBuffers(1,EBO);
 
         //绑定VAO
         gl.glBindVertexArray(VAO.get(0));
         //绑定VBO
         gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(0));
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferTriangle.capacity() * Float.BYTES, vertexBufferTriangle, GL_STATIC_DRAW);
-        //绑定EBO
-        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO.get(0));
-        gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBufferTriangle.capacity() * Integer.BYTES, indicesBufferTriangle, GL_STATIC_DRAW);
 
         //纹理
         //生成纹理
         TEXTURE = GLBuffers.newDirectIntBuffer(1);
-        gl.glGenTextures(1,TEXTURE);
-
-        //加载图片
-        try {
-            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("D:\\contain.jpg"), false, "JPG");
-            if(textureData!=null){
-                System.out.println(textureData.getHeight());
-                gl.glTexImage2D(GL_TEXTURE_2D,0, GL_RG8,textureData.getWidth(), textureData.getHeight(),0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
-                gl.glGenerateMipmap(GL_TEXTURE_2D);
-            }else{
-                System.out.println("failed to load picture");
-            }
-
-        }catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        gl.glGenTextures(1, TEXTURE);
 
         //绑定纹理
         //gl.glActiveTexture(GL_TEXTURE0);
@@ -103,30 +77,39 @@ public class NmnRenderer {
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+        //加载图片
+        try {
+            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("F:\\下载文件\\EN16njzUEAEBb9t.jpg"), false, "JPG");
+            if (textureData != null) {
+                System.out.println(textureData.getHeight());
+                gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
+                gl.glGenerateMipmap(GL_TEXTURE_2D);
+            } else {
+                System.out.println("failed to load picture");
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
 
         //-----链接顶点属性-----
         //告诉OpenGL该如何解析顶点数据（应用到逐个顶点属性上）
-        //每一行前三个是顶点位置
-        gl.glVertexAttribPointer(0, Vec3.length, GL_FLOAT, false, Vec3.SIZE + Vec3.SIZE + Vec2.SIZE, 0);
+        //0-1是坐标
+        gl.glVertexAttribPointer(0, Vec2.length, GL_FLOAT, false, Vec2.SIZE + Vec2.SIZE, 0);
         gl.glEnableVertexAttribArray(0);
 
-        //4-6是颜色
-        gl.glVertexAttribPointer(1, Vec3.length, GL_FLOAT, false, Vec3.SIZE + Vec3.SIZE + Vec2.SIZE, Vec3.SIZE);
+        //2-3是纹理
+        gl.glVertexAttribPointer(1, Vec2.length, GL_FLOAT, false, Vec2.SIZE + Vec2.SIZE, Vec2.SIZE);
         gl.glEnableVertexAttribArray(1);
-        //8-9是纹理
-        gl.glVertexAttribPointer(2, Vec2.length, GL_FLOAT, false, Vec3.SIZE + Vec3.SIZE + Vec2.SIZE, Vec3.SIZE + Vec3.SIZE);
-        gl.glEnableVertexAttribArray(2);
-
 
     }
 
     public void drawNmn(GL3 gl, Program program) {
         gl.glUseProgram(program.name);
-        gl.glBindTexture(GL_TEXTURE_2D,TEXTURE.get(0));
+        gl.glBindTexture(GL_TEXTURE_2D, TEXTURE.get(0));
         gl.glBindVertexArray(VAO.get(0));
-        gl.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     }
-
 
 }
