@@ -33,10 +33,10 @@ public class NmnRenderer {
 
         final float[] triVertices = {
                 //   ---- 位置 ----      - 纹理坐标 -
-                 0.3f,  0.6f,             1.0f, 0.0f,   // 右上
-                 0.3f, -0.3f,             1.0f, 1.0f,   // 右下
-                -0.3f, -0.3f,             0.0f, 1.0f,   // 左下
-                -0.3f,  0.6f,             0.0f, 0.0f    // 左上
+                 0.3f,  0.6f,             1.0f, 1.0f,   // 右上
+                 0.3f, -0.3f,             1.0f, 0.0f,   // 右下
+                -0.3f, -0.3f,             0.0f, 0.0f,   // 左下
+                -0.3f,  0.6f,             0.0f, 1.0f    // 左上
         };
 
         /*
@@ -79,7 +79,7 @@ public class NmnRenderer {
 
         //加载图片
         try {
-            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("F:\\下载文件\\EN16njzUEAEBb9t.jpg"), false, "JPG");
+            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/contain.jpg"), false, "JPG");
             if (textureData != null) {
                 System.out.println(textureData.getHeight());
                 gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
