@@ -1,14 +1,14 @@
 package converter.entity;
 
 public class MuiNote {
-    private int pitch;
-    private String timeString;
-    private int noteNumbers;
-    private double durationTicks;
-    private long triggerTick;
-    private int channelNumber;
-    private int resolution;
-    private int trackNumber;
+    private int pitch;//音高
+    private String timeString;//1248gw
+    private int noteNumbers;//有几个音符
+    private double durationTicks;//持续时间240
+    private long triggerTick;//开始时间
+    private int channelNumber;//通道编号
+    private int resolution;//分辨率480
+    private int trackNumber;//音轨编号
 
     public MuiNote(int pitch, String timeString, int noteNumbers, double durationTicks) {
         this.pitch = pitch;

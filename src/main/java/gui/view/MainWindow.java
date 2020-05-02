@@ -18,6 +18,7 @@ import gui.entity.Status;
 import pianoroll.component.Pianoroll;
 import pianoroll.component.PianorollCanvas;
 import midiplayer.MidiPlayer;
+import converter.component.NmnCanvas;
 
 /**
  * @author Chief
@@ -39,9 +40,11 @@ public class MainWindow extends JFrame {
 
         // 初始化钢琴卷帘组件
         PianorollCanvas.Setup();
+        NmnCanvas.Setup();
 
         // 钢琴卷帘组件加入到窗口
         layeredPane.add(PianorollCanvas.GetGlcanvas(), new Integer(100));
+        layeredPane.add(NmnCanvas.GetGlcanvas(), new Integer(200));
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();

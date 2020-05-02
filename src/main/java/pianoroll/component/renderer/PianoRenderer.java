@@ -48,7 +48,7 @@ public class PianoRenderer {
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_KEYWHITE));
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferKeyWhite.capacity() * Float.BYTES, vertexBufferKeyWhite, GL_STATIC_DRAW);
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);//？
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, buffer.get(Semantic.Buffer.VERTEX_KEYBLACK));
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferKeyBlack.capacity() * Float.BYTES, vertexBufferKeyBlack, GL_STATIC_DRAW);
@@ -69,7 +69,7 @@ public class PianoRenderer {
 
             gl.glBindVertexArray(key.getVao().get(0));
             {
-                gl.glBindBuffer(GL_ARRAY_BUFFER, vbo);
+                gl.glBindBuffer(GL_ARRAY_BUFFER, vbo);//?
                 {
                     gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
                     gl.glVertexAttribPointer(Semantic.Attr.POSITION, Vec2.length, GL_FLOAT, false, Vec2.SIZE, 0);
