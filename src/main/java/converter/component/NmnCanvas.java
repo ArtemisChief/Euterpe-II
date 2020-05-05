@@ -69,7 +69,8 @@ public class NmnCanvas implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
-        gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .2f).put(1, .3f).put(2, .4f).put(3, 1f));
+        //gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .2f).put(1, .3f).put(2, .4f).put(3, 1f));
+        gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, 1f).put(1, 1f).put(2, 1f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
         //绘制

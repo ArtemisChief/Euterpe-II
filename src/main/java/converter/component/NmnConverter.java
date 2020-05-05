@@ -55,21 +55,23 @@ public class NmnConverter {
 
         int totalPitch = 0;
         int pitchNum = 0;
+        int currentLine = 0;
+        //int currentChannel = 0;
+        int currentSection = 0;
         for(MuiNote muiNote:muiNoteList){
+            /*
             if(muiNote.getTrackNumber() != currentTrack || muiNote.getChannelNumber() != currentChannel){
                 //TODO:处理多音轨
                 continue;
             }
+            */
 
-            if(muiNote.getPitch() == -1){
-                continue;
-            }
 
-            for(int i = 0; i < muiNote.getNoteNumbers();i++){
+            for(int i = 0; i < muiNote.getTimeStringPure().length();i++){
                 int time = 4;
                 int dotNum = 0;
 
-                String s = muiNote.getTimeString().substring(i,i+1);
+                String s = muiNote.getTimeStringPure().substring(i,i+1);
                 switch (s){
                     case "1":
                         time = 1;
@@ -89,7 +91,7 @@ public class NmnConverter {
                     case  "w":
                         time = 32;
                 }
-                while((muiNote.getTimeString().length()>i+1)&&(muiNote.getTimeString().substring(i+1,i+2) == "*")){
+                while((muiNote.getTimeStringPure().length()>i+1)&&(muiNote.getTimeStringPure().substring(i+1,i+2) == "*")){
                     dotNum++;
                     i++;
                 }
@@ -97,8 +99,11 @@ public class NmnConverter {
                 NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
                 nmnNotes.add(nmnNote);
 
-                totalPitch += muiNote.getPitch();
-                pitchNum++;
+                if(muiNote.getPitch() != -1){
+                    totalPitch += muiNote.getPitch();
+                    pitchNum++;
+                }
+
             }
         }
 

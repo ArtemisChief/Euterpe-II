@@ -18,4 +18,10 @@ public class NmnNote {
     public void setPitch(int pitch){
         this.pitch = pitch;
     }
+    public int getTime(){
+        return time;
+    }
+    public int getDotNum(){
+        return dotNum;
+    }
 }

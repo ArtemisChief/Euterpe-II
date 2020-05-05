@@ -157,68 +157,178 @@ public class NmnRenderer {
 
         float offsetX = -0.05f;
         float offsetY = 0;
-        for(int i = 0; i<nmnNoteList.size();i++){
+
+        int currentLine = 0;
+        int currentSection = 0;
+        int sectionContent = 0;
+        for(NmnNote nmnNote: nmnNoteList){
             GraphicElement element = new GraphicElement();
             offsetX +=0.05;
-            if(i%30 == 0 && i>=30){
+            if(currentSection == 4){
+                currentLine++;
+                currentSection = 0;
                 offsetX = 0f;
                 offsetY -= 0.18f;
             }
             element.setOffsetX(offsetX);
             element.setOffsetY(offsetY);
 
+            addElement(gl, element, Integer.toString(nmnNote.getPitch()), vertexBufferTriangle);
 
-            //生成VAO
-            gl.glGenVertexArrays(1, element.getVao());
-
-            //绑定VAO
-            gl.glBindVertexArray(element.getVao().get(0));
-            //绑定VBO
-            gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(1));
-            gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferTriangle.capacity() * Float.BYTES, vertexBufferTriangle, GL_STATIC_DRAW);
-
-            //纹理
-            //生成纹理
-            gl.glGenTextures(1, element.getTexture());
-
-            //绑定纹理
-            gl.glBindTexture(GL_TEXTURE_2D, element.getTexture().get(0));
-            // 为当前绑定的纹理对象设置环绕、过滤方式
-            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            //加载图片
-            try {
-                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/"+nmnNoteList.get(i).getPitch()+".jpg"), false, "JPG");
-                if (textureData != null) {
-                    System.out.println(textureData.getHeight());
-                    gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
-                    gl.glGenerateMipmap(GL_TEXTURE_2D);
-                } else {
-                    System.out.println("failed to load picture");
+            //如果是4分音符，在后面加个空格；如果是2分音符或全音符，加横杠
+            int time = nmnNote.getTime();
+            if(time == 4 ){
+                String picName = " ";
+                GraphicElement tempElement = new GraphicElement();
+                //如果是带附点的
+                if(nmnNote.getDotNum()>0){
+                    picName = "dot" + nmnNote.getDotNum();
+                }else {
+                    picName = "blank";
                 }
 
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
+                offsetX +=0.05;
+                tempElement.setOffsetX(offsetX);
+                tempElement.setOffsetY(offsetY);
+
+                addElement(gl, tempElement, picName, vertexBufferTriangle);
             }
 
-            //-----链接顶点属性-----
-            //告诉OpenGL该如何解析顶点数据（应用到逐个顶点属性上）
-            //0-1是坐标
-            gl.glVertexAttribPointer(0, Vec2.length, GL_FLOAT, false, Vec2.SIZE + Vec2.SIZE, 0);
-            gl.glEnableVertexAttribArray(0);
+            if(time == 2){
+                GraphicElement tempElement = new GraphicElement();
+                offsetX +=0.05;
+                tempElement.setOffsetX(offsetX);
+                tempElement.setOffsetY(offsetY);
 
-            //2-3是纹理
-            gl.glVertexAttribPointer(1, Vec2.length, GL_FLOAT, false, Vec2.SIZE + Vec2.SIZE, Vec2.SIZE);
-            gl.glEnableVertexAttribArray(1);
+                addElement(gl, tempElement, "rung", vertexBufferTriangle);
 
-            elements.add(element);
+                String picName = " ";
+                //如果是带一个附点的
+                if(nmnNote.getDotNum()==1){
+                    picName = "rung";
+                }else {
+                    picName = "blank";
+                }
+                //TODO：处理带两个及以上附点的情况
+                //TODO：处理跨小节情况
+
+                tempElement = new GraphicElement();
+                offsetX +=0.05;
+                tempElement.setOffsetX(offsetX);
+                tempElement.setOffsetY(offsetY);
+
+                addElement(gl, tempElement, picName, vertexBufferTriangle);
+            }
+
+            if(time == 1) {
+                for(int i = 0;i<2;i++){
+                    GraphicElement tempElement = new GraphicElement();
+                    offsetX += 0.05;
+                    tempElement.setOffsetX(offsetX);
+                    tempElement.setOffsetY(offsetY);
+
+                    addElement(gl, tempElement, "rung", vertexBufferTriangle);
+                }
+            }
+
+
+            //计算当前小节容量，是否开始新的小节
+            int tempContent=0;
+            switch (time){
+                case 1:
+                    tempContent = 32;
+                    break;
+                case 2:
+                    tempContent = 16;
+                    break;
+                case 4:
+                    tempContent = 8;
+                    break;
+                case 8:
+                    tempContent = 4;
+                    break;
+                case 16:
+                    tempContent = 2;
+                    break;
+                case 32:
+                    tempContent = 1;
+                    break;
+            }
+            int tempDotNum = nmnNote.getDotNum();
+            while(tempDotNum>0){
+                sectionContent += tempContent;
+                tempContent = tempContent/2;
+            }
+            sectionContent += tempContent;
+
+            //3/4拍的情况下
+            if(sectionContent>=24){
+                currentSection++;
+                //画小节线
+                GraphicElement vBar = new GraphicElement();
+                offsetX +=0.05;
+                vBar.setOffsetX(offsetX);
+                vBar.setOffsetY(offsetY);
+                addElement(gl,vBar,"vBar",vertexBufferTriangle);
+                //小节内容清零
+                sectionContent = 0;
+            }
+
+
+
         }
 
 
 
     }
 
+    private void addElement(GL3 gl, GraphicElement element, String picName, FloatBuffer vertexBufferTriangle){
+        //生成VAO
+        gl.glGenVertexArrays(1, element.getVao());
+
+        //绑定VAO
+        gl.glBindVertexArray(element.getVao().get(0));
+        //绑定VBO
+        gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(1));
+        gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferTriangle.capacity() * Float.BYTES, vertexBufferTriangle, GL_STATIC_DRAW);
+
+        //纹理
+        //生成纹理
+        gl.glGenTextures(1, element.getTexture());
+
+        //绑定纹理
+        gl.glBindTexture(GL_TEXTURE_2D, element.getTexture().get(0));
+        // 为当前绑定的纹理对象设置环绕、过滤方式
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        //加载图片
+        try {
+            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/"+picName+".jpg"), false, "JPG");
+            if (textureData != null) {
+                System.out.println(textureData.getHeight());
+                gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
+                gl.glGenerateMipmap(GL_TEXTURE_2D);
+            } else {
+                System.out.println("failed to load picture");
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        //-----链接顶点属性-----
+        //告诉OpenGL该如何解析顶点数据（应用到逐个顶点属性上）
+        //0-1是坐标
+        gl.glVertexAttribPointer(0, Vec2.length, GL_FLOAT, false, Vec2.SIZE + Vec2.SIZE, 0);
+        gl.glEnableVertexAttribArray(0);
+
+        //2-3是纹理
+        gl.glVertexAttribPointer(1, Vec2.length, GL_FLOAT, false, Vec2.SIZE + Vec2.SIZE, Vec2.SIZE);
+        gl.glEnableVertexAttribArray(1);
+
+        elements.add(element);
+    }
 }
