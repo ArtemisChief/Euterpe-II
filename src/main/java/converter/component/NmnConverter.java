@@ -122,7 +122,7 @@ public class NmnConverter {
         try {
 
             status=new ArrayList<>();
-            List<MuiNote> muiNoteList = new ArrayList<>();
+            muiNoteList = new ArrayList<>();
 
             //通过MIDI解析器解析MIDI文件
             MidiContent midiContent = parser.parse(midiFile);
