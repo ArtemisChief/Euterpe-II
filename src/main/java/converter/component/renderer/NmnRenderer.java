@@ -107,7 +107,7 @@ public class NmnRenderer {
 
         //加载图片
         try {
-            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/tonality.png"), false, "PNG");
+            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/tonality.jpg"), false, "JPG");
             if (textureData != null) {
                 System.out.println(textureData.getHeight());
                 gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
@@ -134,6 +134,9 @@ public class NmnRenderer {
     }
 
     private void initNotes(GL3 gl){
+        File midiFile = new File("src/main/resources/symbols/Heartache.mid");
+        nmnConverter = NmnConverter.GetInstance();
+        nmnNoteList = nmnConverter.getNmnNoteList(midiFile);
         /*
         notes = new ArrayList<>();
 
@@ -145,17 +148,24 @@ public class NmnRenderer {
         */
         float[] Vertices = {
                 //   ---- 位置 ----      - 纹理坐标 -
-                -0.9f,  0.7f,             1.0f, 1.0f,   // 右上
-                -0.9f, 0.55f,             1.0f, 0.0f,   // 右下
+                -0.93f,  0.7f,             1.0f, 1.0f,   // 右上
+                -0.93f, 0.55f,             1.0f, 0.0f,   // 右下
                 -0.98f, 0.55f,             0.0f, 0.0f,   // 左下
                 -0.98f,  0.7f,             0.0f, 1.0f    // 左上
         };
         FloatBuffer vertexBufferTriangle = GLBuffers.newDirectFloatBuffer(Vertices);
 
-        for(int i = 0; i<10;i++){
-            float offsetX = 0.08f * i;
+        float offsetX = -0.05f;
+        float offsetY = 0;
+        for(int i = 0; i<nmnNoteList.size();i++){
             GraphicElement element = new GraphicElement();
+            if(i%30 == 0 && i>=30){
+                offsetX = -0.05f;
+                offsetY -= 0.18;
+            }
             element.setOffsetX(offsetX);
+            element.setOffsetY(offsetY);
+
 
             //生成VAO
             gl.glGenVertexArrays(1, element.getVao());
@@ -180,7 +190,7 @@ public class NmnRenderer {
 
             //加载图片
             try {
-                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/tonality.png"), false, "PNG");
+                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/"+"36"+".jpg"), false, "JPG");
                 if (textureData != null) {
                     System.out.println(textureData.getHeight());
                     gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
