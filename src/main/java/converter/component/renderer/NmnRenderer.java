@@ -134,7 +134,7 @@ public class NmnRenderer {
     }
 
     private void initNotes(GL3 gl){
-        File midiFile = new File("src/main/resources/symbols/Heartache.mid");
+        File midiFile = new File("src/main/resources/symbols/Luv Letter.mid");
         nmnConverter = NmnConverter.GetInstance();
         nmnNoteList = nmnConverter.getNmnNoteList(midiFile);
         /*
@@ -190,7 +190,7 @@ public class NmnRenderer {
 
             //加载图片
             try {
-                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/"+"36"+".jpg"), false, "JPG");
+                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/"+nmnNoteList.get(i).getPitch()+".jpg"), false, "JPG");
                 if (textureData != null) {
                     System.out.println(textureData.getHeight());
                     gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
