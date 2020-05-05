@@ -112,9 +112,6 @@ public class MuiNote {
         return timeString;
     }
 
-    public int getNoteNumbers() {
-        return noteNumbers;
-    }
 
     public double getDurationTicks() {
         return durationTicks;
@@ -146,5 +143,22 @@ public class MuiNote {
 
     }
 
-
+    public int getPitch(){
+        return pitch;
+    }
+    public String getTimeStringPure(){
+        return timeString;
+    }
+    public int getNoteNumbers() {
+        return noteNumbers;
+    }
+    public int getTrackNumber(){
+        return trackNumber;
+    }
+    public int getChannelNumber(){
+        return channelNumber;
+    }
+    public long getTriggerTick(){
+        return triggerTick;
+    }
 }

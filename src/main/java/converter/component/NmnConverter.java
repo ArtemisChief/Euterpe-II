@@ -2,6 +2,7 @@ package converter.component;
 
 import converter.entity.MidiChannel;
 import converter.entity.MuiNote;
+import converter.entity.NmnNote;
 import midipaser.component.MidiParser;
 import midipaser.entity.MidiContent;
 import midipaser.entity.MidiEvent;
@@ -16,6 +17,14 @@ import java.util.List;
 
 public class NmnConverter {
 
+    private NmnConverter() {
+    }
+
+    private static final NmnConverter instance = new NmnConverter();
+
+    public static NmnConverter GetInstance() {
+        return instance;
+    }
 
     //MIDI文件的分辨率，代表一个四分音符占多少tick
     private int resolution;
@@ -32,17 +41,88 @@ public class NmnConverter {
     //只保存了乐器或速度事件的MidiChannel
     private List<MidiChannel> status;
 
-    private List<MuiNote> muiNoteList;
+      private List<MuiNote> muiNoteList;
 
+    public  List<NmnNote> getNmnNoteList(File midiFile){
+        List<MuiNote> muiNoteList = getMuiNoteList(midiFile);
+        List<NmnNote> nmnNotes = new ArrayList<>();
 
+        int currentTrack = muiNoteList.get(0).getTrackNumber();
+        int currentChannel = muiNoteList.get(0).getChannelNumber();
 
+        int currentRow = 0;
+        int currentColumn = 0;
+
+        int totalPitch = 0;
+        int pitchNum = 0;
+        for(MuiNote muiNote:muiNoteList){
+            if(muiNote.getTrackNumber() != currentTrack || muiNote.getChannelNumber() != currentChannel){
+                //TODO:处理多音轨
+                continue;
+            }
+
+            for(int i = 0; i < muiNote.getNoteNumbers();i++){
+                int time = 4;
+                int dotNum = 0;
+
+                String s = muiNote.getTimeString().substring(i,i+1);
+                switch (s){
+                    case "1":
+                        time = 1;
+                        break;
+                    case "2":
+                        time = 2;
+                        break;
+                    case "4":
+                        time = 4;
+                        break;
+                    case "8":
+                        time = 8;
+                        break;
+                    case "g":
+                        time = 16;
+                        break;
+                    case  "w":
+                        time = 32;
+                }
+                while(muiNote.getTimeString().substring(i+1,i+2) == "*"){
+                    dotNum++;
+                    i++;
+                }
+
+                NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
+                nmnNotes.add(nmnNote);
+
+                totalPitch += muiNote.getPitch();
+                pitchNum++;
+            }
+        }
+
+        //处理偏移，使所有的音符平均音高在60-72之间
+        int absolute_offset = totalPitch / pitchNum - 60;
+        int offset = 0;
+        while(absolute_offset>12){
+            absolute_offset -= 12;
+            offset += 12;
+        }
+        while(absolute_offset<0){
+            absolute_offset += 12;
+            offset -= 12;
+        }
+        for(NmnNote nmnNote: nmnNotes){
+            int currentPitch = nmnNote.getPitch();
+            nmnNote.setPitch(currentPitch - offset);
+        }
+
+        return nmnNotes;
+    }
 
     public List<MuiNote> getMuiNoteList(File midiFile) {
         MidiParser parser = MidiParser.GetInstance();
         try {
 
             status=new ArrayList<>();
-            muiNoteList=new ArrayList<>();
+            List<MuiNote> muiNoteList = new ArrayList<>();
 
             //通过MIDI解析器解析MIDI文件
             MidiContent midiContent = parser.parse(midiFile);
