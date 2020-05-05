@@ -134,7 +134,7 @@ public class NmnRenderer {
     }
 
     private void initNotes(GL3 gl){
-        File midiFile = new File("src/main/resources/symbols/Luv Letter.mid");
+        File midiFile = new File("src/main/resources/symbols/AWM.mid");
         nmnConverter = NmnConverter.GetInstance();
         nmnNoteList = nmnConverter.getNmnNoteList(midiFile);
         /*
@@ -159,9 +159,10 @@ public class NmnRenderer {
         float offsetY = 0;
         for(int i = 0; i<nmnNoteList.size();i++){
             GraphicElement element = new GraphicElement();
+            offsetX +=0.05;
             if(i%30 == 0 && i>=30){
-                offsetX = -0.05f;
-                offsetY -= 0.18;
+                offsetX = 0f;
+                offsetY -= 0.18f;
             }
             element.setOffsetX(offsetX);
             element.setOffsetY(offsetY);

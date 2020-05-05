@@ -61,6 +61,10 @@ public class NmnConverter {
                 continue;
             }
 
+            if(muiNote.getPitch() == -1){
+                continue;
+            }
+
             for(int i = 0; i < muiNote.getNoteNumbers();i++){
                 int time = 4;
                 int dotNum = 0;
@@ -85,7 +89,7 @@ public class NmnConverter {
                     case  "w":
                         time = 32;
                 }
-                while(muiNote.getTimeString().substring(i+1,i+2) == "*"){
+                while((muiNote.getTimeString().length()>i+1)&&(muiNote.getTimeString().substring(i+1,i+2) == "*")){
                     dotNum++;
                     i++;
                 }
