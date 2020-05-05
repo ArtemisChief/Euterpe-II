@@ -62,7 +62,8 @@ public class NmnCanvas implements GLEventListener {
         nmnRenderer.init(gl);
 
         nmnProgram = new Program(gl, getClass(),
-                "/shaders", "Nmn.vert", "Nmn.frag");
+                "/shaders", "Nmn.vert", "Nmn.frag",
+                "offsetX", "offsetY");
     }
 
     @Override

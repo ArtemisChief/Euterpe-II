@@ -17,6 +17,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static com.jogamp.opengl.GL.*;
+import static uno.buffer.UtilKt.destroyBuffers;
 
 import java.io.*;
 import javax.imageio.*;
@@ -44,15 +45,16 @@ public class NmnRenderer {
     public void init(GL3 gl) {
 
         //生成VBO
-        VBO = GLBuffers.newDirectIntBuffer(1);
-        gl.glGenBuffers(1, VBO);
+        VBO = GLBuffers.newDirectIntBuffer(2);
+        gl.glGenBuffers(2, VBO);
 
         //TODO
         initTonality(gl);
         initNotes(gl);
 
 
-
+        //gl.glDeleteBuffers(1, VBO);
+        //destroyBuffers(VBO);
     }
 
     public void drawNmn(GL3 gl, Program program) {
@@ -61,6 +63,10 @@ public class NmnRenderer {
         for(GraphicElement element: elements){
             gl.glBindTexture(GL_TEXTURE_2D, element.getTexture().get(0));
             gl.glBindVertexArray(element.getVao().get(0));
+
+            gl.glUniform1f(program.get("offsetX"), element.getOffsetX());
+            gl.glUniform1f(program.get("offsetY"), element.getOffsetY());
+
             gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
         }
 
@@ -101,7 +107,7 @@ public class NmnRenderer {
 
         //加载图片
         try {
-            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/diao.png"), false, "PNG");
+            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/tonality.png"), false, "PNG");
             if (textureData != null) {
                 System.out.println(textureData.getHeight());
                 gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
@@ -126,6 +132,7 @@ public class NmnRenderer {
 
         elements.add(element);
     }
+
     private void initNotes(GL3 gl){
         /*
         notes = new ArrayList<>();
@@ -136,33 +143,27 @@ public class NmnRenderer {
 
         }
         */
-
+        float[] Vertices = {
+                //   ---- 位置 ----      - 纹理坐标 -
+                -0.9f,  0.7f,             1.0f, 1.0f,   // 右上
+                -0.9f, 0.55f,             1.0f, 0.0f,   // 右下
+                -0.98f, 0.55f,             0.0f, 0.0f,   // 左下
+                -0.98f,  0.7f,             0.0f, 1.0f    // 左上
+        };
+        FloatBuffer vertexBufferTriangle = GLBuffers.newDirectFloatBuffer(Vertices);
 
         for(int i = 0; i<10;i++){
-            float[] Vertices = {
-                    //   ---- 位置 ----      - 纹理坐标 -
-                    -0.9f,  0.7f,             1.0f, 1.0f,   // 右上
-                    -0.9f, 0.55f,             1.0f, 0.0f,   // 右下
-                    -0.98f, 0.55f,             0.0f, 0.0f,   // 左下
-                    -0.98f,  0.7f,             0.0f, 1.0f    // 左上
-            };
-
             float offsetX = 0.08f * i;
-            Vertices[0] += offsetX;
-            Vertices[4] += offsetX;
-            Vertices[8] += offsetX;
-            Vertices[12] += offsetX;
-
-            FloatBuffer vertexBufferTriangle = GLBuffers.newDirectFloatBuffer(Vertices);
-
             GraphicElement element = new GraphicElement();
+            element.setOffsetX(offsetX);
+
             //生成VAO
             gl.glGenVertexArrays(1, element.getVao());
 
             //绑定VAO
             gl.glBindVertexArray(element.getVao().get(0));
             //绑定VBO
-            gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(0));
+            gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(1));
             gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferTriangle.capacity() * Float.BYTES, vertexBufferTriangle, GL_STATIC_DRAW);
 
             //纹理
@@ -179,7 +180,7 @@ public class NmnRenderer {
 
             //加载图片
             try {
-                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/diao.png"), false, "PNG");
+                TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/tonality.png"), false, "PNG");
                 if (textureData != null) {
                     System.out.println(textureData.getHeight());
                     gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
