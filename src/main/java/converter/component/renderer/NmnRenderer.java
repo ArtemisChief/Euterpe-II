@@ -37,17 +37,17 @@ public class NmnRenderer {
 
     public NmnRenderer(){
         elements = new ArrayList<>();
-        midiFile = new File("src/main/resources/symbols/Canon.mid");
+        midiFile = new File("src/main/resources/symbols/AWM.mid");
 
         //默认，3/4拍，每小节3*8=24个32分音符
-        section = 32;
+        section = 24;
     }
     public NmnRenderer(File midiFile) {
         elements = new ArrayList<>();
         this.midiFile = midiFile;
 
-        //默认，3/4拍，每小节3*8=24个32分音符
-        section = 24;
+        //默认，4/4拍，每小节4*8=32个32分音符
+        section = 32;
     }
     public NmnRenderer(File midiFile, String beat) {
         elements = new ArrayList<>();
@@ -360,7 +360,7 @@ public class NmnRenderer {
         try {
             TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/"+picName+".jpg"), false, "JPG");
             if (textureData != null) {
-                System.out.println(textureData.getHeight());
+                //System.out.println(textureData.getHeight());
                 gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
                 gl.glGenerateMipmap(GL_TEXTURE_2D);
             } else {
