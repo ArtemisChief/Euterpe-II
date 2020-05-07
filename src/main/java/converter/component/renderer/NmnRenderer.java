@@ -30,16 +30,18 @@ public class NmnRenderer {
     IntBuffer VBO;
 
     private NmnConverter nmnConverter;
+    File midiFile;
     List<NmnNote> nmnNoteList;
     List<GraphicElement> elements;
 
     public NmnRenderer(){
         elements = new ArrayList<>();
+        midiFile = new File("src/main/resources/symbols/AWM.mid");
 
     }
     public NmnRenderer(File midiFile) {
-        nmnConverter = NmnConverter.GetInstance();
-        nmnNoteList = nmnConverter.getNmnNoteList(midiFile);
+        elements = new ArrayList<>();
+        this.midiFile = midiFile;
     }
 
     public void init(GL3 gl) {
@@ -134,18 +136,9 @@ public class NmnRenderer {
     }
 
     private void initNotes(GL3 gl){
-        File midiFile = new File("src/main/resources/symbols/AWM.mid");
         nmnConverter = NmnConverter.GetInstance();
         nmnNoteList = nmnConverter.getNmnNoteList(midiFile);
-        /*
-        notes = new ArrayList<>();
 
-        for(int trackID = 0; trackID < nmnNoteList.size(); trackID++){
-            GraphicElement note = new GraphicElement(trackID);
-
-
-        }
-        */
         float[] Vertices = {
                 //   ---- 位置 ----      - 纹理坐标 -
                 -0.93f,  0.7f,             1.0f, 1.0f,   // 右上
