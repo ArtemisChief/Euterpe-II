@@ -33,15 +33,58 @@ public class NmnRenderer {
     File midiFile;
     List<NmnNote> nmnNoteList;
     List<GraphicElement> elements;
+    int section;//每小节容量
 
     public NmnRenderer(){
         elements = new ArrayList<>();
         midiFile = new File("src/main/resources/symbols/AWM.mid");
 
+        //默认，3/4拍，每小节3*8=24个32分音符
+        section = 24;
     }
     public NmnRenderer(File midiFile) {
         elements = new ArrayList<>();
         this.midiFile = midiFile;
+
+        //默认，3/4拍，每小节3*8=24个32分音符
+        section = 24;
+    }
+    public NmnRenderer(File midiFile, String beat) {
+        elements = new ArrayList<>();
+        this.midiFile = midiFile;
+
+        try {
+            int num = Integer.parseInt(beat.substring(0, beat.indexOf("/")));
+            int noteType = Integer.parseInt(beat.substring(beat.indexOf("/")));
+
+            int timePerNote = 8;
+            switch (noteType) {
+                case 1:
+                    timePerNote = 32;
+                    break;
+                case 2:
+                    timePerNote = 16;
+                    break;
+                case 4:
+                    timePerNote = 8;
+                    break;
+                case 8:
+                    timePerNote = 4;
+                    break;
+                case 16:
+                    timePerNote = 2;
+                    break;
+                case 32:
+                    timePerNote = 1;
+                    break;
+            }
+
+            section = num * timePerNote;
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            section = 24;
+        }
     }
 
     public void init(GL3 gl) {
@@ -259,27 +302,8 @@ public class NmnRenderer {
 
 
             //计算当前小节容量，是否开始新的小节
-            int tempContent=0;
-            switch (time){
-                case 1:
-                    tempContent = 32;
-                    break;
-                case 2:
-                    tempContent = 16;
-                    break;
-                case 4:
-                    tempContent = 8;
-                    break;
-                case 8:
-                    tempContent = 4;
-                    break;
-                case 16:
-                    tempContent = 2;
-                    break;
-                case 32:
-                    tempContent = 1;
-                    break;
-            }
+            int tempContent = parseContent(time);
+
             int tempDotNum = nmnNote.getDotNum();
             while(tempDotNum>0){
                 sectionContent += tempContent;
@@ -289,7 +313,7 @@ public class NmnRenderer {
             sectionContent += tempContent;
 
             //3/4拍的情况下
-            if(sectionContent>=24){
+            if(sectionContent>=section){
                 currentSection++;
                 //画小节线
                 GraphicElement vBar = new GraphicElement();
@@ -357,5 +381,30 @@ public class NmnRenderer {
         gl.glEnableVertexAttribArray(1);
 
         elements.add(element);
+    }
+
+    private int parseContent(int noteTime){
+        int tempContent=0;
+        switch (noteTime){
+            case 1:
+                tempContent = 32;
+                break;
+            case 2:
+                tempContent = 16;
+                break;
+            case 4:
+                tempContent = 8;
+                break;
+            case 8:
+                tempContent = 4;
+                break;
+            case 16:
+                tempContent = 2;
+                break;
+            case 32:
+                tempContent = 1;
+                break;
+        }
+        return tempContent;
     }
 }
