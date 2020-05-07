@@ -37,10 +37,10 @@ public class NmnRenderer {
 
     public NmnRenderer(){
         elements = new ArrayList<>();
-        midiFile = new File("src/main/resources/symbols/AWM.mid");
+        midiFile = new File("src/main/resources/symbols/Canon.mid");
 
         //默认，3/4拍，每小节3*8=24个32分音符
-        section = 24;
+        section = 32;
     }
     public NmnRenderer(File midiFile) {
         elements = new ArrayList<>();
@@ -280,9 +280,10 @@ public class NmnRenderer {
                     //TODO:处理全音符跨小节问题
 
                     GraphicElement tempElement = new GraphicElement();
-                    offsetX += 0.05;
+                    offsetX += 0.075;
                     tempElement.setOffsetX(offsetX);
                     tempElement.setOffsetY(offsetY);
+                    offsetX += 0.025;
 
                     addElement(gl, tempElement, "rung", vertexBufferTriangle, 1);
                 }

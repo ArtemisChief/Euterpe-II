@@ -182,6 +182,9 @@ public class NmnConverter {
         }
         for(NmnNote nmnNote: nmnNotes){
             int currentPitch = nmnNote.getPitch();
+            if(currentPitch == -1){
+                continue;
+            }
             nmnNote.setPitch(currentPitch - offset);
         }
 
