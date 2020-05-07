@@ -59,6 +59,10 @@ public class NmnConverter {
         //int currentChannel = 0;
         int currentSection = 0;
         for(MuiNote muiNote:muiNoteList){
+            //如果noteNum为0，跳过这个音符
+            if(muiNote.getNoteNumbers()==0){
+                continue;
+            }
             /*
             if(muiNote.getTrackNumber() != currentTrack || muiNote.getChannelNumber() != currentChannel){
                 //TODO:处理多音轨
@@ -66,12 +70,14 @@ public class NmnConverter {
             }
             */
 
+            ////时长相当于多少个32分音符数量
+            //int time = (int)(muiNote.getDurationTicks() * 8)  / muiNote.getResolution();
 
-            for(int i = 0; i < muiNote.getTimeStringPure().length();i++){
+            if(muiNote.getNoteNumbers() == 1){
                 int time = 4;
                 int dotNum = 0;
 
-                String s = muiNote.getTimeStringPure().substring(i,i+1);
+                String s = muiNote.getTimeStringPure().substring(0,1);
                 switch (s){
                     case "1":
                         time = 1;
@@ -91,17 +97,73 @@ public class NmnConverter {
                     case  "w":
                         time = 32;
                 }
-                while((muiNote.getTimeStringPure().length()>i+1)&&(muiNote.getTimeStringPure().substring(i+1,i+2) == "*")){
-                    dotNum++;
-                    i++;
+
+                //判断附点
+                if(muiNote.getTimeStringPure().length()>1){
+                    dotNum = muiNote.getTimeStringPure().length() - 1;
                 }
 
+                //添加音符
                 NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
                 nmnNotes.add(nmnNote);
 
+                //休止符不参与平均音高计算
                 if(muiNote.getPitch() != -1){
                     totalPitch += muiNote.getPitch();
                     pitchNum++;
+                }
+            }
+
+            if(muiNote.getNoteNumbers()>1){
+
+                int currentPosition = 0;
+                String timeString = muiNote.getTimeStringPure();
+                for(int i = 0; i < muiNote.getNoteNumbers();i++){
+                    int time = 4;
+                    int dotNum = 0;
+
+                    String s = muiNote.getTimeStringPure().substring(currentPosition,currentPosition + 1);
+                    switch (s){
+                        case "1":
+                            time = 1;
+                            break;
+                        case "2":
+                            time = 2;
+                            break;
+                        case "4":
+                            time = 4;
+                            break;
+                        case "8":
+                            time = 8;
+                            break;
+                        case "g":
+                            time = 16;
+                            break;
+                        case  "w":
+                            time = 32;
+                    }
+                    currentPosition++;
+
+
+                    //判断附点
+                    while(currentPosition< timeString.length()){
+                        if(timeString.substring(currentPosition, currentPosition + 1) != "*"){
+                            break;
+                        }
+                        dotNum++;
+                        currentPosition++;
+                    }
+
+                    //添加音符
+                    NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
+                    nmnNotes.add(nmnNote);
+
+                    //休止符不参与平均音高计算
+                    if(muiNote.getPitch() != -1){
+                        totalPitch += muiNote.getPitch();
+                        pitchNum++;
+                    }
+
                 }
 
             }

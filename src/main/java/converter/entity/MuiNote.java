@@ -112,6 +112,9 @@ public class MuiNote {
         return timeString;
     }
 
+    public int getResolution(){
+        return resolution;
+    }
 
     public double getDurationTicks() {
         return durationTicks;

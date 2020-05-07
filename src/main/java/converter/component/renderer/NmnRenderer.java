@@ -45,8 +45,8 @@ public class NmnRenderer {
     public void init(GL3 gl) {
 
         //生成VBO
-        VBO = GLBuffers.newDirectIntBuffer(2);
-        gl.glGenBuffers(2, VBO);
+        VBO = GLBuffers.newDirectIntBuffer(3);
+        gl.glGenBuffers(3, VBO);
 
         //TODO
         initTonality(gl);
@@ -155,7 +155,16 @@ public class NmnRenderer {
         };
         FloatBuffer vertexBufferTriangle = GLBuffers.newDirectFloatBuffer(Vertices);
 
-        float offsetX = -0.05f;
+        float[] underline = {
+                //   ---- 位置 ----      - 纹理坐标 -
+                -0.93f,  0.7f,             1.0f, 1.0f,   // 右上
+                -0.93f, 0.65f,             1.0f, 0.0f,   // 右下
+                -0.98f, 0.65f,             0.0f, 0.0f,   // 左下
+                -0.98f,  0.7f,             0.0f, 1.0f    // 左上
+        };
+        FloatBuffer vertexBufferUnderline = GLBuffers.newDirectFloatBuffer(underline);
+
+        float offsetX = 0;
         float offsetY = 0;
 
         int currentLine = 0;
@@ -164,43 +173,52 @@ public class NmnRenderer {
         for(NmnNote nmnNote: nmnNoteList){
             GraphicElement element = new GraphicElement();
             offsetX +=0.05;
+            //换行操作
             if(currentSection == 4){
                 currentLine++;
                 currentSection = 0;
-                offsetX = 0f;
-                offsetY -= 0.18f;
+                offsetX = 0.05f;
+                offsetY -= 0.23f;
             }
             element.setOffsetX(offsetX);
             element.setOffsetY(offsetY);
 
-            addElement(gl, element, Integer.toString(nmnNote.getPitch()), vertexBufferTriangle);
+            addElement(gl, element, Integer.toString(nmnNote.getPitch()), vertexBufferTriangle, 1);
 
             //如果是4分音符，在后面加个空格；如果是2分音符或全音符，加横杠
             int time = nmnNote.getTime();
             if(time == 4 ){
                 String picName = " ";
                 GraphicElement tempElement = new GraphicElement();
+
                 //如果是带附点的
                 if(nmnNote.getDotNum()>0){
                     picName = "dot" + nmnNote.getDotNum();
-                }else {
-                    picName = "blank";
+                    offsetX +=0.05;
+                    tempElement.setOffsetX(offsetX);
+                    tempElement.setOffsetY(offsetY);
+
+                    addElement(gl, tempElement, picName, vertexBufferTriangle, 1);
                 }
+
+                picName = "blank";
 
                 offsetX +=0.05;
                 tempElement.setOffsetX(offsetX);
                 tempElement.setOffsetY(offsetY);
 
-                addElement(gl, tempElement, picName, vertexBufferTriangle);
+                addElement(gl, tempElement, picName, vertexBufferTriangle, 1);
             }
 
             if(time == 2){
+
                 GraphicElement tempElement = new GraphicElement();
-                offsetX +=0.05;
+                offsetX +=0.075;
                 tempElement.setOffsetX(offsetX);
                 tempElement.setOffsetY(offsetY);
 
-                addElement(gl, tempElement, "rung", vertexBufferTriangle);
+                addElement(gl, tempElement, "rung", vertexBufferTriangle, 1);
+
 
                 String picName = " ";
                 //如果是带一个附点的
@@ -213,22 +231,37 @@ public class NmnRenderer {
                 //TODO：处理跨小节情况
 
                 tempElement = new GraphicElement();
-                offsetX +=0.05;
+                offsetX +=0.075;
                 tempElement.setOffsetX(offsetX);
                 tempElement.setOffsetY(offsetY);
 
-                addElement(gl, tempElement, picName, vertexBufferTriangle);
+                addElement(gl, tempElement, picName, vertexBufferTriangle, 1);
+
             }
 
             if(time == 1) {
-                for(int i = 0;i<2;i++){
+                for(int i = 0;i<3;i++){
+                    //TODO:处理全音符跨小节问题
+
                     GraphicElement tempElement = new GraphicElement();
                     offsetX += 0.05;
                     tempElement.setOffsetX(offsetX);
                     tempElement.setOffsetY(offsetY);
 
-                    addElement(gl, tempElement, "rung", vertexBufferTriangle);
+                    addElement(gl, tempElement, "rung", vertexBufferTriangle, 1);
                 }
+            }
+
+            if(time > 4){
+
+                GraphicElement tempElement = new GraphicElement();
+                //offsetX不变
+                float tempOffsetY = offsetY - 0.15f;
+                tempElement.setOffsetX(offsetX);
+                tempElement.setOffsetY(tempOffsetY);
+
+                addElement(gl, tempElement, "underline"+time, vertexBufferUnderline, 2);
+
             }
 
 
@@ -258,6 +291,7 @@ public class NmnRenderer {
             while(tempDotNum>0){
                 sectionContent += tempContent;
                 tempContent = tempContent/2;
+                tempDotNum--;
             }
             sectionContent += tempContent;
 
@@ -269,7 +303,7 @@ public class NmnRenderer {
                 offsetX +=0.05;
                 vBar.setOffsetX(offsetX);
                 vBar.setOffsetY(offsetY);
-                addElement(gl,vBar,"vBar",vertexBufferTriangle);
+                addElement(gl,vBar,"vBar",vertexBufferTriangle,1);
                 //小节内容清零
                 sectionContent = 0;
             }
@@ -282,14 +316,14 @@ public class NmnRenderer {
 
     }
 
-    private void addElement(GL3 gl, GraphicElement element, String picName, FloatBuffer vertexBufferTriangle){
+    private void addElement(GL3 gl, GraphicElement element, String picName, FloatBuffer vertexBufferTriangle, int VBO_Num){
         //生成VAO
         gl.glGenVertexArrays(1, element.getVao());
 
         //绑定VAO
         gl.glBindVertexArray(element.getVao().get(0));
         //绑定VBO
-        gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(1));
+        gl.glBindBuffer(GL_ARRAY_BUFFER, VBO.get(VBO_Num));
         gl.glBufferData(GL_ARRAY_BUFFER, vertexBufferTriangle.capacity() * Float.BYTES, vertexBufferTriangle, GL_STATIC_DRAW);
 
         //纹理
