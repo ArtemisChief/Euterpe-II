@@ -41,7 +41,7 @@ public class InputTexts {
     public class MyDocument extends DefaultStyledDocument {
         @Override
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-            if(FileIO.GetInstance().isOpeningFile()) {
+            if(FileIO.GetInstance().isWritingInputText()) {
                 super.insertString(offs, str, a);
             }
             else{

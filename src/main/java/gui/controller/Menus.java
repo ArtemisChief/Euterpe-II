@@ -1,5 +1,6 @@
 package gui.controller;
 
+import converter.component.MidiConverter;
 import converter.component.NmnCanvas;
 import gui.view.MainWindow;
 import midiplayer.MidiPlayer;
@@ -384,8 +385,26 @@ public class Menus {
 
         // 转换Midi到Mui
         mainWindow.convertToMuiMenuItem.addActionListener(e -> {
-            if (!FileIO.GetInstance().convertMidiFile())
+            File midiFile = FileIO.GetInstance().openMidiFile();
+
+            if (midiFile == null)
                 return;
+
+            String result = MidiConverter.GetInstance().converterToMui(midiFile);
+
+            if(result.equals("转换过程中出现错误，所选取文件为不支持的midi文件")) {
+                mainWindow.outputTextArea.setText("转换过程中出现错误，所选取文件为不支持的midi文件");
+                mainWindow.outputTextRadioMenuItem.doClick();
+                return;
+            }
+
+            FileIO.GetInstance().setWritingInputText(true);
+            mainWindow.inputTextPane.setText(result);
+            mainWindow.inputTextPane.setCaretPosition(0);
+            FileIO.GetInstance().setWritingInputText(false);
+            InputTexts.GetInstance().refreshColor();
+
+            Status.SetCurrentStatus(Status.NEW_FILE);
 
             mainWindow.outputTextArea.setText("");
             mainWindow.playBtn.setText("▶");
