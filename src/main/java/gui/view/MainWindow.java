@@ -40,11 +40,15 @@ public class MainWindow extends JFrame {
 
         // 初始化钢琴卷帘组件
         PianorollCanvas.Setup();
-        NmnCanvas.Setup();
 
         // 钢琴卷帘组件加入到窗口
         layeredPane.add(PianorollCanvas.GetGlcanvas(), new Integer(100));
-        layeredPane.add(NmnCanvas.GetGlcanvas(), new Integer(200));
+
+        // 初始化简谱转换器
+        NmnCanvas.Setup();
+
+        // 简谱转换器加入到窗口
+        layeredPane.add(NmnCanvas.GetGlcanvas(), new Integer(100));
 
         // 行号与滚动条
         StringBuilder lineStr = new StringBuilder();

@@ -75,10 +75,6 @@ public class NmnCanvas implements GLEventListener {
 
         //绘制
         nmnRenderer.drawNmn(gl, nmnProgram);
-
-
-
-
     }
 
     @Override

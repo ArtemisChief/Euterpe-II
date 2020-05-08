@@ -1,5 +1,6 @@
 package gui.controller;
 
+import converter.component.NmnCanvas;
 import gui.view.MainWindow;
 import midiplayer.MidiPlayer;
 import gui.entity.Status;
@@ -429,7 +430,7 @@ public class Menus {
 
         // 打开简谱面板
         mainWindow.nmnRadioMenuItem.addActionListener(e -> {
-
+            mainWindow.layeredPane.moveToFront(NmnCanvas.GetGlcanvas());
         });
 
         // 打开乐器菜单
