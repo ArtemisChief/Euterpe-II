@@ -1,6 +1,7 @@
 package converter.entity;
 
-public class NmnNote {
+public class NmnNote{
+    //基本信息
     private int pitch;//音高
     private int time;//音符时值1、2、4、8、16、32
     private int dotNum;
@@ -11,12 +12,12 @@ public class NmnNote {
         this.time = time;
         this.dotNum = dotNum;
     }
+    public void setPitch(int pitch){
+        this.pitch = pitch;
+    }
 
     public int getPitch(){
         return pitch;
-    }
-    public void setPitch(int pitch){
-        this.pitch = pitch;
     }
     public int getTime(){
         return time;

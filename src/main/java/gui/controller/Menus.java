@@ -1,6 +1,7 @@
 package gui.controller;
 
 import converter.component.NmnCanvas;
+import converter.component.NmnConverter;
 import gui.view.MainWindow;
 import midiplayer.MidiPlayer;
 import gui.entity.Status;
@@ -410,7 +411,16 @@ public class Menus {
 
         // 转换Mui到简谱
         mainWindow.convertToNmnMenuItem.addActionListener(e -> {
+            File file = FileIO.GetInstance().openMidiFile();
 
+            if (file == null)
+                return;
+            //录入MIDI文件
+            NmnCanvas.GetInstance().setMidiFile(file);
+            //NmnConverter.GetInstance().loadMidiFile(file);
+            //设置节拍
+            String beat = "3/4";
+            NmnConverter.GetInstance().setSection(beat);
         });
 
         // 打开钢琴卷帘面板

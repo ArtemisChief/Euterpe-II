@@ -5,8 +5,10 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import converter.component.renderer.NmnRenderer;
+import gui.controller.FileIO;
 import uno.glsl.Program;
 
+import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -15,7 +17,6 @@ import static com.jogamp.opengl.GL2ES3.GL_COLOR;
 import static com.jogamp.opengl.GL2ES3.GL_DEPTH;
 
 public class NmnCanvas implements GLEventListener {
-
     // 单例
     private static final NmnCanvas instance = new NmnCanvas();
 
@@ -28,6 +29,9 @@ public class NmnCanvas implements GLEventListener {
 
     //renderer
     private final NmnRenderer nmnRenderer;
+    //midiFile
+    private File midiFile;
+    private File currentFile;
 
     private Program nmnProgram;
 
@@ -69,6 +73,16 @@ public class NmnCanvas implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
+
+        if(currentFile == null || currentFile != midiFile){
+            currentFile = midiFile;
+            //update
+            NmnConverter.GetInstance().update(midiFile);
+            //BindBuffer
+            nmnRenderer.bindNotes(gl);
+        }
+
+
         //gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, .2f).put(1, .3f).put(2, .4f).put(3, 1f));
         gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, 1f).put(1, 1f).put(2, 1f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
@@ -89,5 +103,12 @@ public class NmnCanvas implements GLEventListener {
 
     public static GLCanvas GetGlcanvas() {
         return glcanvas;
+    }
+
+    public void setMidiFile(File midiFile){
+        this.midiFile = midiFile;
+    }
+    public NmnRenderer getNmnRenderer(){
+        return nmnRenderer;
     }
 }

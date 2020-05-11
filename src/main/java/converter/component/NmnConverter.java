@@ -1,5 +1,7 @@
 package converter.component;
 
+import converter.component.controller.NmnController;
+import converter.entity.GraphicElement;
 import converter.entity.MidiChannel;
 import converter.entity.MuiNote;
 import converter.entity.NmnNote;
@@ -17,181 +19,84 @@ import java.util.List;
 
 public class NmnConverter {
 
+    File midiFile;
+    int section = 24;
+
+    //Controller,用于更新
+    private final NmnController nmnController;
+
     private NmnConverter() {
+        nmnController = new NmnController();
     }
-
+    //单例模式
     private static final NmnConverter instance = new NmnConverter();
-
     public static NmnConverter GetInstance() {
         return instance;
     }
 
-    //MIDI文件的分辨率，代表一个四分音符占多少tick
-    private int resolution;
+    //-----加载midi文件和节拍-----
+    //节拍输入可以为字符串如“3/4”，最终转换为表示每小节含有多少个32分音符的数字，如3/4拍每小节含有24个
+    public void loadMidiFile(File midiFile){
+        this.midiFile = midiFile;
+    }
+    public File getMidiFile(){
+        return  midiFile;
+    }
+    public void setSection(int section){
+        this.section = section;
+    }
+    public void setSection(String beat){
+        try {
+            int num = Integer.parseInt(beat.substring(0, beat.indexOf("/")));
+            int noteType = Integer.parseInt(beat.substring(beat.indexOf("/")+1));
 
-    //用于保存上一个音符事件在MUI中对应的字符串
-    private MuiNote muiNote = null;
-
-    //当前播放到的时点
-    private double currentTick=0;
-
-    //最后一个尚未播放的音的持续时间
-    private double lastDuration=0;
-
-    //只保存了乐器或速度事件的MidiChannel
-    private List<MidiChannel> status;
-
-      private List<MuiNote> muiNoteList;
-
-    public  List<NmnNote> getNmnNoteList(File midiFile){
-        List<MuiNote> muiNoteList = getMuiNoteList(midiFile);
-        List<NmnNote> nmnNotes = new ArrayList<>();
-
-        int currentTrack = muiNoteList.get(0).getTrackNumber();
-        int currentChannel = muiNoteList.get(0).getChannelNumber();
-
-        int currentRow = 0;
-        int currentColumn = 0;
-
-        int totalPitch = 0;
-        int pitchNum = 0;
-        int currentLine = 0;
-        //int currentChannel = 0;
-        int currentSection = 0;
-        for(MuiNote muiNote:muiNoteList){
-            //如果noteNum为0，跳过这个音符
-            if(muiNote.getNoteNumbers()==0){
-                continue;
-            }
-            /*
-            if(muiNote.getTrackNumber() != currentTrack || muiNote.getChannelNumber() != currentChannel){
-                //TODO:处理多音轨
-                continue;
-            }
-            */
-
-            ////时长相当于多少个32分音符数量
-            //int time = (int)(muiNote.getDurationTicks() * 8)  / muiNote.getResolution();
-
-            if(muiNote.getNoteNumbers() == 1){
-                int time = 4;
-                int dotNum = 0;
-
-                String s = muiNote.getTimeStringPure().substring(0,1);
-                switch (s){
-                    case "1":
-                        time = 1;
-                        break;
-                    case "2":
-                        time = 2;
-                        break;
-                    case "4":
-                        time = 4;
-                        break;
-                    case "8":
-                        time = 8;
-                        break;
-                    case "g":
-                        time = 16;
-                        break;
-                    case  "w":
-                        time = 32;
-                }
-
-                //判断附点
-                if(muiNote.getTimeStringPure().length()>1){
-                    dotNum = muiNote.getTimeStringPure().length() - 1;
-                }
-
-                //添加音符
-                NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
-                nmnNotes.add(nmnNote);
-
-                //休止符不参与平均音高计算
-                if(muiNote.getPitch() != -1){
-                    totalPitch += muiNote.getPitch();
-                    pitchNum++;
-                }
+            int timePerNote = 8;
+            switch (noteType) {
+                case 1:
+                    timePerNote = 32;
+                    break;
+                case 2:
+                    timePerNote = 16;
+                    break;
+                case 4:
+                    timePerNote = 8;
+                    break;
+                case 8:
+                    timePerNote = 4;
+                    break;
+                case 16:
+                    timePerNote = 2;
+                    break;
+                case 32:
+                    timePerNote = 1;
+                    break;
             }
 
-            if(muiNote.getNoteNumbers()>1){
+            this.section = num * timePerNote;
 
-                int currentPosition = 0;
-                String timeString = muiNote.getTimeStringPure();
-                for(int i = 0; i < muiNote.getNoteNumbers();i++){
-                    int time = 4;
-                    int dotNum = 0;
-
-                    String s = muiNote.getTimeStringPure().substring(currentPosition,currentPosition + 1);
-                    switch (s){
-                        case "1":
-                            time = 1;
-                            break;
-                        case "2":
-                            time = 2;
-                            break;
-                        case "4":
-                            time = 4;
-                            break;
-                        case "8":
-                            time = 8;
-                            break;
-                        case "g":
-                            time = 16;
-                            break;
-                        case  "w":
-                            time = 32;
-                    }
-                    currentPosition++;
-
-
-                    //判断附点
-                    while(currentPosition< timeString.length()){
-                        if(timeString.substring(currentPosition, currentPosition + 1) != "*"){
-                            break;
-                        }
-                        dotNum++;
-                        currentPosition++;
-                    }
-
-                    //添加音符
-                    NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
-                    nmnNotes.add(nmnNote);
-
-                    //休止符不参与平均音高计算
-                    if(muiNote.getPitch() != -1){
-                        totalPitch += muiNote.getPitch();
-                        pitchNum++;
-                    }
-
-                }
-
-            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            this.section = 24;
         }
-
-        //处理偏移，使所有的音符平均音高在60-72之间
-        int absolute_offset = totalPitch / pitchNum - 60;
-        int offset = 0;
-        while(absolute_offset>12){
-            absolute_offset -= 12;
-            offset += 12;
-        }
-        while(absolute_offset<0){
-            absolute_offset += 12;
-            offset -= 12;
-        }
-        for(NmnNote nmnNote: nmnNotes){
-            int currentPitch = nmnNote.getPitch();
-            if(currentPitch == -1){
-                continue;
-            }
-            nmnNote.setPitch(currentPitch - offset);
-        }
-
-        return nmnNotes;
+    }
+    public int getSection(){
+        return section;
     }
 
-    public List<MuiNote> getMuiNoteList(File midiFile) {
+    //-----读取MIDI文件，转化为MuiNote序列-----
+    //MIDI文件的分辨率，代表一个四分音符占多少tick
+    private int resolution;
+    //用于保存上一个音符事件在MUI中对应的字符串
+    private MuiNote muiNote = null;
+    //当前播放到的时点
+    private double currentTick=0;
+    //最后一个尚未播放的音的持续时间
+    private double lastDuration=0;
+    //只保存了乐器或速度事件的MidiChannel
+    private List<MidiChannel> status;
+    private List<MuiNote> muiNoteList;
+
+    private List<MuiNote> getMuiNoteListFromMidi(File midiFile) {
         MidiParser parser = MidiParser.GetInstance();
         try {
 
@@ -394,6 +299,366 @@ public class NmnConverter {
         }
     }
 
+
+    //-----将MuiNote序列转化为绘图所需的NmnNote序列-----
+    //第一步，将MuiNote处理成只含有基本信息的NmnNote
+    private List<NmnNote> getNmnNoteListFromMuiNoteList(){
+        List<MuiNote> muiNoteList = getMuiNoteListFromMidi(midiFile);
+        List<NmnNote> nmnNotes = new ArrayList<>();
+
+        int totalPitch = 0;
+        int pitchNum = 0;
+
+        for(MuiNote muiNote:muiNoteList){
+            //如果noteNum为0，跳过这个音符
+            if(muiNote.getNoteNumbers()==0){
+                continue;
+            }
+
+            //muiNote中音符数为1时
+            if(muiNote.getNoteNumbers() == 1){
+                int time = 4;
+                int dotNum = 0;
+
+                String s = muiNote.getTimeStringPure().substring(0,1);
+                switch (s){
+                    case "1":
+                        time = 1;
+                        break;
+                    case "2":
+                        time = 2;
+                        break;
+                    case "4":
+                        time = 4;
+                        break;
+                    case "8":
+                        time = 8;
+                        break;
+                    case "g":
+                        time = 16;
+                        break;
+                    case  "w":
+                        time = 32;
+                }
+
+                //判断附点
+                if(muiNote.getTimeStringPure().length()>1){
+                    dotNum = muiNote.getTimeStringPure().length() - 1;
+                }
+
+                //添加音符
+                NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
+                nmnNotes.add(nmnNote);
+
+                //休止符不参与平均音高计算
+                if(muiNote.getPitch() != -1){
+                    totalPitch += muiNote.getPitch();
+                    pitchNum++;
+                }
+            }//endif（音符数为1）
+
+            //音符数大于1时
+            if(muiNote.getNoteNumbers()>1){
+
+                int currentPosition = 0;
+                String timeString = muiNote.getTimeStringPure();
+                for(int i = 0; i < muiNote.getNoteNumbers();i++){
+                    int time = 4;
+                    int dotNum = 0;
+
+                    String s = muiNote.getTimeStringPure().substring(currentPosition,currentPosition + 1);
+                    switch (s){
+                        case "1":
+                            time = 1;
+                            break;
+                        case "2":
+                            time = 2;
+                            break;
+                        case "4":
+                            time = 4;
+                            break;
+                        case "8":
+                            time = 8;
+                            break;
+                        case "g":
+                            time = 16;
+                            break;
+                        case  "w":
+                            time = 32;
+                    }
+                    currentPosition++;
+
+
+                    //判断附点
+                    while(currentPosition< timeString.length()){
+                        if(timeString.substring(currentPosition, currentPosition + 1) != "*"){
+                            break;
+                        }
+                        dotNum++;
+                        currentPosition++;
+                    }
+
+                    //添加音符
+                    NmnNote nmnNote = new NmnNote(muiNote.getPitch(), time, dotNum);
+                    nmnNotes.add(nmnNote);
+
+                    //休止符不参与平均音高计算
+                    if(muiNote.getPitch() != -1){
+                        totalPitch += muiNote.getPitch();
+                        pitchNum++;
+                    }
+
+                }//endfor（将含有多个音符的muiNote拆分为多个只含有一个音符的NmnNote）
+
+            }//endif（音符数>1）
+
+        }//endfor（遍历muiNote序列，生成nmnNote）
+
+        //处理偏移，使所有的音符平均音高在60-72之间
+        int absolute_offset = totalPitch / pitchNum - 60;
+        int offset = 0;
+        while(absolute_offset>12){
+            absolute_offset -= 12;
+            offset += 12;
+        }
+        while(absolute_offset<0){
+            absolute_offset += 12;
+            offset -= 12;
+        }
+        for(NmnNote nmnNote: nmnNotes){
+            int currentPitch = nmnNote.getPitch();
+            if(currentPitch == -1){
+                continue;
+            }
+            nmnNote.setPitch(currentPitch - offset);
+        }
+
+        //释放资源
+        muiNoteList.clear();
+        muiNoteList = null;
+
+        return nmnNotes;
+    }
+    //第二步，遍历NmnNoteList，生成绘制所需的GraphicElement序列
+    public List<GraphicElement> getNmnNoteList(){
+        List<NmnNote> nmnNoteList = getNmnNoteListFromMuiNoteList();
+        List<GraphicElement> graphicElements = new ArrayList<>();
+
+        float offsetX = 0;
+        float offsetY = 0;
+        int currentSection = 0;
+        int sectionContent = 0;
+
+        final int NORMAL_ELEMENT = 1;
+        final int UNDERLINE_ELEMENT = 2;
+        GraphicElement element;
+        for(NmnNote nmnNote: nmnNoteList){
+            offsetX += 0.05;
+            //换行操作
+            if (currentSection == 4) {
+                currentSection = 0;
+                offsetX = 0.05f;
+                offsetY -= 0.23f;
+            }
+            //-----处理音高信息-----
+            element = new GraphicElement();
+            element.setOffsetX(offsetX);
+            element.setOffsetY(offsetY);
+            element.setPicName(Integer.toString(nmnNote.getPitch()));
+            element.setShapeType(NORMAL_ELEMENT);
+
+            graphicElements.add(element);
+
+
+            //-----处理时值信息-----
+            int time = nmnNote.getTime();
+            //如果是4分音符，在后面加个空格
+            if (time == 4) {
+                String picName = " ";
+                element = new GraphicElement();
+
+                //如果是带附点的
+                if (nmnNote.getDotNum() > 0) {
+                    picName = "dot" + nmnNote.getDotNum();
+                }else {
+                    picName = "blank";
+                }
+                offsetX += 0.05;
+                element.setOffsetX(offsetX);
+                element.setOffsetY(offsetY);
+                element.setPicName(picName);
+                element.setShapeType(NORMAL_ELEMENT);
+
+                graphicElements.add(element);
+            }//endif（四分音符）
+
+            //如果是2分音符，加一个横杠
+            if (time == 2) {
+                element = new GraphicElement();
+                String picName = "rung";
+                offsetX += 0.075;
+                element.setOffsetX(offsetX);
+                element.setOffsetY(offsetY);
+                element.setPicName(picName);
+                element.setShapeType(NORMAL_ELEMENT);
+
+                graphicElements.add(element);
+
+                //如果是不带附点，插入一个空格，否则再插入一个横杠
+                // TODO：处理带两个及以上附点的情况
+                // TODO：处理跨小节情况
+                if (nmnNote.getDotNum() != 1) {
+                    picName = "blank";
+                }
+
+                element = new GraphicElement();
+                picName = "rung";
+                offsetX += 0.075;
+                element.setOffsetX(offsetX);
+                element.setOffsetY(offsetY);
+                element.setPicName(picName);
+                element.setShapeType(NORMAL_ELEMENT);
+
+                graphicElements.add(element);
+            }//endif（二分音符）
+
+            //如果是全音符
+            if (time == 1) {
+                for (int i = 0; i < 3; i++) {
+                    //TODO:处理全音符跨小节问题
+                    element = new GraphicElement();
+                    String picName = "rung";
+                    offsetX += 0.075;
+                    element.setOffsetX(offsetX);
+                    element.setOffsetY(offsetY);
+                    element.setPicName(picName);
+                    element.setShapeType(NORMAL_ELEMENT);
+                    offsetX += 0.025;
+
+                    graphicElements.add(element);
+                }
+            }//endif（全音符）
+
+            if (time > 4) {
+                element = new GraphicElement();
+                String picName = "underline" + time;
+                //offsetX不变，添加一个临时用的tempOffsetY
+                float tempOffsetY = offsetY - 0.15f;
+                element.setOffsetX(offsetX);
+                element.setOffsetY(tempOffsetY);
+                element.setPicName(picName);
+                element.setShapeType(UNDERLINE_ELEMENT);
+
+                graphicElements.add(element);
+
+                //如果是带附点的
+                if (nmnNote.getDotNum() > 0) {
+                    picName = "dot" + nmnNote.getDotNum();
+                    offsetX += 0.05;
+                    element.setOffsetX(offsetX);
+                    element.setOffsetY(offsetY);
+                    element.setPicName(picName);
+                    element.setShapeType(NORMAL_ELEMENT);
+
+                    graphicElements.add(element);
+
+                    //附点下面也要下划线
+                    element = new GraphicElement();
+                    picName = "underline" + time;
+
+                    //沿用offsetX和tempOffsetY
+                    element.setOffsetX(offsetX);
+                    element.setOffsetY(tempOffsetY);
+                    element.setPicName(picName);
+                    element.setShapeType(UNDERLINE_ELEMENT);
+
+                    graphicElements.add(element);
+                }
+
+            }//endif（8、16、32分音符）
+
+            //-----计算当前小节容量，是否开始新的小节-----
+            int tempContent = parseContent(time);
+
+            int tempDotNum = nmnNote.getDotNum();
+            while (tempDotNum > 0) {
+                sectionContent += tempContent;
+                tempContent = tempContent / 2;
+                tempDotNum--;
+            }
+            sectionContent += tempContent;
+
+            //默认3/4拍，section可设置
+            if (sectionContent >= section) {
+                currentSection++;
+                //画小节线
+                GraphicElement vBar = new GraphicElement();
+                offsetX += 0.05;
+                vBar.setOffsetX(offsetX);
+                vBar.setOffsetY(offsetY);
+                vBar.setPicName("vBar");
+                vBar.setShapeType(NORMAL_ELEMENT);
+
+                graphicElements.add(vBar);
+                //小节内容清零
+                sectionContent = 0;
+            }//endif（根据拍子话小节线）
+
+
+        }//endfor（遍历nmnNoteList,生成绘图用的graphicElements序列）
+
+        //释放资源
+        nmnNoteList.clear();
+        nmnNoteList = null;
+
+        return graphicElements;
+    }
+
+    //使用Controller更新
+    public void update(File midiFile){
+        if(midiFile == null){
+            return;
+        }
+        if(this.midiFile == null || midiFile!= this.midiFile){
+            this.midiFile = midiFile;
+            loadMidiFile(midiFile);
+
+            List<GraphicElement> graphicElements = getNmnNoteList();
+            nmnController.updateNmn(graphicElements);
+        }
+    }
+
+
+
+
+    //-----NmnNote转GraphicElement的辅助函数-----
+    private int parseContent(int noteTime) {
+        int tempContent = 0;
+        switch (noteTime) {
+            case 1:
+                tempContent = 32;
+                break;
+            case 2:
+                tempContent = 16;
+                break;
+            case 4:
+                tempContent = 8;
+                break;
+            case 8:
+                tempContent = 4;
+                break;
+            case 16:
+                tempContent = 2;
+                break;
+            case 32:
+                tempContent = 1;
+                break;
+        }
+        return tempContent;
+    }
+
+
+    //-----MIDI转MuiNote辅助函数-----
     //获取MuiNote的函数，按音符事件的音高和持续事件对应得到在mui乐谱中旋律的字符串和节奏的字符串
     private MuiNote getMuiNote(int pitch, double durationTicks,int trackNumber,int channelNumber,long triggerTick) {
         int noteNumbers = 0;
@@ -480,7 +745,6 @@ public class NmnConverter {
         return temp;
     }
 
-
     //获取MuiNote的函数，按音符事件的音高和持续事件对应得到在mui乐谱中旋律的字符串和节奏的字符串
     //针对非同时音的版本，即可以用连音来拼接时值
     private MuiNote getMaxMuiNote(int pitch, double durationTicks,int trackNumber,int channelNumber,long triggerTick) {
@@ -558,8 +822,6 @@ public class NmnConverter {
         return temp;
     }
 
-
-
     //对从MIDI解析器获得的按音轨分组保存的事件进行按通道再分组的函数
     private List<MidiChannel> sortMidiChannel(List<MidiTrack> midiTracks) {
         List<MidiChannel> midiChannels = new ArrayList<>();
@@ -624,7 +886,6 @@ public class NmnConverter {
         }
         return midiChannels;
     }
-
 
     //需要进行乐谱属性语句添加时，将未添加的音符或音乐句子添加到mui乐谱中的函数
     //内部逻辑和进行音符添加时差不多，主要就是怎么补对应的休止符让最后一个音符播完后的时间是目前乐谱属性语句对应的事件的开始时间
