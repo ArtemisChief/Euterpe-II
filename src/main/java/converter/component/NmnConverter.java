@@ -447,11 +447,23 @@ public class NmnConverter {
         float offsetX = 0;
         float offsetY = 0;
         int currentSection = 0;
-        int sectionContent = 0;
+        int sectionContentLeft = section;
 
+        final int TONALITY_ELEMENT = 0;
         final int NORMAL_ELEMENT = 1;
         final int UNDERLINE_ELEMENT = 2;
         GraphicElement element;
+
+        //添加调号（1=C）
+        element = new GraphicElement();
+        element.setOffsetX(offsetX);
+        element.setOffsetY(offsetY);
+        element.setPicName("tonality");
+        element.setShapeType(TONALITY_ELEMENT);
+
+        graphicElements.add(element);
+
+
         for(NmnNote nmnNote: nmnNoteList){
             offsetX += 0.05;
             //换行操作
@@ -460,6 +472,52 @@ public class NmnConverter {
                 offsetX = 0.05f;
                 offsetY -= 0.23f;
             }
+
+            //-----计算当前小节剩余容量，用于判断是否开始新的小节-----
+            int time = nmnNote.getTime();
+            //获取此音符的容量
+            int basicContent = parseContent(time);
+            int totalContent = basicContent;
+
+            //判断附点数量情况
+            int tempDotNum = nmnNote.getDotNum();
+            while (tempDotNum > 0) {
+                basicContent = basicContent / 2;
+                totalContent += basicContent;
+                tempDotNum--;
+            }
+
+            /*
+            //处理跨小节
+            while(totalContent >= sectionContentLeft){
+                //一个小节剩余的容量肯定是一个整音符的
+                //生成该音符
+
+                //生成小节线
+
+                //修改数值，开始新的小节
+                totalContent -= sectionContentLeft;
+                sectionContentLeft = section;
+                currentSection++;
+                //换行操作
+                if (currentSection == 4) {
+                    currentSection = 0;
+                    offsetX = 0.05f;
+                    offsetY -= 0.23f;
+                }
+
+                //继续下一轮循环，直到该音符剩下的时长小于一个小节
+            }
+            //如果剩余时长不为零（这时正处于一个新的小节的开头，其一定是小于），绘制剩下的那一部分音符
+            if(totalContent>0){
+                //生成该音符
+
+
+            }
+            */
+            sectionContentLeft -= totalContent;
+
+
             //-----处理音高信息-----
             element = new GraphicElement();
             element.setOffsetX(offsetX);
@@ -471,7 +529,6 @@ public class NmnConverter {
 
 
             //-----处理时值信息-----
-            int time = nmnNote.getTime();
             //如果是4分音符，在后面加个空格
             if (time == 4) {
                 String picName = " ";
@@ -576,19 +633,11 @@ public class NmnConverter {
 
             }//endif（8、16、32分音符）
 
-            //-----计算当前小节容量，是否开始新的小节-----
-            int tempContent = parseContent(time);
 
-            int tempDotNum = nmnNote.getDotNum();
-            while (tempDotNum > 0) {
-                sectionContent += tempContent;
-                tempContent = tempContent / 2;
-                tempDotNum--;
-            }
-            sectionContent += tempContent;
 
+            //-----绘制小节线-----
             //默认3/4拍，section可设置
-            if (sectionContent >= section) {
+            if (sectionContentLeft <= 0) {
                 currentSection++;
                 //画小节线
                 GraphicElement vBar = new GraphicElement();
@@ -600,7 +649,7 @@ public class NmnConverter {
 
                 graphicElements.add(vBar);
                 //小节内容清零
-                sectionContent = 0;
+                sectionContentLeft = section;
             }//endif（根据拍子话小节线）
 
 
@@ -655,7 +704,20 @@ public class NmnConverter {
         }
         return tempContent;
     }
+/*
+    private void processNote(List<GraphicElement> graphicElements, int pitch, int content){
+        GraphicElement element;
+        //-----处理音高信息-----
+        element = new GraphicElement();
+        element.setOffsetX(offsetX);
+        element.setOffsetY(offsetY);
+        element.setPicName(Integer.toString(nmnNote.getPitch()));
+        element.setShapeType(NORMAL_ELEMENT);
 
+        graphicElements.add(element);
+
+    }
+*/
 
     //-----MIDI转MuiNote辅助函数-----
     //获取MuiNote的函数，按音符事件的音高和持续事件对应得到在mui乐谱中旋律的字符串和节奏的字符串
