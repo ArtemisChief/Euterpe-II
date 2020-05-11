@@ -507,12 +507,11 @@ public class NmnConverter {
                 //如果是不带附点，插入一个空格，否则再插入一个横杠
                 // TODO：处理带两个及以上附点的情况
                 // TODO：处理跨小节情况
-                if (nmnNote.getDotNum() != 1) {
+                if (nmnNote.getDotNum() == 0) {
                     picName = "blank";
                 }
 
                 element = new GraphicElement();
-                picName = "rung";
                 offsetX += 0.075;
                 element.setOffsetX(offsetX);
                 element.setOffsetY(offsetY);
