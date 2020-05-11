@@ -1,11 +1,9 @@
 package gui.controller;
 
-import converter.component.MidiConverter;
 import gui.view.MainWindow;
 import midibuilder.component.MidiFileBuilder;
 import midiplayer.MidiPlayer;
 import gui.entity.Status;
-import pianoroll.component.Pianoroll;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -26,14 +24,14 @@ public class FileIO {
 
     private File file;
 
-    private boolean isOpeningFile;
+    private boolean isWritingInputText;
 
     private FileIO() {
         mainWindow = MainWindow.GetInstance();
 
         tempMidiFile = null;
         file = null;
-        isOpeningFile = false;
+        isWritingInputText = false;
     }
 
     public boolean openMuiFile() {
@@ -62,10 +60,10 @@ public class FileIO {
 
                 bufferedReader.close();
 
-                isOpeningFile=true;
+                isWritingInputText = true;
                 mainWindow.inputTextPane.setText(stringBuilder.toString());
                 mainWindow.inputTextPane.setCaretPosition(0);
-                isOpeningFile=false;
+                isWritingInputText = false;
 
                 InputTexts.GetInstance().refreshColor();
 
@@ -174,46 +172,13 @@ public class FileIO {
     public void loadSoundFont() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("SoundFont File", "sf2","sf3");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("SoundFont File", "sf2", "sf3");
         fileChooser.setFileFilter(filter);
         int value = fileChooser.showOpenDialog(mainWindow);
         if (value == JFileChooser.CANCEL_OPTION)
             return;
         File soundFontFile = fileChooser.getSelectedFile();
         MidiPlayer.GetInstance().loadSoundBank(soundFontFile);
-    }
-
-    public boolean convertMidiFile() {
-        if (Status.GetCurrentStatus().getIsEdited())
-            if (!Diaglogs.GetInstance().askSaving())
-                return false;
-
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Midi File", "mid");
-        fileChooser.setFileFilter(filter);
-        int value = fileChooser.showOpenDialog(mainWindow);
-        if (value == JFileChooser.CANCEL_OPTION)
-            return false;
-        File midiFile = fileChooser.getSelectedFile();
-
-        String result = MidiConverter.GetInstance().converterToMui(midiFile);
-
-        if(result.equals("转换过程中出现错误，所选取文件为不支持的midi文件")) {
-            mainWindow.outputTextArea.setText("转换过程中出现错误，所选取文件为不支持的midi文件");
-            mainWindow.outputTextRadioMenuItem.doClick();
-            return false;
-        }
-
-        isOpeningFile=true;
-        mainWindow.inputTextPane.setText(result);
-        mainWindow.inputTextPane.setCaretPosition(0);
-        isOpeningFile=false;
-        InputTexts.GetInstance().refreshColor();
-
-        Status.SetCurrentStatus(Status.NEW_FILE);
-
-        return true;
     }
 
     public File openMidiFile() {
@@ -237,8 +202,12 @@ public class FileIO {
         return tempMidiFile;
     }
 
-    public boolean isOpeningFile() {
-        return isOpeningFile;
+    public boolean isWritingInputText() {
+        return isWritingInputText;
+    }
+
+    public void setWritingInputText(boolean writingInputText) {
+        isWritingInputText = writingInputText;
     }
 
 }
