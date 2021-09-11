@@ -6,6 +6,8 @@ Simple editor and Midi player for a original designed music language, which supp
 
 Introduction in Chinese: [Click Here](https://lab-ch76.top/2019/02/euterpe/)
 
+![demo](https://github.com/ArtemisChief/Euterpe-II/blob/master/img/demo.png?raw=true)
+
 ## Example
 
 Run this
