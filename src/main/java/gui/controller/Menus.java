@@ -438,7 +438,7 @@ public class Menus {
             NmnCanvas.GetInstance().setMidiFile(file);
             //NmnConverter.GetInstance().loadMidiFile(file);
             //设置节拍
-            String beat = "4/4";
+            String beat = "3/4";
             NmnConverter.GetInstance().setSection(beat);
         });
 

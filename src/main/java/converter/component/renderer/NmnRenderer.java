@@ -21,6 +21,7 @@ import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
 import static uno.buffer.UtilKt.destroyBuffers;
+import com.jogamp.opengl.util.texture.TextureData;
 
 public class NmnRenderer {
     private IntBuffer VBO;
@@ -134,7 +135,7 @@ public class NmnRenderer {
 
                         //加载图片
                         try {
-                            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), new File("src/main/resources/symbols/" + element.getPicName() + ".jpg"), false, "JPG");
+                            TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), this.getClass().getResource("/symbols/" + element.getPicName() + ".jpg"), false, "JPG");
                             if (textureData != null) {
                                 //System.out.println(textureData.getHeight());
                                 gl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData.getWidth(), textureData.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureData.getBuffer());
